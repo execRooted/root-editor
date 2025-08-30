@@ -1,6 +1,6 @@
-# Root-Editor
+# root-editor
 
-A powerful, terminal-based text editor written in C using ncurses. Designed for efficient text editing with a focus on reliability and user experience.
+A terminal-based text editor written in C using ncurses. Designed for efficient text editing with a focus on reliability and user experience.
 
 ## Features
 
