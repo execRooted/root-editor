@@ -482,12 +482,12 @@ void render_help_screen(EditorState * state) {
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+A        - Select all");
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+X        - Cut selected text");
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+Shift+C  - Copy to system clipboard");
-        if (line < max_help_line) mvprintw(line++, 2, "Ctrl+C        - Copy to editor clipboard");
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+Shift+V  - Paste from clipboard");
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+Z        - Undo last line addition");
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+Y        - Redo");
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+F        - Find");
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+L        - Jump to line");
+        if (line < max_help_line) mvprintw(line++, 2, "Ctrl+M        - Make a new line");
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+H        - Toggle this help");
 
         line += 2;

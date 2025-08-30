@@ -1,8 +1,6 @@
 #include "editor.h"
 
 void highlight_line(EditorState* state, int line_num, int screen_row, int line_num_width);
-void highlight_syntax_errors(EditorState* state, int line_num, int screen_row, int line_num_width);
-void detect_syntax_errors(EditorState* state);
 
 void find_all_occurrences(EditorState * state,
         const char * search_term);
@@ -14,7 +12,6 @@ void replace_text_simple(EditorState * state,
                 const char * replace_term);
 
 void render_screen(EditorState * state) {
-
         erase();
 
         int max_y, max_x;
@@ -38,7 +35,6 @@ void render_screen(EditorState * state) {
         const int end_line = (start_line + max_y - 4 > state -> line_count) ?
                 state -> line_count : start_line + max_y - 4;
 
-        const int max_line_display = max_x - line_num_width - 1;
 
         char ** lines = state -> lines;
 
@@ -73,7 +69,6 @@ void render_screen(EditorState * state) {
                         }
                 } else {
                         highlight_line(state, i, screen_row, line_num_width);
-                        highlight_syntax_errors(state, i, screen_row, line_num_width);
                 }
         }
 

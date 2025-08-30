@@ -130,7 +130,6 @@ void highlight_line(EditorState* state, int line_num, int screen_row, int line_n
 int is_keyword(const char* word, EditorState* state);
 int is_number(const char* token);
 void free_syntax_data(EditorState* state);
-void detect_syntax_errors(EditorState* state);
-void highlight_syntax_errors(EditorState* state, int line_num, int screen_row, int line_num_width);
+
 
 #endif

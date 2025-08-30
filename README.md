@@ -21,8 +21,23 @@ A powerful, terminal-based text editor written in C using ncurses. Designed for 
 ### Quick Install (Recommended)
 
 1. Clone or download the repository
+
+```
+git clone https://guthub.com/execRooted/root-editor.git
+```
+
+
 2. Navigate to the project directory
+
+```
+cd root-editor
+```
+
 3. Run the installer with root privileges:
+
+```
+chmod +x installer.sh
+```
 
 ```bash
 sudo ./install.sh
@@ -40,17 +55,22 @@ The installer will:
 If you prefer manual installation:
 
 1. Install dependencies:
+
+
+    ##### Ubuntu/Debian
     ```bash
-    # Ubuntu/Debian
     sudo apt-get install gcc cmake make libncurses5-dev libncursesw5-dev
-
-    # CentOS/RHEL/Fedora
+    ```
+    ##### CentOS/RHEL/Fedora
+    ```
     sudo yum install gcc cmake make ncurses-devel  # or dnf
-
-    # Arch Linux
+    ```
+    ##### Arch Linux
+    ```
     sudo pacman -S gcc cmake make ncurses
-
-    # openSUSE
+    ```
+    ##### openSUSE
+    ```
     sudo zypper install gcc cmake make ncurses-devel
     ```
 
@@ -62,6 +82,8 @@ If you prefer manual installation:
 3. Install manually:
     ```bash
     sudo cp editor /usr/local/bin/root-editor
+    ```
+    ```
     sudo chmod 755 /usr/local/bin/root-editor
     ```
 
@@ -69,14 +91,19 @@ If you prefer manual installation:
 
 ### Basic Usage
 
+
+ ###### Launch
 ```bash
-# Launch editor
 root-editor
-
-# Open a file
+```
+ 
+ ###### Open a file
+```
 root-editor filename.txt
+```
 
-# Using the alias
+##### Using the alias
+```
 re filename.txt
 ```
 
@@ -88,13 +115,13 @@ Ctrl+Q        - Quit
 Ctrl+S        - Save file
 Ctrl+A        - Select all
 Ctrl+X        - Cut selected text
-Ctrl+Shift+C  - Copy to system clipboard
-Ctrl+C        - Copy to editor clipboard
+Ctrl+Shift+C  - Copy to clipboard
 Ctrl+Shift+V  - Paste from clipboard
 Ctrl+Z        - Undo last line addition
 Ctrl+Y        - Redo
 Ctrl+F        - Find
 Ctrl+L        - Jump to line
+Ctrl+M        - Make new line
 Ctrl+H        - Toggle this help
 
 
@@ -129,18 +156,26 @@ Files are created automatically if they don't exist
 
 To build from source manually:
 
+
+##### Clone the repository
 ```bash
-# Clone the repository
 git clone <repository-url>
 cd root-editor
+```
 
-# Build
+
+##### Build
+```
 make
+```
 
-# Clean build files
+##### Clean build files
+```
 make clean
+```
 
-# Run
+##### Run
+```
 ./editor
 ```
 
@@ -176,22 +211,16 @@ The editor includes several configurable options:
   - 🟣 **Constants**: true, false, NULL, None (Magenta)
   - 🔴 **Preprocessor/Special**: #include, #define, using, etc. (Red)
 
-- **Real-time Error Detection**: Automatic syntax error highlighting
-  - 🔴 **Unmatched brackets**: {, }, (, ), [, ]
-  - 🔴 **Missing semicolons** (C/C++/C#/Rust)
-  - 🔴 **Missing colons** (Python)
-  - 🔴 **Double semicolons**
-  - Errors update every 2 seconds automatically
 - **Word Wrap**: Toggle word wrapping on/off
+
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Permission Denied**: Make sure to run the installer with `sudo`
-2. **Missing Dependencies**: Run `sudo ./install.sh` to auto-install dependencies
-3. **Terminal Colors**: Ensure your terminal supports colors
-4. **Clipboard Issues**: Install `xclip`, `wl-clipboard`, or `xsel` for system clipboard
+1. **Missing Dependencies**: Run `sudo ./install.sh` to auto-install dependencies
+2. **Terminal Colors**: Ensure your terminal supports colors
+3. **Clipboard Issues**: Install `xclip`, `wl-clipboard`, or `xsel` for system clipboard
 
 ### Emergency Recovery
 
@@ -207,18 +236,15 @@ Contributions are welcome! Please:
 4. Test thoroughly
 5. Submit a pull request
 
-## License
-
-This project is open source. Please check the license file for details.
-
 ## Support
 
 For issues, questions, or contributions:
 
 - Create an issue on GitHub
-- Check the built-in help (`F1` in the editor)
+- Check the built-in help (`F1` or `Ctrl+H` in the editor)
 - Review the source code for implementation details
 
 ---
 
-**Root-Editor** - Efficient terminal-based text editing for power users.
+
+**Root-Editor** - ***Made by execRooted***

@@ -4,6 +4,7 @@ LIBS = -lncurses
 OBJS = main.o editor.o file_io.o input_handling.o rendering.o selection.o syntax.o
 TARGET = editor
 
+
 all: $(TARGET)
 
 $(TARGET): $(OBJS)

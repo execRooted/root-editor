@@ -23,7 +23,7 @@ check_root() {
         echo "Please enter your password to continue with uninstallation:"
         echo
 
-        # Try to authenticate with sudo
+        
         if sudo -v 2>/dev/null; then
             print_success "Authentication successful - proceeding with uninstallation"
             return 0
@@ -193,4 +193,5 @@ main() {
         exit 1
     fi
 }
+
 main "$@"
