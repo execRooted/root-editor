@@ -1,0 +1,195 @@
+#include "editor.h"
+#include <string.h>
+#include <stdlib.h>
+
+void select_all(EditorState * state) {
+        if (state -> line_count == 0) return;
+
+        state -> select_mode = 1;
+        state -> select_start_x = 0;
+        state -> select_start_y = 0;
+        state -> select_end_x = strlen(state -> lines[state -> line_count - 1]);
+        state -> select_end_y = state -> line_count - 1;
+        state -> cursor_x = state -> select_end_x;
+        state -> cursor_y = state -> select_end_y;
+        show_status(state, "All text selected");
+}
+
+void copy_selected_text(EditorState * state) {
+        if (!state -> select_mode) {
+                show_status(state, "No text selected");
+                return;
+        }
+
+        int start_y = state -> select_start_y;
+        int end_y = state -> select_end_y;
+        int start_x = state -> select_start_x;
+        int end_x = state -> select_end_x;
+
+        size_t total_length = 0;
+        for (int i = start_y; i <= end_y; i++) {
+                int line_len = strlen(state -> lines[i]);
+                int line_start = (i == start_y) ? start_x : 0;
+                int line_end = (i == end_y) ? end_x : line_len;
+                total_length += (line_end - line_start);
+                if (i < end_y) total_length++;
+        }
+
+        if (total_length >= MAX_LINE_LENGTH) {
+                show_status(state, "Selection too large for clipboard");
+                return;
+        }
+
+        char * clipboard = malloc(total_length + 1);
+        if (!clipboard) return;
+        int pos = 0;
+        for (int i = start_y; i <= end_y; i++) {
+                int line_len = strlen(state -> lines[i]);
+                int line_start = (i == start_y) ? start_x : 0;
+                int line_end = (i == end_y) ? end_x : line_len;
+                int copy_len = line_end - line_start;
+
+                if (copy_len > 0) {
+                        strncpy(clipboard + pos, state -> lines[i] + line_start, copy_len);
+                        pos += copy_len;
+                }
+
+                if (i < end_y) {
+                        clipboard[pos++] = '\n';
+                }
+        }
+        clipboard[pos] = '\0';
+
+        copy_to_system_clipboard(clipboard);
+        free(clipboard);
+
+        show_status(state, "Selection copied to clipboard");
+}
+
+void clear_selection(EditorState * state) {
+        state -> select_mode = 0;
+        state -> select_start_x = 0;
+        state -> select_start_y = 0;
+        state -> select_end_x = 0;
+        state -> select_end_y = 0;
+}
+
+void start_selection(EditorState * state) {
+        state -> select_mode = 1;
+        state -> select_start_x = state -> cursor_x;
+        state -> select_start_y = state -> cursor_y;
+        state -> select_end_x = state -> cursor_x;
+        state -> select_end_y = state -> cursor_y;
+}
+
+void extend_selection(EditorState * state) {
+        if (state -> select_mode) {
+                state -> select_end_x = state -> cursor_x;
+                state -> select_end_y = state -> cursor_y;
+
+                if (state -> select_start_y > state -> select_end_y ||
+                        (state -> select_start_y == state -> select_end_y &&
+                                state -> select_start_x > state -> select_end_x)) {
+                        int temp_x = state -> select_start_x;
+                        int temp_y = state -> select_start_y;
+                        state -> select_start_x = state -> select_end_x;
+                        state -> select_start_y = state -> select_end_y;
+                        state -> select_end_x = temp_x;
+                        state -> select_end_y = temp_y;
+                }
+        }
+}
+
+int has_selection(EditorState * state) {
+        return state -> select_mode &&
+                (state -> select_start_y != state -> select_end_y ||
+                        state -> select_start_x != state -> select_end_x);
+}
+
+char * get_selected_text(EditorState * state) {
+        if (!has_selection(state)) return NULL;
+
+        int start_y = state -> select_start_y;
+        int end_y = state -> select_end_y;
+        int start_x = state -> select_start_x;
+        int end_x = state -> select_end_x;
+
+        size_t total_length = 0;
+        for (int i = start_y; i <= end_y; i++) {
+                int line_len = strlen(state -> lines[i]);
+                int line_start = (i == start_y) ? start_x : 0;
+                int line_end = (i == end_y) ? end_x : line_len;
+                total_length += (line_end - line_start);
+                if (i < end_y) total_length++;
+        }
+
+        char * selected_text = malloc(total_length + 1);
+        if (!selected_text) return NULL;
+        int pos = 0;
+        for (int i = start_y; i <= end_y; i++) {
+                int line_len = strlen(state -> lines[i]);
+                int line_start = (i == start_y) ? start_x : 0;
+                int line_end = (i == end_y) ? end_x : line_len;
+                int copy_len = line_end - line_start;
+
+                if (copy_len > 0) {
+                        strncpy(selected_text + pos, state -> lines[i] + line_start, copy_len);
+                        pos += copy_len;
+                }
+
+                if (i < end_y) {
+                        selected_text[pos++] = '\n';
+                }
+        }
+        selected_text[pos] = '\0';
+
+        return selected_text;
+}
+
+void delete_selected_text(EditorState * state) {
+        if (!has_selection(state)) return;
+
+        save_undo_state(state);
+
+        int start_y = state -> select_start_y;
+        int end_y = state -> select_end_y;
+        int start_x = state -> select_start_x;
+        int end_x = state -> select_end_x;
+
+        if (start_y == end_y) {
+                char * line = state -> lines[start_y];
+                memmove( & line[start_x], & line[end_x], strlen(line) - end_x + 1);
+                state -> cursor_x = start_x;
+                state -> cursor_y = start_y;
+        } else {
+                char * first_line = state -> lines[start_y];
+                first_line[start_x] = '\0';
+
+                char * last_line = state -> lines[end_y];
+                char * remaining_text = (char * ) malloc(MAX_LINE_LENGTH);
+                if (!remaining_text) return;
+                strcpy(remaining_text, & last_line[end_x]);
+
+                int lines_to_remove = end_y - start_y;
+                for (int i = start_y + 1; i <= end_y; i++) {
+                        free(state -> lines[i]);
+                }
+
+                for (int i = start_y + 1; i < state -> line_count - lines_to_remove; i++) {
+                        state -> lines[i] = state -> lines[i + lines_to_remove];
+                }
+
+                state -> line_count -= lines_to_remove;
+
+                if (strlen(first_line) + strlen(remaining_text) < MAX_LINE_LENGTH) {
+                        strcat(first_line, remaining_text);
+                }
+
+                state -> cursor_x = start_x;
+                state -> cursor_y = start_y;
+                free(remaining_text);
+        }
+
+        state -> dirty = 1;
+        clear_selection(state);
+}

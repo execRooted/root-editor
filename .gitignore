@@ -1,0 +1,91 @@
+# Compiled binaries
+editor
+root-editor
+re
+
+# Object files
+*.o
+
+# Build artifacts
+*.a
+*.so
+*.dylib
+*.dll
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Autosave files
+*.autosave
+
+# Emergency save files
+*.emergency
+
+# Log files
+*.log
+
+# Core dumps
+core
+core.*
+
+# Build directories
+build/
+dist/
+bin/
+
+# Archive files
+*.tar.gz
+*.zip
+*.rar
+*.7z
+
+# Package files
+*.deb
+*.rpm
+*.pkg
+
+# Text editor specific
+*.txt
+*.md.bak
+
+# C/C++ specific
+*.i
+*.s
+
+# Dependency directories
+node_modules/
+vendor/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Configuration files that might contain sensitive data
+config.local.*
+secrets.*
