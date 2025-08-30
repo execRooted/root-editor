@@ -507,6 +507,7 @@ void render_help_screen(EditorState * state) {
 
         line += 2;
         if (line < max_help_line) mvprintw(line++, 2, "Navigation:");
+        if (line < max_help_line) mvprintw(line++, 2, "Home/End      - Move to start or end of the line");
         if (line < max_help_line) mvprintw(line++, 2, "Arrow Keys    - Move cursor");
         if (line < max_help_line) mvprintw(line++, 2, "Backspace     - Delete character");
         if (line < max_help_line) mvprintw(line++, 2, "Enter         - New line");
