@@ -24,9 +24,6 @@ void init_editor(EditorState * state) {
         state -> select_end_y = 0;
         state -> show_help = 0;
         state -> needs_sudo = 0;
-        state -> autosave_enabled = 0;
-        state -> autosave_interval = 300;
-        state -> last_save_time = time(NULL);
 
         memset(state -> key_states, 0, sizeof(state -> key_states));
         memset(state -> key_timestamps, 0, sizeof(state -> key_timestamps));
@@ -115,7 +112,6 @@ void new_line(EditorState * state) {
         int old_cursor_y = state -> cursor_y;
         int old_line_count = state -> line_count;
 
-        // Normal splitting
         char * line = state -> lines[state -> cursor_y];
 
         char * new_line = (char * ) malloc(MAX_LINE_LENGTH);
@@ -379,6 +375,8 @@ void copy_to_system_clipboard(const char * text) {
                 if (system(command) == 0) {
                         success = 1;
                 }
+                snprintf(command, sizeof(command), "echo '%s' | xclip -selection primary", text);
+                system(command);
         }
 
         if (!success && system("which wl-copy >/dev/null 2>&1") == 0) {
@@ -524,7 +522,6 @@ void render_help_screen(EditorState * state) {
         if (line < max_help_line) mvprintw(line++, 2, "F8            - Paste editor clipboard line");
         if (line < max_help_line) mvprintw(line++, 2, "F9            - Undo");
         if (line < max_help_line) mvprintw(line++, 2, "F10           - Redo");
-        if (line < max_help_line) mvprintw(line++, 2, "F11           - Toggle autosave");
         if (line < max_help_line) mvprintw(line++, 2, "F12           - Toggle enhanced syntax highlighting");
 
         line += 2;
@@ -558,37 +555,7 @@ void render_help_screen(EditorState * state) {
         state -> show_help = 0;
 }
 
-void autosave_check(EditorState * state) {
-        if (!state -> autosave_enabled || !state -> dirty || state -> filename[0] == '\0') {
-                return;
-        }
 
-        time_t current_time = time(NULL);
-        if (current_time - state -> last_save_time >= state -> autosave_interval) {
-
-                char autosave_path[256];
-                snprintf(autosave_path, sizeof(autosave_path), "%s.autosave", state -> filename);
-
-                FILE * autosave_file = fopen(autosave_path, "w");
-                if (autosave_file) {
-                        for (int i = 0; i < state -> line_count; i++) {
-                                fprintf(autosave_file, "%s\n", state -> lines[i]);
-                        }
-                        fclose(autosave_file);
-                        state -> last_save_time = current_time;
-                }
-        }
-}
-
-void toggle_autosave(EditorState * state) {
-        state -> autosave_enabled = !state -> autosave_enabled;
-        if (state -> autosave_enabled) {
-                state -> last_save_time = time(NULL);
-                show_status(state, "Autosave enabled (5min intervals)");
-        } else {
-                show_status(state, "Autosave disabled");
-        }
-}
 
 void toggle_syntax_highlighting(EditorState * state) {
         state -> syntax_enabled = !state -> syntax_enabled;

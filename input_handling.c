@@ -6,7 +6,20 @@
 void delete_current_line(EditorState * state);
 
 char * get_system_clipboard() {
-    FILE * fp = popen("xclip -selection clipboard -o 2>/dev/null", "r");
+    FILE * fp;
+
+    fp = popen("xclip -selection clipboard -o 2>/dev/null", "r");
+    if (fp) {
+        char buffer[1024 * 1024];
+        size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp);
+        pclose(fp);
+        if (len > 0) {
+            buffer[len] = '\0';
+            return strdup(buffer);
+        }
+    }
+
+    fp = popen("xclip -selection primary -o 2>/dev/null", "r");
     if (fp) {
         char buffer[1024 * 1024];
         size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp);
@@ -29,6 +42,17 @@ char * get_system_clipboard() {
     }
 
     fp = popen("xsel --clipboard --output 2>/dev/null", "r");
+    if (fp) {
+        char buffer[1024 * 1024];
+        size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp);
+        pclose(fp);
+        if (len > 0) {
+            buffer[len] = '\0';
+            return strdup(buffer);
+        }
+    }
+
+    fp = popen("xsel --primary --output 2>/dev/null", "r");
     if (fp) {
         char buffer[1024 * 1024];
         size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp);
@@ -157,9 +181,6 @@ void handle_input(EditorState * state, int ch) {
                         redo(state);
                         mark_key_processed(state, KEY_F(10));
                 }
-                break;
-        case KEY_F(11):
-                toggle_autosave(state);
                 break;
         case KEY_F(12):
                 toggle_syntax_highlighting(state);
@@ -348,30 +369,19 @@ void paste_text(EditorState * state) {
         }
 
         char * clipboard_content = get_system_clipboard();
-        if (!clipboard_content) {
+        if (!clipboard_content || strlen(clipboard_content) == 0) {
+                if (clipboard_content) free(clipboard_content);
                 show_status(state, "No content to paste");
                 return;
         }
 
-        if (!clipboard_content || strlen(clipboard_content) == 0) {
-                if (clipboard_content) free(clipboard_content);
-                clipboard_content = NULL;
-        }
-
-        if (clipboard_content) {
-                size_t len = strlen(clipboard_content);
-                while (len > 0 && (clipboard_content[len - 1] == '\n' || clipboard_content[len - 1] == '\r')) {
-                        clipboard_content[len - 1] = '\0';
-                        len--;
-                }
+        size_t len = strlen(clipboard_content);
+        while (len > 0 && (clipboard_content[len - 1] == '\n' || clipboard_content[len - 1] == '\r')) {
+                clipboard_content[len - 1] = '\0';
+                len--;
         }
 
         if (clipboard_content && strlen(clipboard_content) > 0) {
-                if (strstr(clipboard_content, "bash:") || strstr(clipboard_content, "[rooted@execRooted")) {
-                        show_status(state, "Cannot paste terminal output");
-                        free(clipboard_content);
-                        return;
-                }
                 save_undo_state(state);
 
                 if (state -> cursor_x > (int) strlen(state -> lines[state -> cursor_y])) {

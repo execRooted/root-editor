@@ -192,13 +192,11 @@ void delete_selected_text(EditorState * state) {
 
         state -> dirty = 1;
 
-        // Remove trailing empty lines to leave only one line
         while (state -> line_count > 1 && strlen(state -> lines[state -> line_count - 1]) == 0) {
                 free(state -> lines[state -> line_count - 1]);
                 state -> line_count--;
         }
 
-        // Adjust cursor if it's out of bounds
         if (state -> cursor_y >= state -> line_count) {
                 state -> cursor_y = state -> line_count - 1;
         }

@@ -47,9 +47,6 @@ typedef struct {
     UndoState redo_buffer[MAX_UNDO_STATES];
     int show_help;
     int needs_sudo;
-    int autosave_enabled;
-    int autosave_interval;
-    time_t last_save_time;
     int key_states[256];
     time_t key_timestamps[256];
     int syntax_enabled;
