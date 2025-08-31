@@ -67,3 +67,4 @@ select_*
 *.autosave
 *.emergency
 /tmp/kilo_editor_clipboard.txt
+*[*]*

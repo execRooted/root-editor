@@ -32,6 +32,20 @@ syntax.o: syntax.c editor.h
 	$(CC) $(CFLAGS) -c syntax.c
 
 clean:
-	rm -f $(TARGET) $(OBJS)
+	rm -f $(TARGET) $(OBJS) *.tmp *.bak *.backup *.autosave *.emergency /tmp/kilo_editor_clipboard.txt cursor_x cursor_y dirty line_count lines* select_* 2>/dev/null || true
+	find . -name "*.o" -delete
+	find . -name "editor" -delete
+	find . -name "*.tmp" -delete
+	find . -name "*.bak" -delete
+	find . -name "*.backup" -delete
+	find . -name "*.autosave" -delete
+	find . -name "*.emergency" -delete
+	find . -name "cursor_x" -delete
+	find . -name "cursor_y" -delete
+	find . -name "dirty" -delete
+	find . -name "line_count" -delete
+	find . -name "lines*" -delete
+	find . -name "select_*" -delete
+	find . -name "*[*]*" -delete
 
 .PHONY: all clean
