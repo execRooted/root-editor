@@ -1,4 +1,66 @@
+#define _POSIX_C_SOURCE 200809L
 #include "editor.h"
+#include <stdlib.h>
+#include <stdio.h>
+
+char * get_system_clipboard() {
+    FILE * fp = popen("xclip -selection clipboard -o 2>/dev/null", "r");
+    if (fp) {
+        char buffer[1024 * 1024];
+        size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp);
+        pclose(fp);
+        if (len > 0) {
+            buffer[len] = '\0';
+            return strdup(buffer);
+        }
+    }
+
+    fp = popen("wl-paste 2>/dev/null", "r");
+    if (fp) {
+        char buffer[1024 * 1024];
+        size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp);
+        pclose(fp);
+        if (len > 0) {
+            buffer[len] = '\0';
+            return strdup(buffer);
+        }
+    }
+
+    fp = popen("xsel --clipboard --output 2>/dev/null", "r");
+    if (fp) {
+        char buffer[1024 * 1024];
+        size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp);
+        pclose(fp);
+        if (len > 0) {
+            buffer[len] = '\0';
+            return strdup(buffer);
+        }
+    }
+
+    fp = popen("termux-clipboard-get 2>/dev/null", "r");
+    if (fp) {
+        char buffer[1024 * 1024];
+        size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp);
+        pclose(fp);
+        if (len > 0) {
+            buffer[len] = '\0';
+            return strdup(buffer);
+        }
+    }
+
+    fp = popen("pbpaste 2>/dev/null", "r");
+    if (fp) {
+        char buffer[1024 * 1024];
+        size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp);
+        pclose(fp);
+        if (len > 0) {
+            buffer[len] = '\0';
+            return strdup(buffer);
+        }
+    }
+
+    return NULL;
+}
 
 void handle_input(EditorState * state, int ch) {
 
@@ -195,6 +257,16 @@ void handle_ctrl_keys(EditorState * state, int ch) {
         case 12:
                 jump_to_line(state);
                 break;
+        case 18:
+                state -> cursor_y = 0;
+                state -> cursor_x = 0;
+                move_cursor(state, 0, 0);
+                break;
+        case 5:
+                state -> cursor_y = state -> line_count - 1;
+                state -> cursor_x = strlen(state -> lines[state -> cursor_y]);
+                move_cursor(state, 0, 0);
+                break;
         default:
                 break;
         }
@@ -205,7 +277,6 @@ void cut_text(EditorState * state) {
 
                 char * selected = get_selected_text(state);
                 if (selected) {
-                        strcpy(state -> clipboard, selected);
                         copy_to_system_clipboard(selected);
                         delete_selected_text(state);
                         free(selected);
@@ -215,7 +286,6 @@ void cut_text(EditorState * state) {
 
                 save_undo_state(state);
 
-                strcpy(state -> clipboard, state -> lines[state -> cursor_y]);
                 copy_to_system_clipboard(state -> lines[state -> cursor_y]);
                 state -> lines[state -> cursor_y][0] = '\0';
                 state -> cursor_x = 0;
@@ -228,7 +298,6 @@ void cut_text(EditorState * state) {
 
 void copy_text(EditorState * state) {
         if (strlen(state -> lines[state -> cursor_y]) > 0) {
-                strcpy(state -> clipboard, state -> lines[state -> cursor_y]);
                 copy_to_system_clipboard(state -> lines[state -> cursor_y]);
                 show_status(state, "Line copied to clipboard");
         }
@@ -241,42 +310,10 @@ void paste_text(EditorState * state) {
                 return;
         }
 
-        char * clipboard_content = NULL;
-        size_t content_size = 0;
-
-        FILE * sys_clip = fopen("/tmp/kilo_editor_clipboard.txt", "r");
-        if (sys_clip) {
-                fseek(sys_clip, 0, SEEK_END);
-                content_size = ftell(sys_clip);
-                fseek(sys_clip, 0, SEEK_SET);
-
-                if (content_size > 0 && content_size < 1024 * 1024) {
-                        clipboard_content = (char * ) malloc(content_size + 1);
-                        if (clipboard_content) {
-                                size_t bytes_read = fread(clipboard_content, 1, content_size, sys_clip);
-                                if (bytes_read == content_size) {
-                                        clipboard_content[content_size] = '\0';
-                                        if (content_size > 0 && clipboard_content[content_size - 1] == '\n') {
-                                                clipboard_content[content_size - 1] = '\0';
-                                        }
-                                } else {
-                                        free(clipboard_content);
-                                        clipboard_content = NULL;
-                                }
-                        }
-                }
-                fclose(sys_clip);
-        }
-
-        if (!clipboard_content || strlen(clipboard_content) == 0) {
-                if (clipboard_content) free(clipboard_content);
-                size_t internal_len = strlen(state -> clipboard);
-                if (internal_len > 0) {
-                        clipboard_content = (char * ) malloc(internal_len + 1);
-                        if (clipboard_content) {
-                                strcpy(clipboard_content, state -> clipboard);
-                        }
-                }
+        char * clipboard_content = get_system_clipboard();
+        if (!clipboard_content) {
+                show_status(state, "No content to paste");
+                return;
         }
 
         if (!clipboard_content || strlen(clipboard_content) == 0) {
@@ -293,6 +330,12 @@ void paste_text(EditorState * state) {
         }
 
         if (clipboard_content && strlen(clipboard_content) > 0) {
+                // Check if content looks like bash output
+                if (strstr(clipboard_content, "bash:") || strstr(clipboard_content, "[rooted@execRooted")) {
+                        show_status(state, "Cannot paste terminal output");
+                        free(clipboard_content);
+                        return;
+                }
                 save_undo_state(state);
 
                 if (state -> cursor_x > (int) strlen(state -> lines[state -> cursor_y])) {

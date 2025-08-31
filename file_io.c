@@ -30,11 +30,26 @@ void load_file(EditorState * state,
                 }
 
                 state -> lines[state -> line_count] = (char * ) malloc(MAX_LINE_LENGTH);
+                if (!state -> lines[state -> line_count]) {
+                        show_status(state, "Memory allocation failed");
+                        return;
+                }
                 strcpy(state -> lines[state -> line_count], buffer);
                 state -> line_count++;
         }
 
         fclose(file);
+
+        if (state -> line_count == 0) {
+                state -> lines[0] = (char * ) malloc(MAX_LINE_LENGTH);
+                if (!state -> lines[0]) {
+                        show_status(state, "Memory allocation failed");
+                        return;
+                }
+                state -> lines[0][0] = '\0';
+                state -> line_count = 1;
+        }
+
         strcpy(state -> filename, filename);
         state -> dirty = 0;
         state -> cursor_x = 0;

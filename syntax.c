@@ -449,13 +449,17 @@ void highlight_line(EditorState* state, int line_num, int screen_row, int line_n
 
                 if (is_constant(word)) {
                     attron(COLOR_PAIR(COLOR_CONSTANT));
+                    attron(A_BOLD);
                     mvprintw(screen_row, col, "%s", word);
                     col += len;
+                    attroff(A_BOLD);
                     attroff(COLOR_PAIR(COLOR_CONSTANT));
                 } else if (is_data_type(word)) {
                     attron(COLOR_PAIR(COLOR_DATA_TYPE));
+                    attron(A_BOLD);
                     mvprintw(screen_row, col, "%s", word);
                     col += len;
+                    attroff(A_BOLD);
                     attroff(COLOR_PAIR(COLOR_DATA_TYPE));
                 } else if (is_stdlib_type(word)) {
                     attron(COLOR_PAIR(COLOR_STDLIB_TYPE));
@@ -496,13 +500,17 @@ void highlight_line(EditorState* state, int line_num, int screen_row, int line_n
                     if (is_function) {
                         if (is_stdlib_function(word)) {
                             attron(COLOR_PAIR(COLOR_STDLIB_FUNCTION));
+                            attron(A_BOLD);
                             mvprintw(screen_row, col, "%s", word);
                             col += len;
+                            attroff(A_BOLD);
                             attroff(COLOR_PAIR(COLOR_STDLIB_FUNCTION));
                         } else {
                             attron(COLOR_PAIR(COLOR_FUNCTION));
+                            attron(A_BOLD);
                             mvprintw(screen_row, col, "%s", word);
                             col += len;
+                            attroff(A_BOLD);
                             attroff(COLOR_PAIR(COLOR_FUNCTION));
                         }
                     } else {

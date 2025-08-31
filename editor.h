@@ -40,7 +40,6 @@ typedef struct {
     int line_numbers;
     int word_wrap;
     int tab_size;
-    char* clipboard;
     int select_mode;
     int select_start_x, select_start_y;
     int select_end_x, select_end_y;

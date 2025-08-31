@@ -3,7 +3,6 @@
 #include <time.h>
 
 
-static jmp_buf recovery_buffer;
 static EditorState * global_state = NULL;
 
 void set_window_title() {
@@ -58,6 +57,22 @@ int main(int argc, char * argv[]) {
                 init_pair(1, COLOR_BLACK, COLOR_WHITE);
                 init_pair(6, COLOR_BLACK, COLOR_WHITE);
                 init_pair(15, COLOR_WHITE, COLOR_BLACK);
+
+                // Syntax highlighting colors
+                init_pair(7, COLOR_BLUE, COLOR_BLACK);      // data types
+                init_pair(8, COLOR_YELLOW, COLOR_BLACK);    // strings
+                init_pair(9, COLOR_GREEN, COLOR_BLACK);     // comments
+                init_pair(10, COLOR_YELLOW, COLOR_BLACK);   // numbers
+                init_pair(11, COLOR_YELLOW, COLOR_BLACK);   // preprocessor
+                init_pair(12, COLOR_BLUE, COLOR_BLACK);     // keywords
+                init_pair(13, COLOR_WHITE, COLOR_BLACK);    // default
+                init_pair(14, COLOR_CYAN, COLOR_BLACK);     // operators
+                init_pair(15, COLOR_CYAN, COLOR_BLACK);     // characters and line numbers
+                init_pair(16, COLOR_YELLOW, COLOR_BLACK);   // functions
+                init_pair(17, COLOR_MAGENTA, COLOR_BLACK);  // constants
+                init_pair(18, COLOR_MAGENTA, COLOR_BLACK);  // booleans
+                init_pair(19, COLOR_CYAN, COLOR_BLACK);     // brackets
+                init_pair(20, COLOR_MAGENTA, COLOR_BLACK);  // control flow
         }
         int ch;
         while (1) {
@@ -76,7 +91,6 @@ int main(int argc, char * argv[]) {
                 free(state.lines[i]);
         }
         free(state.lines);
-        free(state.clipboard);
         return 0;
         
 }

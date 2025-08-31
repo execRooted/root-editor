@@ -17,8 +17,6 @@ void init_editor(EditorState * state) {
         state -> line_numbers = 1;
         state -> word_wrap = 0;
         state -> tab_size = TAB_SIZE;
-        state -> clipboard = (char * ) malloc(MAX_LINE_LENGTH);
-        state -> clipboard[0] = '\0';
         state -> select_mode = 0;
         state -> select_start_x = 0;
         state -> select_start_y = 0;
@@ -114,9 +112,17 @@ void new_line(EditorState * state) {
                 return;
         }
 
+        int old_cursor_y = state -> cursor_y;
+        int old_line_count = state -> line_count;
+
+        // Normal splitting
         char * line = state -> lines[state -> cursor_y];
 
         char * new_line = (char * ) malloc(MAX_LINE_LENGTH);
+        if (!new_line) {
+                show_status(state, "Memory allocation failed");
+                return;
+        }
         strcpy(new_line, & line[state -> cursor_x]);
         line[state -> cursor_x] = '\0';
 
@@ -128,6 +134,9 @@ void new_line(EditorState * state) {
         state -> line_count++;
         state -> cursor_y++;
         state -> cursor_x = 0;
+
+        move_cursor(state, 0, 0);
+        napms(10);
         state -> dirty = 1;
 }
 
@@ -169,10 +178,11 @@ void move_cursor(EditorState * state, int dx, int dy) {
         int max_y, max_x_screen;
         getmaxyx(stdscr, max_y, max_x_screen);
 
-        if (state -> cursor_y < state -> scroll_offset) {
-                state -> scroll_offset = state -> cursor_y;
-        } else if (state -> cursor_y >= state -> scroll_offset + max_y - 2) {
-                state -> scroll_offset = state -> cursor_y - max_y + 3;
+        if (state -> cursor_y <= state -> scroll_offset + 2) {
+                state -> scroll_offset = state -> cursor_y - 3;
+                if (state -> scroll_offset < 0) state -> scroll_offset = 0;
+        } else if (state -> cursor_y >= state -> scroll_offset + max_y - 5) {
+                state -> scroll_offset = state -> cursor_y - max_y + 6;
         }
 
         if (state -> scroll_offset < 0) state -> scroll_offset = 0;
@@ -194,6 +204,9 @@ void show_status(EditorState * state,
 
 void show_status_left(EditorState * state,
         const char * message) {
+        int old_cursor_y = state -> cursor_y;
+        int old_line_count = state -> line_count;
+
         int max_y, max_x;
         getmaxyx(stdscr, max_y, max_x);
 
@@ -358,44 +371,49 @@ void redo(EditorState * state) {
 void copy_to_system_clipboard(const char * text) {
         if (!text || strlen(text) == 0) return;
 
-        const char * clipboard_file = "/tmp/kilo_editor_clipboard.txt";
-        FILE * clip = fopen(clipboard_file, "w");
-        if (clip) {
-                fprintf(clip, "%s", text);
-                fclose(clip);
+        int success = 0;
 
-                int success = 0;
-
-                if (system("which xclip >/dev/null 2>&1") == 0) {
-                        if (system("xclip -selection clipboard < /tmp/kilo_editor_clipboard.txt >/dev/null 2>&1") == 0) {
-                                success = 1;
-                        }
+        if (system("which xclip >/dev/null 2>&1") == 0) {
+                char command[1024];
+                snprintf(command, sizeof(command), "echo '%s' | xclip -selection clipboard", text);
+                if (system(command) == 0) {
+                        success = 1;
                 }
+        }
 
-                if (!success && system("which wl-copy >/dev/null 2>&1") == 0) {
-                        if (system("wl-copy < /tmp/kilo_editor_clipboard.txt >/dev/null 2>&1") == 0) {
-                                success = 1;
-                        }
+        if (!success && system("which wl-copy >/dev/null 2>&1") == 0) {
+                char command[1024];
+                snprintf(command, sizeof(command), "echo '%s' | wl-copy", text);
+                if (system(command) == 0) {
+                        success = 1;
                 }
+        }
 
-                if (!success && system("which xsel >/dev/null 2>&1") == 0) {
-                        if (system("xsel --clipboard < /tmp/kilo_editor_clipboard.txt >/dev/null 2>&1") == 0) {
-                                success = 1;
-                        }
+        if (!success && system("which xsel >/dev/null 2>&1") == 0) {
+                char command[1024];
+                snprintf(command, sizeof(command), "echo '%s' | xsel --clipboard", text);
+                if (system(command) == 0) {
+                        success = 1;
                 }
+        }
 
-                if (!success && system("which termux-clipboard-set >/dev/null 2>&1") == 0) {
-                        if (system("termux-clipboard-set < /tmp/kilo_editor_clipboard.txt >/dev/null 2>&1") == 0) {
-                                success = 1;
-                        }
+        if (!success && system("which termux-clipboard-set >/dev/null 2>&1") == 0) {
+                char command[1024];
+                snprintf(command, sizeof(command), "echo '%s' | termux-clipboard-set", text);
+                if (system(command) == 0) {
+                        success = 1;
                 }
+        }
 
-                if (!success && system("which pbcopy >/dev/null 2>&1") == 0) {
-                        if (system("pbcopy < /tmp/kilo_editor_clipboard.txt >/dev/null 2>&1") == 0) {
-                                success = 1;
-                        }
+        if (!success && system("which pbcopy >/dev/null 2>&1") == 0) {
+                char command[1024];
+                snprintf(command, sizeof(command), "echo '%s' | pbcopy", text);
+                if (system(command) == 0) {
+                        success = 1;
                 }
+        }
 
+        if (!success) {
         }
 }
 
@@ -431,9 +449,10 @@ void jump_to_line(EditorState * state) {
                 state -> cursor_x = 0;
 
                 if (state -> cursor_y < state -> scroll_offset) {
-                        state -> scroll_offset = state -> cursor_y;
-                } else if (state -> cursor_y >= state -> scroll_offset + max_y - 2) {
-                        state -> scroll_offset = state -> cursor_y - max_y + 3;
+                        state -> scroll_offset = state -> cursor_y - 1;
+                        if (state -> scroll_offset < 0) state -> scroll_offset = 0;
+                } else if (state -> cursor_y >= state -> scroll_offset + max_y - 3) {
+                        state -> scroll_offset = state -> cursor_y - max_y + 4;
                 }
 
                 char msg[256];
@@ -481,10 +500,12 @@ void render_help_screen(EditorState * state) {
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+S        - Save file");
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+A        - Select all");
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+X        - Cut selected text");
-        if (line < max_help_line) mvprintw(line++, 2, "Ctrl+Shift+C  - Copy to system clipboard");
-        if (line < max_help_line) mvprintw(line++, 2, "Ctrl+Shift+V  - Paste from clipboard");
+        if (line < max_help_line) mvprintw(line++, 2, "Ctrl+C        - Copy to system clipboard");
+        if (line < max_help_line) mvprintw(line++, 2, "Ctrl+V        - Paste from clipboard");
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+Z        - Undo last line addition");
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+Y        - Redo");
+        if (line < max_help_line) mvprintw(line++, 2, "Ctrl+R        - Go to start of file");
+        if (line < max_help_line) mvprintw(line++, 2, "Ctrl+E        - Go to end of file");
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+F        - Find");
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+L        - Jump to line");
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+M        - Make a new line");
