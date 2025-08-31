@@ -55,3 +55,15 @@ cursor_y][0]
 file_io.c
 line_count++
 lines[state
+cursor_x
+cursor_y
+dirty
+line_count
+lines*
+select_*
+*.tmp
+*.bak
+*.backup
+*.autosave
+*.emergency
+/tmp/kilo_editor_clipboard.txt
