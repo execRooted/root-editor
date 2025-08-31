@@ -2,6 +2,8 @@
 
 A terminal-based text editor written in C using ncurses. Designed for efficient text editing with a focus on reliability and user experience.
 
+> Tested on Arch Linux. It should work with all major Linux distros that use a package from down below.
+
 ## Features
 
 - **Full Terminal Interface**: Uses ncurses for a rich terminal-based editing experience
