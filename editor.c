@@ -509,6 +509,7 @@ void render_help_screen(EditorState * state) {
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+F        - Find");
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+L        - Jump to line");
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+M        - Make a new line");
+        if (line < max_help_line) mvprintw(line++, 2, "Ctrl+D        - Delete current line");
         if (line < max_help_line) mvprintw(line++, 2, "Ctrl+H        - Toggle this help");
 
         line += 2;

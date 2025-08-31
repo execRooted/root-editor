@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+void delete_current_line(EditorState * state);
+
 char * get_system_clipboard() {
     FILE * fp = popen("xclip -selection clipboard -o 2>/dev/null", "r");
     if (fp) {
@@ -199,6 +201,7 @@ void handle_ctrl_keys(EditorState * state, int ch) {
         case 25:
         case 24:
         case 6:
+        case 4:
                 needs_tracking = 1;
                 break;
         }
@@ -267,6 +270,9 @@ void handle_ctrl_keys(EditorState * state, int ch) {
                 state -> cursor_x = strlen(state -> lines[state -> cursor_y]);
                 move_cursor(state, 0, 0);
                 break;
+        case 4:
+                delete_current_line(state);
+                break;
         default:
                 break;
         }
@@ -303,6 +309,37 @@ void copy_text(EditorState * state) {
         }
 }
 
+void delete_current_line(EditorState * state) {
+        if (state -> line_count <= 1) {
+                show_status(state, "Cannot delete the last line");
+                return;
+        }
+
+        save_undo_state(state);
+
+        free(state -> lines[state -> cursor_y]);
+
+        for (int i = state -> cursor_y; i < state -> line_count - 1; i++) {
+                state -> lines[i] = state -> lines[i + 1];
+        }
+
+        state -> line_count--;
+
+        if (state -> cursor_y >= state -> line_count) {
+                state -> cursor_y = state -> line_count - 1;
+        }
+
+        if (state -> cursor_y < 0) state -> cursor_y = 0;
+
+        state -> cursor_x = 0;
+
+        move_cursor(state, 0, 0);
+
+        state -> dirty = 1;
+
+        show_status(state, "Line deleted");
+}
+
 void paste_text(EditorState * state) {
 
         if (!state || !state -> lines || state -> cursor_y >= state -> line_count) {
@@ -330,7 +367,6 @@ void paste_text(EditorState * state) {
         }
 
         if (clipboard_content && strlen(clipboard_content) > 0) {
-                // Check if content looks like bash output
                 if (strstr(clipboard_content, "bash:") || strstr(clipboard_content, "[rooted@execRooted")) {
                         show_status(state, "Cannot paste terminal output");
                         free(clipboard_content);

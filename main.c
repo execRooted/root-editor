@@ -73,6 +73,7 @@ int main(int argc, char * argv[]) {
                 init_pair(18, COLOR_MAGENTA, COLOR_BLACK);  // booleans
                 init_pair(19, COLOR_CYAN, COLOR_BLACK);     // brackets
                 init_pair(20, COLOR_MAGENTA, COLOR_BLACK);  // control flow
+                init_pair(26, COLOR_YELLOW, COLOR_BLACK);   // stdlib functions
         }
         int ch;
         while (1) {
