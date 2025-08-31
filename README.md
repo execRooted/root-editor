@@ -122,6 +122,7 @@ Ctrl+Y        - Redo
 Ctrl+F        - Find
 Ctrl+L        - Jump to line
 Ctrl+M        - Make new line
+Ctrl+D        - Deletes current line
 Ctrl+H        - Toggle this help
 
 
@@ -132,8 +133,8 @@ F3            - Find all occurrences (shows line numbers)
 F4            - Replace text
 F5            - Show statistics
 F6            - Cut current line
-F7            - Copy editor cliboard current line
-F8            - Paste editor clipboard line
+F7            - Copy cliboard current line
+F8            - Paste clipboard line
 F9            - Undo
 F10           - Redo
 F11           - Toggle autosave
