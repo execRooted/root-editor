@@ -56,35 +56,20 @@ detect_package_manager() {
     print_status "Detected package manager: $PACKAGE_MANAGER"
 }
 check_root() {
-    if [ "$EUID" -eq 0 ]; then
-        print_success "Running with root privileges"
-        return 0
-    else
-        print_warning "Root privileges required for installation"
-        echo
-        echo "Please enter your password to continue with installation:"
-        echo
-
-       
-        if sudo -v 2>/dev/null; then
-            print_success "Authentication successful - proceeding with installation"
-            return 0
-        else
-            print_error "Authentication failed or sudo not available"
-            print_error "Please run this installer as root: sudo ./install.sh"
-            exit 1
-        fi
+    if [ "$EUID" -ne 0 ]; then
+        print_error "Please run this installer as root: sudo ./install.sh"
+        exit 1
     fi
 }
 install_dependencies() {
     print_status "Checking system dependencies..."
-    local required_packages=("gcc" "cmake" "make" "ncurses-dev")
+    local required_packages=("gcc" "cmake" "make" "ncurses-dev" "wl-clipboard")
     local missing_packages=()
     case $PACKAGE_MANAGER in
-        "pacman") required_packages=("gcc" "cmake" "make" "ncurses");;
-        "apt-get") required_packages=("gcc" "cmake" "make" "libncurses5-dev" "libncursesw5-dev");;
-        "yum"|"dnf") required_packages=("gcc" "cmake" "make" "ncurses-devel");;
-        "zypper") required_packages=("gcc" "cmake" "make" "ncurses-devel");;
+        "pacman") required_packages=("gcc" "cmake" "make" "ncurses" "wl-clipboard");;
+        "apt-get") required_packages=("gcc" "cmake" "make" "libncurses5-dev" "libncursesw5-dev" "wl-clipboard");;
+        "yum"|"dnf") required_packages=("gcc" "cmake" "make" "ncurses-devel" "wl-clipboard");;
+        "zypper") required_packages=("gcc" "cmake" "make" "ncurses-devel" "wl-clipboard");;
     esac
     for pkg in "${required_packages[@]}"; do
         if ! $CHECK_CMD "$pkg" >/dev/null 2>&1; then

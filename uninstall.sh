@@ -14,24 +14,9 @@ print_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
 print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 check_root() {
-    if [ "$EUID" -eq 0 ]; then
-        print_success "Running with root privileges"
-        return 0
-    else
-        print_warning "Root privileges required for uninstallation"
-        echo
-        echo "Please enter your password to continue with uninstallation:"
-        echo
-
-        
-        if sudo -v 2>/dev/null; then
-            print_success "Authentication successful - proceeding with uninstallation"
-            return 0
-        else
-            print_error "Authentication failed or sudo not available"
-            print_error "Please run this uninstaller as root: sudo ./uninstall.sh"
-            exit 1
-        fi
+    if [ "$EUID" -ne 0 ]; then
+        print_error "Please run this uninstaller as root: sudo ./uninstall.sh"
+        exit 1
     fi
 }
 remove_binary() {

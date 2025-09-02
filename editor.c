@@ -368,8 +368,17 @@ void copy_to_system_clipboard(const char * text) {
         if (!text || strlen(text) == 0) return;
 
         int success = 0;
+        int is_wayland = getenv("WAYLAND_DISPLAY") != NULL;
 
-        if (system("which xclip >/dev/null 2>&1") == 0) {
+        if (is_wayland && system("which wl-copy >/dev/null 2>&1") == 0) {
+                char command[1024];
+                snprintf(command, sizeof(command), "echo '%s' | wl-copy", text);
+                if (system(command) == 0) {
+                        success = 1;
+                }
+        }
+
+        if (!success && system("which xclip >/dev/null 2>&1") == 0) {
                 char command[1024];
                 snprintf(command, sizeof(command), "echo '%s' | xclip -selection clipboard", text);
                 if (system(command) == 0) {
@@ -377,14 +386,6 @@ void copy_to_system_clipboard(const char * text) {
                 }
                 snprintf(command, sizeof(command), "echo '%s' | xclip -selection primary", text);
                 system(command);
-        }
-
-        if (!success && system("which wl-copy >/dev/null 2>&1") == 0) {
-                char command[1024];
-                snprintf(command, sizeof(command), "echo '%s' | wl-copy", text);
-                if (system(command) == 0) {
-                        success = 1;
-                }
         }
 
         if (!success && system("which xsel >/dev/null 2>&1") == 0) {

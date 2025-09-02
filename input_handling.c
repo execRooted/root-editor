@@ -7,6 +7,20 @@ void delete_current_line(EditorState * state);
 
 char * get_system_clipboard() {
     FILE * fp;
+    int is_wayland = getenv("WAYLAND_DISPLAY") != NULL;
+
+    if (is_wayland) {
+        fp = popen("wl-paste 2>/dev/null", "r");
+        if (fp) {
+            char buffer[1024 * 1024];
+            size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp);
+            pclose(fp);
+            if (len > 0) {
+                buffer[len] = '\0';
+                return strdup(buffer);
+            }
+        }
+    }
 
     fp = popen("xclip -selection clipboard -o 2>/dev/null", "r");
     if (fp) {
@@ -30,14 +44,16 @@ char * get_system_clipboard() {
         }
     }
 
-    fp = popen("wl-paste 2>/dev/null", "r");
-    if (fp) {
-        char buffer[1024 * 1024];
-        size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp);
-        pclose(fp);
-        if (len > 0) {
-            buffer[len] = '\0';
-            return strdup(buffer);
+    if (!is_wayland) {
+        fp = popen("wl-paste 2>/dev/null", "r");
+        if (fp) {
+            char buffer[1024 * 1024];
+            size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp);
+            pclose(fp);
+            if (len > 0) {
+                buffer[len] = '\0';
+                return strdup(buffer);
+            }
         }
     }
 
@@ -73,7 +89,7 @@ char * get_system_clipboard() {
             return strdup(buffer);
         }
     }
-
+ 
     fp = popen("pbpaste 2>/dev/null", "r");
     if (fp) {
         char buffer[1024 * 1024];

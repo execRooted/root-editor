@@ -68,3 +68,5 @@ select_*
 *.emergency
 /tmp/kilo_editor_clipboard.txt
 *[*]*
+line_count--
+show_help
