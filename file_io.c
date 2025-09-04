@@ -1,5 +1,7 @@
 #include "editor.h"
 
+
+
 void load_file(EditorState * state,
         const char * filename) {
         FILE * file = fopen(filename, "r");
