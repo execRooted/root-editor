@@ -21,6 +21,7 @@
 #define MAX_UNDO_STATES 100
 
 
+
 typedef struct {
     char** lines;
     int line_count;
