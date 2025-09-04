@@ -117,8 +117,8 @@ Ctrl+Q        - Quit
 Ctrl+S        - Save file
 Ctrl+A        - Select all
 Ctrl+X        - Cut selected text
-Ctrl+Shift+C  - Copy to clipboard
-Ctrl+Shift+V  - Paste from clipboard
+Ctrl+C        - Copy to clipboard
+Ctrl+V        - Paste from clipboard
 Ctrl+Z        - Undo last line addition
 Ctrl+Y        - Redo
 Ctrl+F        - Find

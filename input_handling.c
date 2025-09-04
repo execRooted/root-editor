@@ -391,12 +391,6 @@ void paste_text(EditorState * state) {
                 return;
         }
 
-        size_t len = strlen(clipboard_content);
-        while (len > 0 && (clipboard_content[len - 1] == '\n' || clipboard_content[len - 1] == '\r')) {
-                clipboard_content[len - 1] = '\0';
-                len--;
-        }
-
         if (clipboard_content && strlen(clipboard_content) > 0) {
                 save_undo_state(state);
 

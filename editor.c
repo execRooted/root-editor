@@ -367,12 +367,18 @@ void redo(EditorState * state) {
 void copy_to_system_clipboard(const char * text) {
         if (!text || strlen(text) == 0) return;
 
+        char temp_file[] = "/tmp/kilo_editor_clipboard_temp.txt";
+        FILE * fp = fopen(temp_file, "w");
+        if (!fp) return;
+        fprintf(fp, "%s", text);
+        fclose(fp);
+
         int success = 0;
         int is_wayland = getenv("WAYLAND_DISPLAY") != NULL;
 
         if (is_wayland && system("which wl-copy >/dev/null 2>&1") == 0) {
                 char command[1024];
-                snprintf(command, sizeof(command), "echo '%s' | wl-copy", text);
+                snprintf(command, sizeof(command), "cat '%s' | wl-copy", temp_file);
                 if (system(command) == 0) {
                         success = 1;
                 }
@@ -380,17 +386,17 @@ void copy_to_system_clipboard(const char * text) {
 
         if (!success && system("which xclip >/dev/null 2>&1") == 0) {
                 char command[1024];
-                snprintf(command, sizeof(command), "echo '%s' | xclip -selection clipboard", text);
+                snprintf(command, sizeof(command), "cat '%s' | xclip -selection clipboard", temp_file);
                 if (system(command) == 0) {
                         success = 1;
                 }
-                snprintf(command, sizeof(command), "echo '%s' | xclip -selection primary", text);
+                snprintf(command, sizeof(command), "cat '%s' | xclip -selection primary", temp_file);
                 system(command);
         }
 
         if (!success && system("which xsel >/dev/null 2>&1") == 0) {
                 char command[1024];
-                snprintf(command, sizeof(command), "echo '%s' | xsel --clipboard", text);
+                snprintf(command, sizeof(command), "cat '%s' | xsel --clipboard", temp_file);
                 if (system(command) == 0) {
                         success = 1;
                 }
@@ -398,7 +404,7 @@ void copy_to_system_clipboard(const char * text) {
 
         if (!success && system("which termux-clipboard-set >/dev/null 2>&1") == 0) {
                 char command[1024];
-                snprintf(command, sizeof(command), "echo '%s' | termux-clipboard-set", text);
+                snprintf(command, sizeof(command), "cat '%s' | termux-clipboard-set", temp_file);
                 if (system(command) == 0) {
                         success = 1;
                 }
@@ -406,11 +412,13 @@ void copy_to_system_clipboard(const char * text) {
 
         if (!success && system("which pbcopy >/dev/null 2>&1") == 0) {
                 char command[1024];
-                snprintf(command, sizeof(command), "echo '%s' | pbcopy", text);
+                snprintf(command, sizeof(command), "cat '%s' | pbcopy", temp_file);
                 if (system(command) == 0) {
                         success = 1;
                 }
         }
+
+        unlink(temp_file);
 
         if (!success) {
         }

@@ -53,7 +53,9 @@ void render_screen(EditorState * state) {
                         const int end_x = (i == state -> select_end_y) ? state -> select_end_x : line_len;
 
                         if (start_x > 0) {
+                                attron(COLOR_PAIR(13));
                                 mvprintw(screen_row, line_num_width, "%.*s", start_x, line);
+                                attroff(COLOR_PAIR(13));
                         }
 
                         if (end_x > start_x) {
@@ -64,8 +66,10 @@ void render_screen(EditorState * state) {
                         }
 
                         if (end_x < line_len) {
+                                attron(COLOR_PAIR(13));
                                 mvprintw(screen_row, line_num_width + end_x, "%.*s",
                                         line_len - end_x, line + end_x);
+                                attroff(COLOR_PAIR(13));
                         }
                 } else {
                         highlight_line(state, i, screen_row, line_num_width);
@@ -305,7 +309,7 @@ void prompt_root_password(EditorState * state) {
 
         clear();
         attron(COLOR_PAIR(1));
-        mvprintw(max_y / 2 - 3, max_x / 2 - 15, " Root Password Required ");
+        mvprintw(max_y / 2 - 3, max_x / 2 - 15, " Root password required ");
         attroff(COLOR_PAIR(1));
 
         mvprintw(max_y / 2 - 1, max_x / 2 - 25, "Enter root password (or press Esc to cancel): ");

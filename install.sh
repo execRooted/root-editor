@@ -10,11 +10,14 @@ INSTALL_DIR="/usr/local/bin"
 BINARY_NAME="root-editor"
 COMMAND_NAME="re"
 SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+
 print_status() { echo -e "${BLUE}[INFO]${NC} $1"; }
 print_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
 print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 detect_package_manager() {
+    
     if command -v apt-get >/dev/null 2>&1; then
         PACKAGE_MANAGER="apt-get"
         INSTALL_CMD="apt-get install -y"
