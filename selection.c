@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+
+
 void select_all(EditorState * state) {
         if (state -> line_count == 0) return;
 
