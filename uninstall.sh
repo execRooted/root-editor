@@ -9,10 +9,12 @@ NC='\033[0m'
 INSTALL_DIR="/usr/local/bin"
 BINARY_NAME="root-editor"
 COMMAND_NAME="re"
+
 print_status() { echo -e "${BLUE}[INFO]${NC} $1"; }
 print_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
 print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+
 check_root() {
     if [ "$EUID" -ne 0 ]; then
         print_error "Please run this uninstaller as root: sudo ./uninstall.sh"
