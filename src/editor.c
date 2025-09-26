@@ -676,6 +676,7 @@ void jump_to_line(EditorState * state) {
     char prompt[64];
     int prompt_len = snprintf(prompt, sizeof(prompt), "Jump to line (1-%d): ", state -> line_count);
     mvprintw(max_y - 2, 0, "%s", prompt);
+    clrtoeol();
     refresh();
     char input[32] = {
         0

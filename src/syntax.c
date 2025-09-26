@@ -61,20 +61,21 @@ const int data_types_count = sizeof(data_types) / sizeof(data_types[0]);
 
 const char* modifiers[] = {
     "long","short","unsigned","signed","mut","const","static","volatile",
-    "extern","register","auto","pub","priv","ref","async","await"
+    "extern","register","auto","pub","priv","ref","async","await","unsafe"
 };
 const int modifiers_count = sizeof(modifiers) / sizeof(modifiers[0]);
 
 const char* control_flow[] = {
     "if","else","for","while","do","switch","case","default","break",
     "continue","return","goto","match","loop","try","catch","finally",
-    "throw","raise","pass","yield","with","as"
+    "throw","raise","pass","yield","with","as","fn"
 };
 const int control_flow_count = sizeof(control_flow) / sizeof(control_flow[0]);
 
 const char* storage_class[] = {
     "static","const","volatile","extern","let","var","val","def",
-    "class","struct","enum","union","typedef","using","import","from"
+    "class","struct","enum","union","typedef","using","import","from",
+    "impl","trait","dyn","where","type"
 };
 const int storage_class_count = sizeof(storage_class) / sizeof(storage_class[0]);
 
@@ -86,7 +87,7 @@ const int preprocessor_count = sizeof(preprocessor) / sizeof(preprocessor[0]);
 
 const char* constants[] = {
     "NULL","null","None","true","false","TRUE","FALSE","EXIT_SUCCESS",
-    "EXIT_FAILURE","Some","Ok","Err"
+    "EXIT_FAILURE","Some","Ok","Err","self","Self","crate","super"
 };
 const int constants_count = sizeof(constants) / sizeof(constants[0]);
 
@@ -160,13 +161,18 @@ void init_syntax_highlighting(EditorState* state) {
 void detect_file_type(EditorState* state) {
     if (!*state->filename) {
         state->file_type = FILE_TYPE_PLAIN;
-        state->syntax_enabled = 0; 
+        state->syntax_enabled = 0;
+        return;
+    }
+    if (strcmp(state->filename, "Makefile") == 0 || strcmp(state->filename, "makefile") == 0) {
+        state->file_type = FILE_TYPE_MAKEFILE;
+        state->syntax_enabled = 1;
         return;
     }
     const char* ext = strrchr(state->filename, '.');
     if (!ext) {
         state->file_type = FILE_TYPE_PLAIN;
-        state->syntax_enabled = 0; 
+        state->syntax_enabled = 0;
         return;
     }
 
@@ -193,10 +199,30 @@ void detect_file_type(EditorState* state) {
         
         if (strcmp(ext, ".py") == 0) state->file_type = FILE_TYPE_PYTHON;
         else if (strcmp(ext, ".c") == 0 || strcmp(ext, ".cpp") == 0 || strcmp(ext, ".cc") == 0 ||
-                 strcmp(ext, ".cxx") == 0 || strcmp(ext, ".h") == 0 || strcmp(ext, ".hpp") == 0) {
+                  strcmp(ext, ".cxx") == 0 || strcmp(ext, ".h") == 0 || strcmp(ext, ".hpp") == 0) {
             state->file_type = FILE_TYPE_C;
+        } else if (strcmp(ext, ".rs") == 0) {
+            state->file_type = FILE_TYPE_RUST;
+        } else if (strcmp(ext, ".js") == 0) {
+            state->file_type = FILE_TYPE_JAVASCRIPT;
+        } else if (strcmp(ext, ".ts") == 0) {
+            state->file_type = FILE_TYPE_TYPESCRIPT;
+        } else if (strcmp(ext, ".java") == 0) {
+            state->file_type = FILE_TYPE_JAVA;
+        } else if (strcmp(ext, ".php") == 0) {
+            state->file_type = FILE_TYPE_PHP;
+        } else if (strcmp(ext, ".rb") == 0) {
+            state->file_type = FILE_TYPE_RUBY;
+        } else if (strcmp(ext, ".sh") == 0 || strcmp(ext, ".bash") == 0) {
+            state->file_type = FILE_TYPE_SHELL;
+        } else if (strcmp(ext, ".html") == 0) {
+            state->file_type = FILE_TYPE_HTML;
+        } else if (strcmp(ext, ".css") == 0) {
+            state->file_type = FILE_TYPE_CSS;
+        } else if (strcmp(ext, ".cs") == 0) {
+            state->file_type = FILE_TYPE_CSHARP;
         } else {
-            state->file_type = FILE_TYPE_PLAIN; 
+            state->file_type = FILE_TYPE_PLAIN;
         }
 
         
