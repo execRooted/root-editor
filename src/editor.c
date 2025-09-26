@@ -998,4 +998,3 @@ void update_dirty_status(EditorState* state) {
     state->dirty = !content_matches_original(state);
 }
 
-//1000 Line Easter Egg!
