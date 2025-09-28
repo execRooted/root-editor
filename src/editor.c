@@ -809,6 +809,7 @@ void render_help_screen(EditorState * state) {
 
     mvprintw(line++, col1, "Ctrl+Q  Quit");
     mvprintw(line++, col1, "Ctrl+S  Save");
+    mvprintw(line++, col1, "Ctrl+O  Open");
     mvprintw(line++, col1, "Ctrl+A  Select all");
     mvprintw(line++, col1, "Ctrl+B  Select line");
     mvprintw(line++, col1, "Ctrl+W  Select word");
