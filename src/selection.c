@@ -36,23 +36,13 @@ void copy_selected_text(EditorState * state) {
         int start_x = state -> select_start_x;
         int end_x = state -> select_end_x;
 
-        size_t total_length = 0;
-        for (int i = start_y; i <= end_y; i++) {
-                int line_len = strlen(state -> lines[i]);
-                int line_start = (i == start_y) ? start_x : 0;
-                int line_end = (i == end_y) ? end_x : line_len;
-                total_length += (line_end - line_start);
-                if (i < end_y) total_length++;
-        }
-
-        if (total_length >= MAX_LINE_LENGTH) {
-                show_status(state, "Selection too large for clipboard");
+        char temp_file[] = "/tmp/kilo_editor_clipboard_temp.txt";
+        FILE * fp = fopen(temp_file, "w");
+        if (!fp) {
+                show_status(state, "Failed to create temporary file for clipboard");
                 return;
         }
 
-        char * clipboard = malloc(total_length + 1);
-        if (!clipboard) return;
-        int pos = 0;
         for (int i = start_y; i <= end_y; i++) {
                 int line_len = strlen(state -> lines[i]);
                 int line_start = (i == start_y) ? start_x : 0;
@@ -60,20 +50,27 @@ void copy_selected_text(EditorState * state) {
                 int copy_len = line_end - line_start;
 
                 if (copy_len > 0) {
-                        strncpy(clipboard + pos, state -> lines[i] + line_start, copy_len);
-                        pos += copy_len;
+                        fprintf(fp, "%.*s", copy_len, state -> lines[i] + line_start);
                 }
 
                 if (i < end_y) {
-                        clipboard[pos++] = '\n';
+                        fprintf(fp, "\n");
                 }
         }
-        clipboard[pos] = '\0';
+        fclose(fp);
 
-        copy_to_system_clipboard(clipboard);
-        free(clipboard);
+        int is_wayland = getenv("WAYLAND_DISPLAY") != NULL;
+        if (is_wayland) {
+                system("cat '/tmp/kilo_editor_clipboard_temp.txt' | wl-copy 2>/dev/null &");
+        } else {
+                system("cat '/tmp/kilo_editor_clipboard_temp.txt' | xclip -selection clipboard 2>/dev/null &");
+                system("cat '/tmp/kilo_editor_clipboard_temp.txt' | xclip -selection primary 2>/dev/null &");
+        }
+
+        system("rm -f '/tmp/kilo_editor_clipboard_temp.txt' 2>/dev/null &");
 
         clear_selection(state);
+        show_status(state, "Selected text copied to clipboard");
 }
 
 void clear_selection(EditorState * state) {

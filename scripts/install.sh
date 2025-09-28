@@ -116,7 +116,7 @@ check_dependencies() {
         missing_deps+=("make")
     fi
 
-    if [ ${
+    if [ ${#missing_deps[@]} -ne 0 ]; then
         echo -e "${YELLOW}[WARNING]${NC} Missing dependencies: ${missing_deps[*]}"
         echo -e "${BLUE}[INFO]${NC} Installing missing dependencies..."
         install_dependencies
