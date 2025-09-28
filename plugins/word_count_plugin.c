@@ -104,9 +104,9 @@ static void word_count_on_render(EditorState* state) {
     int max_y, max_x;
     getmaxyx(stdscr, max_y, max_x);
     attron(COLOR_PAIR(1)); 
-    const char* syntax_status = (state->file_type == 0) ? "N/A" : (state->syntax_enabled ? "ON" : "OFF");
-    const char* brackets_status = (state->file_type == 0) ? "N/A" : (state->auto_complete_enabled ? "ON" : "OFF");
-    const char* comment_status = (state->file_type == 0) ? "N/A" : (state->comment_complete_enabled ? "ON" : "OFF");
+    const char* syntax_status = (state->syntax_enabled ? "ON" : "OFF");
+    const char* brackets_status = (state->auto_complete_enabled ? "ON" : "OFF");
+    const char* comment_status = (state->comment_complete_enabled ? "ON" : "OFF");
     mvprintw(max_y - 1, 0, "Line: %d, Col: %d | %s | Syntax HL: %s | Autocomplete: %s | Brackets and Quotes Autocomplete: %s | Autosave: %s | Auto Tabbing: %s | Words: %d",
              state->cursor_y + 1, state->cursor_x + 1,
              state->filename[0] ? state->filename : "[Untitled]",
