@@ -70,32 +70,32 @@ install_dependencies() {
     case $PKG_MANAGER in
         pacman)
             echo -e "${BLUE}[INFO]${NC} Installing dependencies with pacman..."
-            sudo pacman -S --needed --noconfirm gcc make ncurses
+            sudo pacman -S --needed --noconfirm gcc cmake ncurses
             ;;
         apt)
             echo -e "${BLUE}[INFO]${NC} Updating package list and installing dependencies with apt..."
             sudo apt update
-            sudo apt install -y build-essential libncurses-dev
+            sudo apt install -y build-essential libncurses-dev cmake
             ;;
         yum)
             echo -e "${BLUE}[INFO]${NC} Installing dependencies with yum..."
             sudo yum groupinstall -y "Development Tools"
-            sudo yum install -y ncurses-devel
+            sudo yum install -y ncurses-devel cmake
             ;;
         dnf)
             echo -e "${BLUE}[INFO]${NC} Installing dependencies with dnf..."
             sudo dnf groupinstall -y "Development Tools"
-            sudo dnf install -y ncurses-devel
+            sudo dnf install -y ncurses-devel cmake
             ;;
         zypper)
             echo -e "${BLUE}[INFO]${NC} Installing dependencies with zypper..."
             sudo zypper install -y -t pattern devel_basis
-            sudo zypper install -y ncurses-devel
+            sudo zypper install -y ncurses-devel cmake
             ;;
         *)
             echo -e "${RED}[ERROR]${NC} Unsupported package manager. Please install dependencies manually:"
             echo "  - GCC compiler (gcc)"
-            echo "  - Make build system"
+            echo "  - CMake build system"
             echo "  - Ncurses development libraries (libncurses-dev, ncurses-devel, etc.)"
             exit 1
             ;;
@@ -112,8 +112,8 @@ check_dependencies() {
         missing_deps+=("gcc")
     fi
 
-    if ! command -v make &> /dev/null; then
-        missing_deps+=("make")
+    if ! command -v cmake &> /dev/null; then
+        missing_deps+=("cmake")
     fi
 
     if [ ${#missing_deps[@]} -ne 0 ]; then
@@ -136,16 +136,15 @@ echo -e "${BLUE}[INFO]${NC} Building Root-Editor..."
 export PATH=/usr/bin:/bin:/usr/local/bin:$PATH
 
 echo -e "${BLUE}[INFO]${NC} Cleaning up any build artifacts..."
-rm -rf build_new 2>/dev/null || true
-/usr/bin/make clean
-clear
+rm -rf build
+cmake -S . -B build
 if [ $? -ne 0 ]; then
-    echo -e "${RED}[ERROR]${NC} Make clean failed."
+    echo -e "${RED}[ERROR]${NC} CMake configure failed."
     exit 1
 fi
-/usr/bin/make
+cmake --build build
 if [ $? -ne 0 ]; then
-    echo -e "${RED}[ERROR]${NC} Make failed."
+    echo -e "${RED}[ERROR]${NC} CMake build failed."
     exit 1
 fi
 clear
@@ -160,14 +159,15 @@ echo -e "${BLUE}[INFO]${NC} Build successful."
 clear
 echo -e "${BLUE}[INFO]${NC} Building plugins..."
 cd plugins
-/usr/bin/make clean
+rm -rf build
+cmake -S . -B build
 if [ $? -ne 0 ]; then
-    echo -e "${RED}[ERROR]${NC} Plugin make clean failed."
+    echo -e "${RED}[ERROR]${NC} Plugin CMake configure failed."
     exit 1
 fi
-/usr/bin/make
+cmake --build build
 if [ $? -ne 0 ]; then
-    echo -e "${RED}[ERROR]${NC} Plugin make failed."
+    echo -e "${RED}[ERROR]${NC} Plugin CMake build failed."
     exit 1
 fi
 cd ..
@@ -185,17 +185,13 @@ sudo mkdir -p /usr/local/lib/root-editor/plugins
 
 echo -e "${BLUE}[INFO]${NC} Removing existing plugins..."
 sudo rm -f /usr/local/lib/root-editor/plugins/*.so
-if [ -f "plugins/theme_plugin.so" ]; then
-    sudo cp plugins/theme_plugin.so /usr/local/lib/root-editor/plugins/
-fi
+sudo cp plugins/build/*.so /usr/local/lib/root-editor/plugins/ 2>/dev/null || true
 
 
 USER_PLUGINS_DIR="$HOME/.config/root-editor/plugins"
 mkdir -p "$USER_PLUGINS_DIR"
 rm -f "$USER_PLUGINS_DIR"/*.so 2>/dev/null || true
-if [ -f "plugins/theme_plugin.so" ]; then
-    cp plugins/theme_plugin.so "$USER_PLUGINS_DIR/"
-fi
+cp plugins/build/*.so "$USER_PLUGINS_DIR/" 2>/dev/null || true
 
 
 

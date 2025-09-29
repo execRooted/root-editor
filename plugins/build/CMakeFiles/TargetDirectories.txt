@@ -1,0 +1,3 @@
+/home/rooted/Projects/github/C/root-editor/plugins/build/CMakeFiles/word_count_plugin.dir
+/home/rooted/Projects/github/C/root-editor/plugins/build/CMakeFiles/edit_cache.dir
+/home/rooted/Projects/github/C/root-editor/plugins/build/CMakeFiles/rebuild_cache.dir

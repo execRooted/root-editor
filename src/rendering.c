@@ -125,6 +125,35 @@ void render_screen(EditorState * state) {
         int max_vis = max_x - text_start_col - 1;
         if (max_vis < 0) max_vis = 0;
         if (vis_x > max_vis) vis_x = max_vis;
+        int words = 0;
+        for (int i = 0; i < state->line_count; i++) {
+            char* line = state->lines[i];
+            int in_word = 0;
+            for (int j = 0; line[j] != '\0'; j++) {
+                if (isspace((unsigned char)line[j])) {
+                    in_word = 0;
+                } else if (!in_word) {
+                    in_word = 1;
+                    words++;
+                }
+            }
+        }
+
+        attron(COLOR_PAIR(1));
+        const char* syntax_status = (state->syntax_enabled ? "ON" : "OFF");
+        const char* brackets_status = (state->auto_complete_enabled ? "ON" : "OFF");
+        const char* comment_status = (state->comment_complete_enabled ? "ON" : "OFF");
+        mvprintw(max_y - 1, 0, "Line: %d, Col: %d | %s | Syntax HL: %s | Autocomplete: %s | Brackets and Quotes Autocomplete: %s | Autosave: %s | Auto Tabbing: %s | Words: %d",
+                 state->cursor_y + 1, state->cursor_x + 1,
+                 state->filename[0] ? state->filename : "[Untitled]",
+                 syntax_status,
+                 comment_status,
+                 brackets_status,
+                 state->autosave_enabled ? "ON" : "OFF",
+                 state->auto_tabbing_enabled ? "ON" : "OFF",
+                 words);
+        attroff(COLOR_PAIR(1));
+
         move(state -> cursor_y - start_line + 3, text_start_col + vis_x);
         refresh();
 }

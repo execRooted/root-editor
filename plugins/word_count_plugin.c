@@ -73,57 +73,13 @@ static int count_chars(const char* text) {
 }
 
 static void word_count_on_render(EditorState* state) {
-    char* text = NULL;
-    if (state->select_mode && has_selection(state)) {
-        text = get_selected_text(state);
-    } else {
-        
-        size_t total_len = 0;
-        for (int i = 0; i < state->line_count; i++) {
-            total_len += strlen(state->lines[i]) + 1; 
-        }
-        text = (char*)malloc(total_len + 1);
-        if (text) {
-            text[0] = '\0';
-            for (int i = 0; i < state->line_count; i++) {
-                strcat(text, state->lines[i]);
-                if (i < state->line_count - 1) strcat(text, "\n");
-            }
-        }
-    }
-
-    int words = 0;
-    if (text) {
-        words = count_words(text);
-        free(text);
-    }
-
-    
-    int cur_y, cur_x;
-    getyx(stdscr, cur_y, cur_x); 
-    int max_y, max_x;
-    getmaxyx(stdscr, max_y, max_x);
-    attron(COLOR_PAIR(1)); 
-    const char* syntax_status = (state->syntax_enabled ? "ON" : "OFF");
-    const char* brackets_status = (state->auto_complete_enabled ? "ON" : "OFF");
-    const char* comment_status = (state->comment_complete_enabled ? "ON" : "OFF");
-    mvprintw(max_y - 1, 0, "Line: %d, Col: %d | %s | Syntax HL: %s | Autocomplete: %s | Brackets and Quotes Autocomplete: %s | Autosave: %s | Auto Tabbing: %s | Words: %d",
-             state->cursor_y + 1, state->cursor_x + 1,
-             state->filename[0] ? state->filename : "[Untitled]",
-             syntax_status,
-             comment_status,
-             brackets_status,
-             state->autosave_enabled ? "ON" : "OFF",
-             state->auto_tabbing_enabled ? "ON" : "OFF",
-             words);
-    attroff(COLOR_PAIR(1));
-    move(cur_y, cur_x); 
+    (void)state;
 }
 
 static PluginInterface plugin_interface = {
     .name = "Word Count Plugin",
     .version = "1.0",
-    .description = "Displays word count in bottom left corner",
+    .description = "Provides word count functionality",
     .on_render = word_count_on_render,
 };
 
