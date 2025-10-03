@@ -122,14 +122,11 @@ char * get_system_clipboard() {
     return NULL;
 }
 void handle_input(EditorState * state, int ch) {
-        
+
         if (ch >= 32 && ch <= 126) {
                 reset_key_states(state);
                 insert_char(state, ch);
                 move_cursor(state, 0, 0);
-                
-                render_screen(state);
-                refresh();
                 return;
         }
 
@@ -336,9 +333,6 @@ void handle_input(EditorState * state, int ch) {
                         reset_key_states(state);
                         insert_char(state, ch);
                         move_cursor(state, 0, 0);
-
-                        render_screen(state);
-                        refresh();
                 }
                 break;
         }

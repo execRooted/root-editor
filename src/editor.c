@@ -26,8 +26,8 @@ void init_editor(EditorState * state) {
     state -> needs_sudo = 0;
     memset(state -> key_states, 0, sizeof(state -> key_states));
     memset(state -> key_timestamps, 0, sizeof(state -> key_timestamps));
-    state -> syntax_enabled = 1;
-    state -> syntax_display_enabled = 1;  
+    state -> syntax_enabled = 0;
+    state -> syntax_display_enabled = 1;
     state -> auto_tabbing_enabled = 1;    
     state -> file_type = 0;
     state -> keywords = NULL;
@@ -754,9 +754,6 @@ void jump_to_line(EditorState * state) {
         } else if (state -> cursor_y >= state -> scroll_offset + max_y - 3) {
             state -> scroll_offset = state -> cursor_y - max_y + 4;
         }
-        char msg[256];
-        snprintf(msg, sizeof(msg), "Jumped to line %d", line_num);
-        show_status(state, msg);
     } else {
         show_status(state, "Line not found or not created");
     }
