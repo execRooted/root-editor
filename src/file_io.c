@@ -21,7 +21,7 @@ void load_file(EditorState * state,
 
         state -> line_count = 0;
 
-        // Get file size
+        
         fseek(file, 0, SEEK_END);
         long file_size = ftell(file);
         fseek(file, 0, SEEK_SET);
@@ -37,7 +37,7 @@ void load_file(EditorState * state,
                 size_t read_size = fread(content, 1, file_size, file);
                 content[read_size] = '\0';
 
-                // Split into lines
+                
                 char * line_start = content;
                 char * ptr = content;
                 while (*ptr && state -> line_count < MAX_LINES) {
@@ -58,7 +58,7 @@ void load_file(EditorState * state,
                         ptr++;
                 }
 
-                // Last line if no trailing newline
+                
                 if (line_start < ptr && state -> line_count < MAX_LINES) {
                         state -> lines[state -> line_count] = (char * ) malloc(MAX_LINE_LENGTH);
                         if (!state -> lines[state -> line_count]) {
