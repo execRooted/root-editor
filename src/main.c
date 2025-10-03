@@ -91,8 +91,6 @@ int main(int argc, char * argv[]) {
          EditorState state;
          init_editor(&state);
 
-         
-         // autodetect_and_load_plugins(&state);
 
          load_config(&state);
 

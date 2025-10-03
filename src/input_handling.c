@@ -446,9 +446,6 @@ void handle_ctrl_keys(EditorState * state, int ch) {
         case 4:
                 delete_current_line(state);
                 break;
-        case 16:  
-                list_plugins(state);
-                break;
         case 14:  
                 load_plugin_interactive(state);
                 break;
