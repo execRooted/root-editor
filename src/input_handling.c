@@ -629,9 +629,6 @@ static void paste_from_string(EditorState * state, const char *clipboard_content
 
         state->dirty = 1;
 
-        char status_msg[256];
-        snprintf(status_msg, sizeof(status_msg), "Pasted %d characters", total_chars_pasted);
-        show_status(state, status_msg);
 
         free(content_copy);
 }
