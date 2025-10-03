@@ -1,6 +1,6 @@
 # Root Editor
 
-> Made and tested on Arch Linux, should work fine in all major distros
+> Made and tested on Arch Linux and Debian-based(Tails more specificly), should work fine in all major distros
 
 
 <img src="github/logo.png" width="500" alt="Root Editor Logo">
