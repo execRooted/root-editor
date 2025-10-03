@@ -13,7 +13,6 @@ void load_file(EditorState * state,
                         show_status(state, "Error: Could not create file");
                         return;
                 }
-                show_status(state, "New file created");
         }
 
         for (int i = 0; i < state -> line_count; i++) {
@@ -21,22 +20,59 @@ void load_file(EditorState * state,
         }
 
         state -> line_count = 0;
-        char buffer[MAX_LINE_LENGTH];
 
-        while (fgets(buffer, MAX_LINE_LENGTH, file) && state -> line_count < MAX_LINES) {
+        // Get file size
+        fseek(file, 0, SEEK_END);
+        long file_size = ftell(file);
+        fseek(file, 0, SEEK_SET);
 
-                size_t len = strlen(buffer);
-                if (len > 0 && buffer[len - 1] == '\n') {
-                        buffer[len - 1] = '\0';
-                }
-
-                state -> lines[state -> line_count] = (char * ) malloc(MAX_LINE_LENGTH);
-                if (!state -> lines[state -> line_count]) {
-                        show_status(state, "Memory allocation failed");
+        if (file_size > 0) {
+                char * content = (char *) malloc(file_size + 1);
+                if (!content) {
+                        show_status(state, "Memory allocation failed for file content");
+                        fclose(file);
                         return;
                 }
-                strcpy(state -> lines[state -> line_count], buffer);
-                state -> line_count++;
+
+                size_t read_size = fread(content, 1, file_size, file);
+                content[read_size] = '\0';
+
+                // Split into lines
+                char * line_start = content;
+                char * ptr = content;
+                while (*ptr && state -> line_count < MAX_LINES) {
+                        if (*ptr == '\n') {
+                                *ptr = '\0';
+                                state -> lines[state -> line_count] = (char * ) malloc(MAX_LINE_LENGTH);
+                                if (!state -> lines[state -> line_count]) {
+                                        show_status(state, "Memory allocation failed");
+                                        free(content);
+                                        fclose(file);
+                                        return;
+                                }
+                                strncpy(state -> lines[state -> line_count], line_start, MAX_LINE_LENGTH - 1);
+                                state -> lines[state -> line_count][MAX_LINE_LENGTH - 1] = '\0';
+                                state -> line_count++;
+                                line_start = ptr + 1;
+                        }
+                        ptr++;
+                }
+
+                // Last line if no trailing newline
+                if (line_start < ptr && state -> line_count < MAX_LINES) {
+                        state -> lines[state -> line_count] = (char * ) malloc(MAX_LINE_LENGTH);
+                        if (!state -> lines[state -> line_count]) {
+                                show_status(state, "Memory allocation failed");
+                                free(content);
+                                fclose(file);
+                                return;
+                        }
+                        strncpy(state -> lines[state -> line_count], line_start, MAX_LINE_LENGTH - 1);
+                        state -> lines[state -> line_count][MAX_LINE_LENGTH - 1] = '\0';
+                        state -> line_count++;
+                }
+
+                free(content);
         }
 
         fclose(file);

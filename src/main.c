@@ -92,7 +92,7 @@ int main(int argc, char * argv[]) {
          init_editor(&state);
 
          
-         autodetect_and_load_plugins(&state);
+         // autodetect_and_load_plugins(&state);
 
          load_config(&state);
 
