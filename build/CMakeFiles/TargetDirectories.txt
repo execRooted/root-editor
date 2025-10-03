@@ -1,3 +1,0 @@
-/home/rooted/Projects/github/C/root-editor/build/CMakeFiles/editor.dir
-/home/rooted/Projects/github/C/root-editor/build/CMakeFiles/edit_cache.dir
-/home/rooted/Projects/github/C/root-editor/build/CMakeFiles/rebuild_cache.dir

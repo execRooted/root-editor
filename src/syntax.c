@@ -71,7 +71,7 @@ const int modifiers_count = sizeof(modifiers) / sizeof(modifiers[0]);
 const char* control_flow[] = {
     "if","else","for","while","do","switch","case","default","break",
     "continue","return","goto","match","loop","try","catch","finally",
-    "throw","raise","pass","yield","with","as","fn"
+    "throw","raise","pass","yield","with","as","fn","fi"
 };
 const int control_flow_count = sizeof(control_flow) / sizeof(control_flow[0]);
 
@@ -216,7 +216,7 @@ void detect_file_type(EditorState* state) {
             state->file_type = FILE_TYPE_PHP;
         } else if (strcmp(ext, ".rb") == 0) {
             state->file_type = FILE_TYPE_RUBY;
-        } else if (strcmp(ext, ".sh") == 0 || strcmp(ext, ".bash") == 0) {
+        } else if (strcmp(ext, ".sh") == 0 || strcmp(ext, ".bash") == 0 || strcmp(ext, ".bat") == 0 || strcmp(ext, ".cmd") == 0) {
             state->file_type = FILE_TYPE_SHELL;
         } else if (strcmp(ext, ".html") == 0) {
             state->file_type = FILE_TYPE_HTML;
@@ -364,7 +364,11 @@ int get_vscode_scope_color(EditorState* state, const char* token, int pos_in_lin
         return get_dynamic_color(state, "constant.language");
     }
 
-    
+    if (state->file_type == FILE_TYPE_SHELL) {
+        if (is_control_flow(token)) return COLOR_MODIFIER;
+        if (strcmp(token, "echo") == 0 || strcmp(token, "clear") == 0 || strcmp(token, "cd") == 0 || strcmp(token, "sudo") == 0 || strcmp(token, "rm") == 0 || strcmp(token, "cp") == 0 || strcmp(token, "mkdir") == 0) return COLOR_INTEGER_LITERAL;
+    }
+
     return get_dynamic_color(state, "variable");
 }
 static int get_hierarchical_color(EditorState* state, const char* scope) {
@@ -436,16 +440,16 @@ int get_dynamic_color(EditorState* state, const char* scope);
 const char* get_dynamic_font_style(EditorState* state, const char* scope);
 int hex_to_color_pair(const char* hex_color) {
     if (!hex_color || hex_color[0] != '#') return COLOR_DEFAULT;
-    
-    if (strcmp(hex_color, "#e06c75") == 0) return COLOR_DATA_TYPE; 
-    if (strcmp(hex_color, "#98c379") == 0) return COLOR_STRING; 
-    if (strcmp(hex_color, "#7f848e") == 0) return COLOR_COMMENT; 
-    if (strcmp(hex_color, "#d19a66") == 0) return COLOR_INTEGER_LITERAL; 
-    if (strcmp(hex_color, "#c678dd") == 0) return COLOR_MODIFIER; 
-    if (strcmp(hex_color, "#56b6c2") == 0) return COLOR_OPERATOR; 
-    if (strcmp(hex_color, "#61afef") == 0) return COLOR_FUNCTION; 
-    if (strcmp(hex_color, "#e5c07b") == 0) return COLOR_CONSTANT; 
-    if (strcmp(hex_color, "#abb2bf") == 0) return COLOR_DEFAULT; 
+
+    if (strcmp(hex_color, "#d20f39") == 0) return COLOR_DATA_TYPE;
+    if (strcmp(hex_color, "#40a02b") == 0) return COLOR_STRING;
+    if (strcmp(hex_color, "#9ca0b0") == 0) return COLOR_COMMENT;
+    if (strcmp(hex_color, "#fe640b") == 0) return COLOR_INTEGER_LITERAL;
+    if (strcmp(hex_color, "#8839ef") == 0) return COLOR_MODIFIER;
+    if (strcmp(hex_color, "#179299") == 0) return COLOR_OPERATOR;
+    if (strcmp(hex_color, "#1e66f5") == 0) return COLOR_FUNCTION;
+    if (strcmp(hex_color, "#df8e1d") == 0) return COLOR_CONSTANT;
+    if (strcmp(hex_color, "#4c4f69") == 0) return COLOR_DEFAULT;
     return COLOR_DEFAULT;
 }
 
@@ -727,6 +731,11 @@ void highlight_line(EditorState* state, int line_num, int screen_row, int line_n
             else if (is_storage_class(word)) color = COLOR_STORAGE_CLASS;
             else if (is_preprocessor(word)) color = COLOR_PREPROCESSOR;
             else if (is_stdlib_function(word)) color = COLOR_STDLIB_FUNCTION;
+
+            if (state->file_type == FILE_TYPE_SHELL) {
+                if (is_control_flow(word)) color = COLOR_MODIFIER;
+                else if (strcmp(word, "echo") == 0 || strcmp(word, "clear") == 0 || strcmp(word, "cd") == 0 || strcmp(word, "sudo") == 0 || strcmp(word, "rm") == 0 || strcmp(word, "cp") == 0 || strcmp(word, "mkdir") == 0) color = COLOR_INTEGER_LITERAL;
+            }
 
             attron(COLOR_PAIR(color));
             mvprintw(screen_row, col, "%.*s", word_len, &line[start]);
