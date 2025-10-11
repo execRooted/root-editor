@@ -37,10 +37,10 @@ void render_screen(EditorState * state) {
         }
         attroff(COLOR_PAIR(1));
 
-        const int line_num_width = 6;
+        const int line_num_width = 4;
         const int start_line = state -> scroll_offset;
-        const int end_line = (start_line + max_y - 3 > state -> line_count) ?
-                state -> line_count : start_line + max_y - 3;
+        const int end_line = (start_line + max_y - 5 > state -> line_count) ?
+                state -> line_count : start_line + max_y - 5;
 
         
         const int show_line_numbers = 1;
@@ -53,7 +53,7 @@ void render_screen(EditorState * state) {
 
                 if (show_line_numbers) {
                         attron(COLOR_PAIR(28) | A_BOLD);
-                        mvprintw(screen_row, 0, "%5d ", i + 1);
+                        mvprintw(screen_row, 0, "%3d ", i + 1);
                         attroff(COLOR_PAIR(28) | A_BOLD);
                 }
 

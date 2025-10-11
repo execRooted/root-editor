@@ -72,6 +72,14 @@ void load_file(EditorState * state,
                         state -> line_count++;
                 }
 
+                if (state->line_count > 0 && strlen(state->lines[state->line_count - 1]) > 0 && state->line_count < MAX_LINES) {
+                        state->lines[state->line_count] = (char*)malloc(MAX_LINE_LENGTH);
+                        if (state->lines[state->line_count]) {
+                                state->lines[state->line_count][0] = '\0';
+                                state->line_count++;
+                        }
+                }
+
                 free(content);
         }
 

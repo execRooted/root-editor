@@ -610,6 +610,14 @@ static void paste_from_string(EditorState * state, const char *clipboard_content
         }
 
         
+        if (state->line_count > 0 && strlen(state->lines[state->line_count - 1]) > 0 && state->line_count < MAX_LINES) {
+                state->lines[state->line_count] = (char*)malloc(MAX_LINE_LENGTH);
+                if (state->lines[state->line_count]) {
+                        state->lines[state->line_count][0] = '\0';
+                        state->line_count++;
+                }
+        }
+
         state->cursor_x = strlen(state->lines[state->cursor_y]);
 
         state->dirty = 1;
