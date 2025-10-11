@@ -313,13 +313,38 @@ void find_all_occurrences(EditorState * state,
         }
 
         if (match_count == 0) {
-                char msg[256];
-                snprintf(msg, sizeof(msg), "No matches found for '%s'", search_term);
-                show_status(state, msg);
+                show_status(state, "The word is not present in this file");
                 free(match_lines);
                 free(match_positions);
                 return;
         }
+
+        int unique_lines[1024];
+        int unique_count = 0;
+        for(int j=0; j<match_count && unique_count < 1024; j++){
+            int line = match_lines[j];
+            int found = 0;
+            for(int k=0; k<unique_count; k++){
+                if(unique_lines[k] == line){ found=1; break; }
+            }
+            if(!found) unique_lines[unique_count++] = line;
+        }
+        char msg[512] = "Found ";
+        strncat(msg, search_term, sizeof(msg) - strlen(msg) - 1);
+        strncat(msg, " on the lines ", sizeof(msg) - strlen(msg) - 1);
+        int len = strlen(msg);
+        for(int j=0; j<unique_count; j++){
+            char num[16];
+            snprintf(num, sizeof(num), "%d", unique_lines[j] + 1);
+            if(j>0) {
+                if(len + 1 < sizeof(msg)) { msg[len++] = ';'; }
+            }
+            if(len + strlen(num) < sizeof(msg)) {
+                strcpy(msg + len, num);
+                len += strlen(num);
+            }
+        }
+        show_status(state, msg);
 
         navigate_matches(state, search_term, match_lines, match_positions, match_count);
 
@@ -604,6 +629,9 @@ void replace_text_simple(EditorState * state,
 
         if (replacements > 0) {
                 state -> dirty = 1;
+                char msg[256];
+                snprintf(msg, sizeof(msg), "Replaced %s with %s", search_term, replace_term);
+                show_status(state, msg);
         } else {
         }
 }
