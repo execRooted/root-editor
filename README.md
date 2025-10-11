@@ -3,7 +3,7 @@
 > Made and tested on Arch Linux and Debian-based(Tails more specificly), should work fine in all major distros
 
 
-<img src="github/logo.png" width="500" alt="Root Editor Logo">
+<img src="github/picture0.png" width="500" alt="Root Editor Logo">
 
 
 
