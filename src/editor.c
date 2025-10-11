@@ -584,11 +584,11 @@ void show_status(EditorState * state,
     const char * message) {
     int max_y, max_x;
     getmaxyx(stdscr, max_y, max_x);
-    
+
     mvprintw(max_y - 1, 0, "%*s", max_x, "");
-    attron(COLOR_PAIR(1));
-    mvprintw(max_y - 1, max_x / 2, " %s ", message);
-    attroff(COLOR_PAIR(1));
+    attron(COLOR_PAIR(1) | A_BOLD);
+    mvprintw(max_y - 1, 0, "%s", message);
+    attroff(COLOR_PAIR(1) | A_BOLD);
     refresh();
     napms(500);
 }
