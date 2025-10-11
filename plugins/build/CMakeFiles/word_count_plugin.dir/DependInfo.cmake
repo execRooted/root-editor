@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/rooted/Projects/github/C/root-editor/plugins/word_count_plugin.c" "CMakeFiles/word_count_plugin.dir/word_count_plugin.c.o" "gcc" "CMakeFiles/word_count_plugin.dir/word_count_plugin.c.o.d"
+  "/home/rooted/Projects/C/root-editor/plugins/word_count_plugin.c" "CMakeFiles/word_count_plugin.dir/word_count_plugin.c.o" "gcc" "CMakeFiles/word_count_plugin.dir/word_count_plugin.c.o.d"
   "" "libword_count_plugin.so" "gcc" "CMakeFiles/word_count_plugin.dir/link.d"
   )
 

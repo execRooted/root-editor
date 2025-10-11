@@ -93,7 +93,6 @@ void unload_all_plugins(EditorState* state) {
 
 void list_plugins(EditorState* state) {
     if (state->plugin_count == 0) {
-        show_status_left(state, "No plugins loaded");
         return;
     }
 
@@ -112,8 +111,6 @@ void list_plugins(EditorState* state) {
             len += strlen(name);
         }
     }
-
-    show_status_left(state, msg);
 }
 
 int find_plugin_by_name(EditorState* state, const char* name) {

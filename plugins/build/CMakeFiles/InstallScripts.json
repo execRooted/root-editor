@@ -1,7 +1,7 @@
 {
 	"InstallScripts" : 
 	[
-		"/home/rooted/Projects/github/C/root-editor/plugins/build/cmake_install.cmake"
+		"/home/rooted/Projects/C/root-editor/plugins/build/cmake_install.cmake"
 	],
 	"Parallel" : false
 }

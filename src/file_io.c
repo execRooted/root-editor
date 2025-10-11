@@ -151,7 +151,6 @@ void save_file(EditorState * state) {
         save_original_content(state);
         update_dirty_status(state);
         state -> needs_sudo = 0;
-        show_status(state, "File saved successfully");
 }
 
 void save_file_with_sudo(EditorState * state) {
@@ -181,11 +180,10 @@ void save_file_with_sudo(EditorState * state) {
         unlink(temp_path);
 
         if (result == 0) {
-                
+
                 save_original_content(state);
                 update_dirty_status(state);
                 state -> needs_sudo = 0;
-                show_status(state, "File saved with sudo privileges");
         } else {
                 show_status(state, "Error: Failed to save with sudo privileges");
         }
@@ -299,9 +297,7 @@ void prompt_filename(EditorState * state) {
 
         if (strlen(filename) > 0) {
                 strcpy(state->filename, filename);
-                show_status(state, "File name set successfully");
         } else {
-                show_status(state, "Save cancelled");
         }
 }
 static char* gui_select_file(void) {
@@ -449,7 +445,6 @@ void prompt_open_file(EditorState * state) {
         if (strlen(filename) > 0) {
                 load_file(state, filename);
         } else {
-                show_status(state, "Open cancelled");
         }
 }
 void autosave_check(EditorState * state) {
@@ -460,14 +455,12 @@ void autosave_check(EditorState * state) {
         if (state->dirty && difftime(now, state->last_autosave_time) >= state->autosave_interval_sec) {
                 save_file(state);
                 state->last_autosave_time = now;
-                show_status(state, "Autosaved");
         }
 }
 
 void toggle_autosave(EditorState * state) {
         state->autosave_enabled = !state->autosave_enabled;
         state->last_autosave_time = time(NULL);
-        show_status(state, state->autosave_enabled ? "Autosave ON" : "Autosave OFF");
 }
 static void ensure_config_dir(char *out_dir, size_t out_sz) {
         const char *home = getenv("HOME");
@@ -547,7 +540,6 @@ void save_config(EditorState * state) {
         fprintf(fp, "comment_complete_enabled=%d\n", state->comment_complete_enabled);
         fprintf(fp, "auto_tabbing_enabled=%d\n", state->auto_tabbing_enabled);
         fclose(fp);
-        show_status(state, "Config saved");
 }
 
 void safe_quit(EditorState * state) {

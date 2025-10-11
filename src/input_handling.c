@@ -308,7 +308,6 @@ void handle_input(EditorState * state, int ch) {
         case 27:
                 if (state->char_select_mode) {
                         state->char_select_mode = 0;
-                        show_status(state, "Character selection mode exited");
                 } else if (state -> select_mode) {
                         clear_selection(state);
                 } else if (state -> show_help) {
@@ -411,7 +410,6 @@ void handle_ctrl_keys(EditorState * state, int ch) {
                         cut_text(state);
                         mark_key_processed(state, ch);
                 } else {
-                        show_status(state, "Select text first (Ctrl+A for all, or use mouse)");
                 }
                 break;
 
@@ -430,12 +428,11 @@ void handle_ctrl_keys(EditorState * state, int ch) {
                 toggle_comment_complete(state);
                 mark_key_processed(state, ch);
                 break;
-        case 23:  
+        case 23:
                 state->char_select_mode = 1;
                 clear_selection(state);
-                
+
                 start_selection(state);
-                show_status(state, "Character selection mode - use arrow keys to select, ESC to exit");
                 mark_key_processed(state, ch);
                 break;
         case 5:
@@ -470,7 +467,6 @@ void cut_text(EditorState * state) {
                 state -> cursor_x = 0;
                 state -> dirty = 1;
         } else {
-                show_status(state, "No text to cut");
         }
 }
 
@@ -505,8 +501,6 @@ void delete_current_line(EditorState * state) {
         move_cursor(state, 0, 0);
 
         state -> dirty = 1;
-
-        show_status(state, "Line deleted");
 }
 
 static void paste_from_string(EditorState * state, const char *clipboard_content) {

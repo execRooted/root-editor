@@ -52,9 +52,9 @@ void render_screen(EditorState * state) {
                 const int screen_row = i - start_line + 3;
 
                 if (show_line_numbers) {
-                        attron(COLOR_PAIR(28));
+                        attron(COLOR_PAIR(28) | A_BOLD);
                         mvprintw(screen_row, 0, "%5d ", i + 1);
-                        attroff(COLOR_PAIR(28));
+                        attroff(COLOR_PAIR(28) | A_BOLD);
                 }
 
                 char * line = lines[i];
@@ -333,16 +333,8 @@ void navigate_matches(EditorState * state,
 
         if (match_count == 0) return;
 
-        char msg[256];
-        snprintf(msg, sizeof(msg), "Found %d matches for '%s'. Press Enter to cycle through matches", match_count, search_term);
-        show_status(state, msg);
-
         current_match = 0;
         jump_to_match(state, match_lines[current_match], match_positions[current_match]);
-
-        char nav_msg[256];
-        snprintf(nav_msg, sizeof(nav_msg), "Match 1/%d - Jumped to line %d", match_count, match_lines[current_match] + 1);
-        show_status(state, nav_msg);
 
         timeout(2000);
 
@@ -353,17 +345,11 @@ void navigate_matches(EditorState * state,
 
                         current_match = (current_match + 1) % match_count;
                         jump_to_match(state, match_lines[current_match], match_positions[current_match]);
-
-                        char nav_msg[256];
-                        snprintf(nav_msg, sizeof(nav_msg), "Match %d/%d - Jumped to line %d", current_match + 1, match_count, match_lines[current_match] + 1);
-                        show_status(state, nav_msg);
                 } else if (ch == 27) {
 
-                        show_status(state, "Find navigation exited");
                         break;
                 } else if (ch == ERR) {
 
-                        show_status(state, "Find navigation timed out");
                         break;
                 }
         }
@@ -618,11 +604,7 @@ void replace_text_simple(EditorState * state,
 
         if (replacements > 0) {
                 state -> dirty = 1;
-                char msg[256];
-                snprintf(msg, sizeof(msg), "Replaced %d occurrences", replacements);
-                show_status(state, msg);
         } else {
-                show_status(state, "No occurrences found");
         }
 }
 
@@ -844,9 +826,6 @@ void cycle_theme(EditorState* state) {
         refresh();
     }
     save_config(state);
-    char msg[64];
-    snprintf(msg, sizeof(msg), "Theme: %s", state->theme_name);
-    show_status(state, msg);
 
 
 }

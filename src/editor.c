@@ -622,7 +622,6 @@ void count_stats(EditorState * state) {
     }
     char msg[256];
     snprintf(msg, sizeof(msg), "Words: %d, Characters: %d", words, characters);
-    show_status(state, msg);
 }
 
 static char* internal_clipboard = NULL;
@@ -854,61 +853,34 @@ void toggle_syntax_highlighting(EditorState * state) {
     state -> syntax_enabled = !state -> syntax_enabled;
     if (state -> syntax_enabled) {
         init_syntax_highlighting(state);
-        show_status(state, "Syntax highlighting enabled");
     } else {
         free_syntax_data(state);
-        show_status(state, "Syntax highlighting disabled");
     }
     save_config(state);
 }
 
 void toggle_word_wrap(EditorState * state) {
     state -> word_wrap = !state -> word_wrap;
-    if (state -> word_wrap) {
-        show_status(state, "Word wrap enabled");
-    } else {
-        show_status(state, "Word wrap disabled");
-    }
     save_config(state);
 }
 
 void toggle_syntax_display(EditorState * state) {
     state -> syntax_display_enabled = !state -> syntax_display_enabled;
-    if (state -> syntax_display_enabled) {
-        show_status(state, "Syntax highlighting display enabled");
-    } else {
-        show_status(state, "Syntax highlighting display disabled");
-    }
     save_config(state);
 }
 
 void toggle_auto_tabbing(EditorState * state) {
     state -> auto_tabbing_enabled = !state -> auto_tabbing_enabled;
-    if (state -> auto_tabbing_enabled) {
-        show_status(state, "Auto indent enabled");
-    } else {
-        show_status(state, "Auto indent disabled");
-    }
     save_config(state);
 }
 
 void toggle_auto_complete(EditorState * state) {
     state -> auto_complete_enabled = !state -> auto_complete_enabled;
-    if (state -> auto_complete_enabled) {
-        show_status(state, "Auto complete enabled");
-    } else {
-        show_status(state, "Auto complete disabled");
-    }
     save_config(state);
 }
 
 void toggle_comment_complete(EditorState * state) {
     state -> comment_complete_enabled = !state -> comment_complete_enabled;
-    if (state -> comment_complete_enabled) {
-        show_status(state, "Comment complete enabled");
-    } else {
-        show_status(state, "Comment complete disabled");
-    }
     save_config(state);
 }
 int can_process_key(EditorState * state, int key_code) {

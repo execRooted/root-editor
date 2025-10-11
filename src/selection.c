@@ -70,7 +70,6 @@ void copy_selected_text(EditorState * state) {
         system("rm -f '/tmp/kilo_editor_clipboard_temp.txt' 2>/dev/null &");
 
         clear_selection(state);
-        show_status(state, "Selected text copied to clipboard");
 }
 
 void clear_selection(EditorState * state) {
