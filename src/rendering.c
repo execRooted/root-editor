@@ -27,7 +27,7 @@ void render_screen(EditorState * state) {
                 strcpy(cwd, "[Unable to get path]");
         }
 
-        attron(COLOR_PAIR(1));
+        attron(COLOR_PAIR(1) | A_BOLD);
         if (strlen(state -> filename) > 0) {
                 mvprintw(0, 0, "Current File: %s", state -> filename);
                 mvprintw(1, 0, "Path: %s", cwd);
@@ -35,9 +35,9 @@ void render_screen(EditorState * state) {
                 mvprintw(0, 0, "Current File: [Untitled]");
                 mvprintw(1, 0, "Path: %s", cwd);
         }
-        attroff(COLOR_PAIR(1));
+        attroff(COLOR_PAIR(1) | A_BOLD);
 
-        const int line_num_width = 4;
+        const int line_num_width = 8;
         const int start_line = state -> scroll_offset;
         const int end_line = (start_line + max_y - 5 > state -> line_count) ?
                 state -> line_count : start_line + max_y - 5;
@@ -53,7 +53,7 @@ void render_screen(EditorState * state) {
 
                 if (show_line_numbers) {
                         attron(COLOR_PAIR(28) | A_BOLD);
-                        mvprintw(screen_row, 0, "%3d ", i + 1);
+                        mvprintw(screen_row, 0, "%5d   ", i + 1);
                         attroff(COLOR_PAIR(28) | A_BOLD);
                 }
 
@@ -139,20 +139,20 @@ void render_screen(EditorState * state) {
             }
         }
 
-        attron(COLOR_PAIR(1));
+        attron(COLOR_PAIR(1) | A_BOLD);
         const char* syntax_status = (state->syntax_enabled ? "ON" : "OFF");
         const char* brackets_status = (state->auto_complete_enabled ? "ON" : "OFF");
         const char* comment_status = (state->comment_complete_enabled ? "ON" : "OFF");
         mvprintw(max_y - 1, 0, "Line: %d, Col: %d | %s | Syntax HL: %s | Autocomplete: %s | Brackets and Quotes Autocomplete: %s | Autosave: %s | Auto Tabbing: %s | Words: %d",
-                 state->cursor_y + 1, state->cursor_x + 1,
-                 state->filename[0] ? state->filename : "[Untitled]",
-                 syntax_status,
-                 comment_status,
-                 brackets_status,
-                 state->autosave_enabled ? "ON" : "OFF",
-                 state->auto_tabbing_enabled ? "ON" : "OFF",
-                 words);
-        attroff(COLOR_PAIR(1));
+                  state->cursor_y + 1, state->cursor_x + 1,
+                  state->filename[0] ? state->filename : "[Untitled]",
+                  syntax_status,
+                  comment_status,
+                  brackets_status,
+                  state->autosave_enabled ? "ON" : "OFF",
+                  state->auto_tabbing_enabled ? "ON" : "OFF",
+                  words);
+        attroff(COLOR_PAIR(1) | A_BOLD);
 
         move(state -> cursor_y - start_line + 3, text_start_col + vis_x);
         refresh();
