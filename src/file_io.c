@@ -107,11 +107,15 @@ void load_file(EditorState* state, const char* filename)
         update_dirty_status(state);
 
         detect_file_type(state);
+
+        // Load config settings
+        load_config(state);
+
         if (state->syntax_enabled) {
                 init_syntax_highlighting(state);
         }
 
-        
+
         call_plugin_file_load_hooks(state, filename);
 
 }
@@ -500,23 +504,20 @@ void load_config(EditorState* state)
         char path[512];
         get_config_path(path, sizeof(path));
         FILE *fp = fopen(path, "r");
-        if (!fp) return;
+        if (!fp) {
+                // Create default config file if it doesn't exist
+                save_config(state);
+                return;
+        }
 
         char line[512];
         while (fgets(line, sizeof(line), fp)) {
-                
+
                 size_t len = strlen(line);
                 if (len && (line[len-1]=='\n' || line[len-1]=='\r')) line[len-1] = '\0';
                 char key[64], val[256];
                 if (sscanf(line, " %63[^=]=%255[^\n] ", key, val) == 2) {
-                        if (strcmp(key, "theme_id")==0) {
-                                
-                                state->theme_id = 1;
-                                strncpy(state->theme_name, "Frappé", sizeof(state->theme_name)-1);
-                                state->theme_name[sizeof(state->theme_name)-1] = '\0';
-                        } else if (strcmp(key, "word_wrap")==0) {
-                                state->word_wrap = atoi(val) ? 1 : 0;
-                        } else if (strcmp(key, "tab_size")==0) {
+                        if (strcmp(key, "tab_size")==0) {
                                 int t = atoi(val);
                                 if (t >= 1 && t <= 8) state->tab_size = t;
                         } else if (strcmp(key, "syntax_enabled")==0) {
@@ -542,7 +543,7 @@ void save_config(EditorState* state)
 {
         char path[512];
         get_config_path(path, sizeof(path));
-        
+
         char dir[512];
         ensure_config_dir(dir, sizeof(dir));
 
@@ -551,8 +552,6 @@ void save_config(EditorState* state)
                 show_status(state, "Failed to save config");
                 return;
         }
-        fprintf(fp, "theme_id=%d\n", state->theme_id);
-        fprintf(fp, "word_wrap=%d\n", state->word_wrap);
         fprintf(fp, "tab_size=%d\n", state->tab_size);
         fprintf(fp, "syntax_enabled=%d\n", state->syntax_enabled);
         fprintf(fp, "autosave_enabled=%d\n", state->autosave_enabled);

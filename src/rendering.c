@@ -144,13 +144,14 @@ void render_screen(EditorState* state)
         const char* syntax_status = (state->syntax_enabled ? "ON" : "OFF");
         const char* brackets_status = (state->auto_complete_enabled ? "ON" : "OFF");
         const char* comment_status = (state->comment_complete_enabled ? "ON" : "OFF");
-        mvprintw(max_y - 1, 0, "Line: %d, Col: %d | %s | Syntax HL: %s | Autocomplete: %s | Brackets and Quotes Autocomplete: %s | Autosave: %s | Auto Tabbing: %s | Words: %d",
+        const char* edited_indicator = (state->dirty ? " [edited]" : "");
+        mvprintw(max_y - 1, 0, "Line: %d, Col: %d | %s%s | Syntax HL: %s | Autocomplete: %s | Brackets and Quotes Autocomplete: %s | Auto Tabbing: %s | Words: %d",
                   state->cursor_y + 1, state->cursor_x + 1,
                   state->filename[0] ? state->filename : "[Untitled]",
+                  edited_indicator,
                   syntax_status,
                   comment_status,
                   brackets_status,
-                  state->autosave_enabled ? "ON" : "OFF",
                   state->auto_tabbing_enabled ? "ON" : "OFF",
                   words);
         attroff(COLOR_PAIR(1) | A_BOLD);

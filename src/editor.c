@@ -16,7 +16,7 @@ void init_editor(EditorState* state)
     state -> filename[0] = '\0';
     state -> dirty = 0;
     state -> line_numbers = 1;
-    state -> word_wrap = 0;
+    state -> word_wrap = 1;
     state -> tab_size = TAB_SIZE;
     state -> select_mode = 0;
     state -> select_start_x = 0;
