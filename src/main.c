@@ -5,16 +5,26 @@
 #include <stdlib.h>
 #include <dirent.h>
 
-static void enable_bracketed_paste(void) { printf("\033[?2004h"); fflush(stdout); }
-static void disable_bracketed_paste(void) { printf("\033[?2004l"); fflush(stdout); }
+static void enable_bracketed_paste(void)
+{
+        printf("\033[?2004h");
+        fflush(stdout);
+}
+static void disable_bracketed_paste(void)
+{
+        printf("\033[?2004l");
+        fflush(stdout);
+}
 
-void set_window_title() {
-         printf("\033]0;root-editor\007");
-         fflush(stdout);
+void set_window_title()
+{
+        printf("\033]0;root-editor\007");
+        fflush(stdout);
 }
 
 
-void show_welcome_screen() {
+void show_welcome_screen()
+{
         clear();
         refresh();
 
@@ -85,7 +95,8 @@ void show_welcome_screen() {
         timeout(0);
 }
 
-int main(int argc, char * argv[]) {
+int main(int argc, char * argv[])
+{
          
 
          EditorState state;

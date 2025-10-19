@@ -3,7 +3,8 @@
 #include <string.h>
 #include <dirent.h>
 
-int load_plugin(EditorState* state, const char* plugin_path) {
+int load_plugin(EditorState* state, const char* plugin_path)
+{
     if (state->plugin_count >= MAX_PLUGINS) {
         return -1;
     }
@@ -61,7 +62,8 @@ int load_plugin(EditorState* state, const char* plugin_path) {
     return index;
 }
 
-void unload_plugin(EditorState* state, int plugin_index) {
+void unload_plugin(EditorState* state, int plugin_index)
+{
     if (plugin_index < 0 || plugin_index >= state->plugin_count) {
         return;
     }
@@ -85,13 +87,15 @@ void unload_plugin(EditorState* state, int plugin_index) {
     state->plugin_count--;
 }
 
-void unload_all_plugins(EditorState* state) {
+void unload_all_plugins(EditorState* state)
+{
     for (int i = state->plugin_count - 1; i >= 0; i--) {
         unload_plugin(state, i);
     }
 }
 
-void list_plugins(EditorState* state) {
+void list_plugins(EditorState* state)
+{
     if (state->plugin_count == 0) {
         return;
     }
@@ -113,7 +117,8 @@ void list_plugins(EditorState* state) {
     }
 }
 
-int find_plugin_by_name(EditorState* state, const char* name) {
+int find_plugin_by_name(EditorState* state, const char* name)
+{
     for (int i = 0; i < state->plugin_count; i++) {
         if (state->plugins[i].interface &&
             state->plugins[i].interface->name &&
@@ -124,7 +129,8 @@ int find_plugin_by_name(EditorState* state, const char* name) {
     return -1;
 }
 
-void call_plugin_keypress_hooks(EditorState* state, int ch) {
+void call_plugin_keypress_hooks(EditorState* state, int ch)
+{
     for (int i = 0; i < state->plugin_count; i++) {
         if (state->plugins[i].loaded &&
             state->plugins[i].interface &&
@@ -134,7 +140,8 @@ void call_plugin_keypress_hooks(EditorState* state, int ch) {
     }
 }
 
-void call_plugin_render_hooks(EditorState* state) {
+void call_plugin_render_hooks(EditorState* state)
+{
     for (int i = 0; i < state->plugin_count; i++) {
         if (state->plugins[i].loaded &&
             state->plugins[i].interface &&
@@ -144,7 +151,8 @@ void call_plugin_render_hooks(EditorState* state) {
     }
 }
 
-void call_plugin_file_load_hooks(EditorState* state, const char* filename) {
+void call_plugin_file_load_hooks(EditorState* state, const char* filename)
+{
     for (int i = 0; i < state->plugin_count; i++) {
         if (state->plugins[i].loaded &&
             state->plugins[i].interface &&
@@ -154,7 +162,8 @@ void call_plugin_file_load_hooks(EditorState* state, const char* filename) {
     }
 }
 
-void call_plugin_file_save_hooks(EditorState* state, const char* filename) {
+void call_plugin_file_save_hooks(EditorState* state, const char* filename)
+{
     for (int i = 0; i < state->plugin_count; i++) {
         if (state->plugins[i].loaded &&
             state->plugins[i].interface &&
@@ -164,7 +173,8 @@ void call_plugin_file_save_hooks(EditorState* state, const char* filename) {
     }
 }
 
-void call_plugin_quit_hooks(EditorState* state) {
+void call_plugin_quit_hooks(EditorState* state)
+{
     for (int i = 0; i < state->plugin_count; i++) {
         if (state->plugins[i].loaded &&
             state->plugins[i].interface &&
@@ -174,7 +184,8 @@ void call_plugin_quit_hooks(EditorState* state) {
     }
 }
 
-void load_plugins_from_directory(EditorState* state, const char* dir_path) {
+void load_plugins_from_directory(EditorState* state, const char* dir_path)
+{
     DIR* dir = opendir(dir_path);
     if (!dir) {
         return;
@@ -206,7 +217,8 @@ void load_plugins_from_directory(EditorState* state, const char* dir_path) {
     closedir(dir);
 }
 
-void autodetect_and_load_plugins(EditorState* state) {
+void autodetect_and_load_plugins(EditorState* state)
+{
     char home_plugins_path[512] = {0};
     const char* home = getenv("HOME");
     if (home) {
@@ -268,7 +280,8 @@ void autodetect_and_load_plugins(EditorState* state) {
     
 }
 
-void load_plugin_interactive(EditorState* state) {
+void load_plugin_interactive(EditorState* state)
+{
     echo();
     curs_set(1);
 

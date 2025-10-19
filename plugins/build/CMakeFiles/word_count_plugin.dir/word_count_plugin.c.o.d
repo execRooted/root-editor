@@ -1,7 +1,7 @@
 CMakeFiles/word_count_plugin.dir/word_count_plugin.c.o: \
- /home/rooted/Projects/C/root-editor/plugins/word_count_plugin.c \
+ /home/rooted/home2/Projects/C/root-editor/plugins/word_count_plugin.c \
  /usr/include/stdc-predef.h \
- /home/rooted/Projects/C/root-editor/plugins/../src/editor.h \
+ /home/rooted/home2/Projects/C/root-editor/plugins/../src/editor.h \
  /usr/include/curses.h /usr/include/ncurses_dll.h \
  /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include/stdint.h \
  /usr/include/stdint.h /usr/include/bits/libc-header-start.h \

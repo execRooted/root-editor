@@ -3,9 +3,11 @@
 #include "editor.h"
 #include "plugin.h"
 
-void load_file(EditorState * state,
-        const char * filename) {
-        FILE * file = fopen(filename, "r");
+void load_file(EditorState* state, const char* filename)
+{
+
+
+        FILE* file = fopen(filename, "r");
         if (!file) {
 
                 file = fopen(filename, "w+");
@@ -114,7 +116,8 @@ void load_file(EditorState * state,
 
 }
 
-void save_file(EditorState * state) {
+void save_file(EditorState* state)
+{
         if (state -> filename[0] == '\0') {
 
                 prompt_filename(state);
@@ -161,7 +164,8 @@ void save_file(EditorState * state) {
         state -> needs_sudo = 0;
 }
 
-void save_file_with_sudo(EditorState * state) {
+void save_file_with_sudo(EditorState* state)
+{
         if (state -> filename[0] == '\0') {
                 show_status(state, "Error: No filename specified");
                 return;
@@ -197,7 +201,8 @@ void save_file_with_sudo(EditorState * state) {
         }
 }
 
-void prompt_filename(EditorState * state) {
+void prompt_filename(EditorState* state)
+{
 
         echo();
         curs_set(1);
@@ -308,10 +313,12 @@ void prompt_filename(EditorState * state) {
         } else {
         }
 }
-static char* gui_select_file(void) {
+static char* gui_select_file(void)
+{
         return NULL;
 }
-void prompt_open_file(EditorState * state) {
+void prompt_open_file(EditorState* state)
+{
         if (state->dirty) {
                 echo();
                 curs_set(1);
@@ -455,7 +462,8 @@ void prompt_open_file(EditorState * state) {
         } else {
         }
 }
-void autosave_check(EditorState * state) {
+void autosave_check(EditorState* state)
+{
         if (!state) return;
         if (!state->autosave_enabled) return;
         if (state->filename[0] == '\0') return; 
@@ -466,11 +474,13 @@ void autosave_check(EditorState * state) {
         }
 }
 
-void toggle_autosave(EditorState * state) {
+void toggle_autosave(EditorState* state)
+{
         state->autosave_enabled = !state->autosave_enabled;
         state->last_autosave_time = time(NULL);
 }
-static void ensure_config_dir(char *out_dir, size_t out_sz) {
+static void ensure_config_dir(char *out_dir, size_t out_sz)
+{
         const char *home = getenv("HOME");
         if (!home) home = ".";
         snprintf(out_dir, out_sz, "%s/.config/root-editor", home);
@@ -478,13 +488,15 @@ static void ensure_config_dir(char *out_dir, size_t out_sz) {
         mkdir(out_dir, 0755);
 }
 
-static void get_config_path(char *out_path, size_t out_sz) {
+static void get_config_path(char *out_path, size_t out_sz)
+{
         char dir[512];
         ensure_config_dir(dir, sizeof(dir));
         snprintf(out_path, out_sz, "%s/config.ini", dir);
 }
 
-void load_config(EditorState * state) {
+void load_config(EditorState* state)
+{
         char path[512];
         get_config_path(path, sizeof(path));
         FILE *fp = fopen(path, "r");
@@ -526,7 +538,8 @@ void load_config(EditorState * state) {
         fclose(fp);
 }
 
-void save_config(EditorState * state) {
+void save_config(EditorState* state)
+{
         char path[512];
         get_config_path(path, sizeof(path));
         
@@ -550,7 +563,8 @@ void save_config(EditorState * state) {
         fclose(fp);
 }
 
-void safe_quit(EditorState * state) {
+void safe_quit(EditorState* state)
+{
          if (!state->dirty) {
 
                   unload_all_plugins(state);

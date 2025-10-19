@@ -4,7 +4,8 @@
 
 
 
-void select_all(EditorState * state) {
+void select_all(EditorState* state)
+{
         if (state -> line_count == 0) return;
 
         state -> select_mode = 1;
@@ -16,7 +17,8 @@ void select_all(EditorState * state) {
         state -> cursor_y = state -> select_end_y;
 }
 
-void select_current_line(EditorState * state) {
+void select_current_line(EditorState* state)
+{
         if (state -> cursor_y < 0 || state -> cursor_y >= state -> line_count) return;
 
         state -> select_mode = 1;
@@ -26,7 +28,8 @@ void select_current_line(EditorState * state) {
         state -> select_end_y = state -> cursor_y;
 }
 
-void copy_selected_text(EditorState * state) {
+void copy_selected_text(EditorState* state)
+{
         if (!state -> select_mode) {
                 return;
         }
@@ -72,7 +75,8 @@ void copy_selected_text(EditorState * state) {
         clear_selection(state);
 }
 
-void clear_selection(EditorState * state) {
+void clear_selection(EditorState* state)
+{
         state -> select_mode = 0;
         state -> select_start_x = 0;
         state -> select_start_y = 0;
@@ -80,7 +84,8 @@ void clear_selection(EditorState * state) {
         state -> select_end_y = 0;
 }
 
-void start_selection(EditorState * state) {
+void start_selection(EditorState* state)
+{
         state -> select_mode = 1;
         state -> select_start_x = state -> cursor_x;
         state -> select_start_y = state -> cursor_y;
@@ -93,15 +98,16 @@ void start_selection(EditorState * state) {
                 int ex = state->cursor_x + 1;
                 if (ex > line_len) ex = line_len;
 
-                state -> select_end_x = ex;                 
+                state -> select_end_x = ex;
                 state -> select_end_y = state -> cursor_y;
         } else {
-                state -> select_end_x = state -> cursor_x;  
+                state -> select_end_x = state -> cursor_x;
                 state -> select_end_y = state -> cursor_y;
         }
 }
 
-void extend_selection(EditorState * state) {
+void extend_selection(EditorState* state)
+{
         if (!state->select_mode) return;
 
         int anchor_x = state->select_start_x;
@@ -111,11 +117,11 @@ void extend_selection(EditorState * state) {
 
         int forward = (cur_y > anchor_y) || (cur_y == anchor_y && cur_x >= anchor_x);
 
-        
+
         state->select_end_x = cur_x;
         state->select_end_y = cur_y;
 
-        
+
         if (state->select_start_y > state->select_end_y ||
             (state->select_start_y == state->select_end_y &&
              state->select_start_x > state->select_end_x)) {
@@ -125,12 +131,13 @@ void extend_selection(EditorState * state) {
             state->select_start_y = state->select_end_y;
             state->select_end_x = temp_x;
             state->select_end_y = temp_y;
-            
-            
+
+
+
             forward = 0;
         }
 
-        
+
         if (forward) {
             int end_line_len = 0;
             if (state->select_end_y >= 0 && state->select_end_y < state->line_count && state->lines[state->select_end_y]) {
@@ -142,13 +149,15 @@ void extend_selection(EditorState * state) {
         }
 }
 
-int has_selection(EditorState * state) {
+int has_selection(EditorState* state)
+{
         return state -> select_mode &&
                 (state -> select_start_y != state -> select_end_y ||
                         state -> select_start_x != state -> select_end_x);
 }
 
-char * get_selected_text(EditorState * state) {
+char* get_selected_text(EditorState* state)
+{
         if (!has_selection(state)) return NULL;
 
         int start_y = state -> select_start_y;
@@ -188,7 +197,8 @@ char * get_selected_text(EditorState * state) {
         return selected_text;
 }
 
-void delete_selected_text(EditorState * state) {
+void delete_selected_text(EditorState* state)
+{
         if (!has_selection(state)) return;
 
         int start_y = state -> select_start_y;
@@ -196,12 +206,15 @@ void delete_selected_text(EditorState * state) {
         int start_x = state -> select_start_x;
         int end_x = state -> select_end_x;
 
-        if (start_y == end_y) {
+        if (start_y == end_y)
+        {
                 char * line = state -> lines[start_y];
                 memmove( & line[start_x], & line[end_x], strlen(line) - end_x + 1);
                 state -> cursor_x = start_x;
                 state -> cursor_y = start_y;
-        } else {
+        }
+        else
+        {
                 char * first_line = state -> lines[start_y];
                 first_line[start_x] = '\0';
 

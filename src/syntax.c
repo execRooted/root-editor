@@ -116,7 +116,8 @@ const char* c_operators[] = {
 };
 const int c_operator_count = sizeof(c_operators) / sizeof(c_operators[0]);
 void load_keywords(EditorState* state);
-int is_in_list(const char* word, const char** list, int count) {
+int is_in_list(const char* word, const char** list, int count)
+{
     if (!word) return 0;
     for (int i = 0; i < count; i++) {
         if (strcmp(word, list[i]) == 0) return 1;
@@ -133,7 +134,8 @@ int is_constant(const char* word)         { return is_in_list(word, constants, c
 int is_stdlib_function(const char* word)  { return is_in_list(word, stdlib_functions, stdlib_functions_count); }
 int is_stdlib_type(const char* word)      { return is_in_list(word, stdlib_types, stdlib_types_count); }
 
-int is_operator(const char* op) {
+int is_operator(const char* op)
+{
     if (!op) return 0;
     for (int i = 0; i < c_operator_count; i++) {
         if (strcmp(op, c_operators[i]) == 0) return 1;
@@ -141,11 +143,13 @@ int is_operator(const char* op) {
     return 0;
 }
 
-int is_bracket(char ch) {
+int is_bracket(char ch)
+{
     return ch=='(' || ch==')' || ch=='[' || ch==']' || ch=='{' || ch=='}';
 }
 
-int is_number(const char* token) {
+int is_number(const char* token)
+{
     if (!token || !*token) return 0;
     int i = 0, has_dot = 0;
     if (token[0]=='-' || token[0]=='+') i++;
@@ -155,13 +159,15 @@ int is_number(const char* token) {
     }
     return 1;
 }
-void init_syntax_highlighting(EditorState* state) {
+void init_syntax_highlighting(EditorState* state)
+{
     if (!state->syntax_enabled) return;
     detect_file_type(state);
     load_keywords(state);
 }
 
-void detect_file_type(EditorState* state) {
+void detect_file_type(EditorState* state)
+{
     if (!*state->filename) {
         state->file_type = FILE_TYPE_PLAIN;
         state->syntax_enabled = 0;
@@ -238,7 +244,8 @@ void detect_file_type(EditorState* state) {
 
 void load_keywords(EditorState* state) { (void)state; }
 
-void free_syntax_data(EditorState* state) {
+void free_syntax_data(EditorState* state)
+{
     if (!state->keywords) return;
     for (int i = 0; i < state->keyword_count; i++) free(state->keywords[i]);
     free(state->keywords);
@@ -246,11 +253,13 @@ void free_syntax_data(EditorState* state) {
     state->keyword_count = 0;
 }
 
-void update_syntax_highlighting(EditorState* state) {
+void update_syntax_highlighting(EditorState* state)
+{
     
     (void)state;
 }
-void analyze_token_context(EditorState* state, int line_num, int token_start, int token_end, TokenInfo* info) {
+void analyze_token_context(EditorState* state, int line_num, int token_start, int token_end, TokenInfo* info)
+{
     if (!state->lines[line_num]) return;
 
     char* line = state->lines[line_num];
@@ -318,7 +327,8 @@ void analyze_token_context(EditorState* state, int line_num, int token_start, in
     info->is_variable = 1;
     strcpy(info->scope, "variable");
 }
-int get_vscode_scope_color(EditorState* state, const char* token, int pos_in_line, char* line, int line_num) {
+int get_vscode_scope_color(EditorState* state, const char* token, int pos_in_line, char* line, int line_num)
+{
     
     TokenInfo info;
     analyze_token_context(state, line_num, pos_in_line, pos_in_line + strlen(token), &info);
@@ -371,7 +381,8 @@ int get_vscode_scope_color(EditorState* state, const char* token, int pos_in_lin
 
     return get_dynamic_color(state, "variable");
 }
-static int get_hierarchical_color(EditorState* state, const char* scope) {
+static int get_hierarchical_color(EditorState* state, const char* scope)
+{
     if (!scope) return COLOR_DEFAULT;
     int color = get_dynamic_color(state, scope);
     if (color != COLOR_DEFAULT) return color;
@@ -438,7 +449,8 @@ int hex_to_color_pair(const char* hex_color);
 int match_scope(const char* token_scope, const char* rule_scope);
 int get_dynamic_color(EditorState* state, const char* scope);
 const char* get_dynamic_font_style(EditorState* state, const char* scope);
-int hex_to_color_pair(const char* hex_color) {
+int hex_to_color_pair(const char* hex_color)
+{
     if (!hex_color || hex_color[0] != '#') return COLOR_DEFAULT;
 
     if (strcmp(hex_color, "#d20f39") == 0) return COLOR_DATA_TYPE;
@@ -453,12 +465,14 @@ int hex_to_color_pair(const char* hex_color) {
     return COLOR_DEFAULT;
 }
 
-int match_scope(const char* token_scope, const char* rule_scope) {
+int match_scope(const char* token_scope, const char* rule_scope)
+{
     if (!token_scope || !rule_scope) return 0;
     return strcmp(token_scope, rule_scope) == 0;
 }
 
-int get_dynamic_color(EditorState* state, const char* scope) {
+int get_dynamic_color(EditorState* state, const char* scope)
+{
     if (!state->json_loaded || !scope) return COLOR_DEFAULT;
     for (int i = 0; i < state->json_rules_count; i++) {
         if (match_scope(scope, state->json_scopes[i])) {
@@ -468,7 +482,8 @@ int get_dynamic_color(EditorState* state, const char* scope) {
     return COLOR_DEFAULT;
 }
 
-const char* get_dynamic_font_style(EditorState* state, const char* scope) {
+const char* get_dynamic_font_style(EditorState* state, const char* scope)
+{
     if (!state->json_loaded || !scope) return "";
     for (int i = 0; i < state->json_rules_count; i++) {
         if (match_scope(scope, state->json_scopes[i])) {
@@ -477,7 +492,8 @@ const char* get_dynamic_font_style(EditorState* state, const char* scope) {
     }
     return "";
 }
-static int toggle_block_comment_state_in_line(const char* line, int upto_col, int in_comment) {
+static int toggle_block_comment_state_in_line(const char* line, int upto_col, int in_comment)
+{
     if (!line) return in_comment;
     int len = (int)strlen(line);
     if (len < 0) len = 0; 
@@ -503,7 +519,8 @@ static int toggle_block_comment_state_in_line(const char* line, int upto_col, in
     return in_comment;
 }
 
-static int in_block_comment_before(EditorState* state, int line_num, int upto_col) {
+static int in_block_comment_before(EditorState* state, int line_num, int upto_col)
+{
     if (!state || line_num < 0 || line_num >= state->line_count) {
         return 0;
     }
@@ -537,13 +554,15 @@ static int in_block_comment_before(EditorState* state, int line_num, int upto_co
     return in_comment;
 }
 
-static int starts_with_preprocessor(const char* line) {
+static int starts_with_preprocessor(const char* line)
+{
     if (!line) return 0;
     int i = 0;
     while (line[i] == ' ' || line[i] == '\t') i++;
     return line[i] == '#';
 }
-void highlight_line(EditorState* state, int line_num, int screen_row, int line_num_width, int horizontal_scroll_offset) {
+void highlight_line(EditorState* state, int line_num, int screen_row, int line_num_width, int horizontal_scroll_offset)
+{
     if (!state->syntax_enabled || !state->syntax_display_enabled || state->file_type == FILE_TYPE_PLAIN) {
         char* line = state->lines[line_num];
         attron(COLOR_PAIR(COLOR_DEFAULT));
@@ -749,7 +768,8 @@ void highlight_line(EditorState* state, int line_num, int screen_row, int line_n
         i++;
     }
 }
-void highlight_line_segment(EditorState* state, int line_num, int screen_row, int line_num_width, int start_col, int max_len) {
+void highlight_line_segment(EditorState* state, int line_num, int screen_row, int line_num_width, int start_col, int max_len)
+{
     if (!state || line_num < 0 || line_num >= state->line_count) return;
     char* line = state->lines[line_num];
     if (!line) return;

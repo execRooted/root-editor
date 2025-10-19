@@ -17,17 +17,19 @@ extern char* internal_clipboard;
 static int dragging = 0;
 static int selection_started_with_shift = 0;
 
-char * get_system_clipboard() {
+char* get_system_clipboard()
+{
     
     if (internal_clipboard && *internal_clipboard) {
         return strdup(internal_clipboard);
     }
 
     
-    FILE * fp;
+    FILE* fp;
     int is_wayland = getenv("WAYLAND_DISPLAY") != NULL;
 
-    if (is_wayland) {
+    if (is_wayland) 
+    {
         fp = popen("wl-paste 2>/dev/null", "r");
         if (fp) {
             char buffer[1024 * 1024];
@@ -62,7 +64,8 @@ char * get_system_clipboard() {
         }
     }
 
-    if (!is_wayland) {
+    if (!is_wayland) 
+    {
         fp = popen("wl-paste 2>/dev/null", "r");
         if (fp) {
             char buffer[1024 * 1024];
@@ -77,6 +80,7 @@ char * get_system_clipboard() {
 
     fp = popen("xsel --clipboard --output 2>/dev/null", "r");
     if (fp) {
+
         char buffer[1024 * 1024];
         size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp);
         pclose(fp);
@@ -87,7 +91,8 @@ char * get_system_clipboard() {
     }
 
     fp = popen("xsel --primary --output 2>/dev/null", "r");
-    if (fp) {
+    if (fp) 
+    {
         char buffer[1024 * 1024];
         size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp);
         pclose(fp);
@@ -98,7 +103,8 @@ char * get_system_clipboard() {
     }
 
     fp = popen("termux-clipboard-get 2>/dev/null", "r");
-    if (fp) {
+    if (fp) 
+    {
         char buffer[1024 * 1024];
         size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp);
         pclose(fp);
@@ -109,7 +115,8 @@ char * get_system_clipboard() {
     }
 
     fp = popen("pbpaste 2>/dev/null", "r");
-    if (fp) {
+    if (fp) 
+    {
         char buffer[1024 * 1024];
         size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp);
         pclose(fp);
@@ -121,7 +128,8 @@ char * get_system_clipboard() {
 
     return NULL;
 }
-void handle_input(EditorState * state, int ch) {
+void handle_input(EditorState* state, int ch)
+{
 
         if (ch >= 32 && ch <= 126) {
                 reset_key_states(state);
@@ -131,37 +139,45 @@ void handle_input(EditorState * state, int ch) {
         }
 
         
-        if (ch == 27) {
+        if (ch == 27) 
+        {
                 if (try_handle_bracketed_paste(state, ch)) {
                         return;
                 }
         }
 
-        if (ch < 32 && ch != 27 && ch != '\n' && ch != '\t' && ch != KEY_BACKSPACE) {
+        if (ch < 32 && ch != 27 && ch != '\n' && ch != '\t' && ch != KEY_BACKSPACE) 
+        {
                 handle_ctrl_keys(state, ch);
                 return;
         }
 
-        switch (ch) {
+        switch (ch)
+        {
         case KEY_UP:
-                if (state->char_select_mode) {
+                if (state->char_select_mode)
+                {
                         move_cursor(state, 0, -1);
                         extend_selection(state);
-                } else if (selection_started_with_shift) {
+                } else if (selection_started_with_shift)
+                {
                         move_cursor(state, 0, -1);
                         extend_selection(state);
                 } else {
                         move_cursor(state, 0, -1);
-                        if (state->select_mode) {
+                        if (state->select_mode)
+                        {
                                 extend_selection(state);
                         }
                 }
                 break;
         case KEY_DOWN:
-                if (state->char_select_mode) {
+                if (state->char_select_mode) 
+                {
                         move_cursor(state, 0, 1);
                         extend_selection(state);
-                } else if (selection_started_with_shift) {
+                } else if (selection_started_with_shift) 
+                {
                         move_cursor(state, 0, 1);
                         extend_selection(state);
                 } else {
@@ -337,7 +353,8 @@ void handle_input(EditorState * state, int ch) {
         }
 }
 
-void handle_ctrl_keys(EditorState * state, int ch) {
+void handle_ctrl_keys(EditorState* state, int ch)
+{
 
         int needs_tracking = 0;
         switch (ch) {
@@ -451,7 +468,8 @@ void handle_ctrl_keys(EditorState * state, int ch) {
         }
 }
 
-void cut_text(EditorState * state) {
+void cut_text(EditorState* state)
+{
         if (state -> select_mode && has_selection(state)) {
 
                 char * selected = get_selected_text(state);
@@ -470,15 +488,19 @@ void cut_text(EditorState * state) {
         }
 }
 
-void copy_text(EditorState * state) {
+void copy_text(EditorState* state)
+{
         if (strlen(state -> lines[state -> cursor_y]) > 0) {
                 copy_to_system_clipboard(state -> lines[state -> cursor_y]);
         }
 }
 
-void delete_current_line(EditorState * state) {
+void delete_current_line(EditorState* state)
+{
         if (state -> line_count <= 1) {
-                show_status(state, "Cannot delete the last line");
+                state -> lines[0][0] = '\0';
+                state -> cursor_x = 0;
+                state -> dirty = 1;
                 return;
         }
 
@@ -503,7 +525,8 @@ void delete_current_line(EditorState * state) {
         state -> dirty = 1;
 }
 
-static void paste_from_string(EditorState * state, const char *clipboard_content) {
+static void paste_from_string(EditorState* state, const char* clipboard_content)
+{
         
         if (!state || !state->lines || state->cursor_y >= state->line_count) {
                 show_status(state, "Invalid editor state for paste operation");
@@ -626,7 +649,8 @@ static void paste_from_string(EditorState * state, const char *clipboard_content
         free(content_copy);
 }
 
-void paste_text(EditorState * state) {
+void paste_text(EditorState* state)
+{
         
         char *clipboard_content = get_system_clipboard();
         if (!clipboard_content || clipboard_content[0] == '\0') {
@@ -640,7 +664,8 @@ void paste_text(EditorState * state) {
         move_cursor(state, 0, 0);
 }
 
-static int try_handle_bracketed_paste(EditorState * state, int first_ch) {
+static int try_handle_bracketed_paste(EditorState* state, int first_ch)
+{
         
         if (first_ch != 27) return 0;
 
@@ -727,7 +752,8 @@ static int try_handle_bracketed_paste(EditorState * state, int first_ch) {
         return 1;
 }
 
-void select_current_word(EditorState *state) {
+void select_current_word(EditorState* state)
+{
     if (!state->lines[state->cursor_y]) return;
     char *line = state->lines[state->cursor_y];
     int len = strlen(line);
@@ -762,7 +788,8 @@ void select_current_word(EditorState *state) {
     }
 }
 
-void handle_mouse_event(EditorState * state) {
+void handle_mouse_event(EditorState* state)
+{
         MEVENT event;
 
         if (getmouse(&event) == OK) {

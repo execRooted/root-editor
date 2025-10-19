@@ -3,7 +3,8 @@
 
 #define FILE_TYPE_PLAIN   0
 
-void init_editor(EditorState * state) {
+void init_editor(EditorState* state)
+{
     state -> lines = (char ** ) malloc(MAX_LINES * sizeof(char * ));
     state -> lines[0] = (char * ) malloc(MAX_LINE_LENGTH);
     state -> lines[0][0] = '\0';
@@ -65,10 +66,12 @@ void init_editor(EditorState * state) {
     state -> plugin_count = 0;
     memset(state -> plugins, 0, sizeof(state -> plugins));
 }
-void toggle_dark_mode(EditorState * state) {
+void toggle_dark_mode(EditorState* state)
+{
     cycle_theme(state);
 }
-void insert_char(EditorState * state, char c) {
+void insert_char(EditorState* state, char c)
+{
     if (!state || !state -> lines || state -> cursor_y >= state -> line_count ||
         state -> cursor_y < 0 || !state -> lines[state -> cursor_y]) {
         return;
@@ -266,7 +269,8 @@ void insert_char(EditorState * state, char c) {
         update_dirty_status(state);
     }
 }
-void delete_char(EditorState * state) {
+void delete_char(EditorState* state)
+{
     if (!state || !state -> lines || state -> cursor_y >= state -> line_count ||
         state -> cursor_y < 0 || !state -> lines[state -> cursor_y]) {
         return;
@@ -361,7 +365,8 @@ void delete_char(EditorState * state) {
         update_dirty_status(state);
     }
 }
-void new_line(EditorState * state) {
+void new_line(EditorState* state)
+{
     if (state -> line_count >= MAX_LINES) {
         show_status(state, "Error: Maximum line count reached (1,000,000 lines)");
         return;
@@ -474,7 +479,8 @@ void new_line(EditorState * state) {
     napms(10);
     update_dirty_status(state);
 }
-void move_cursor(EditorState * state, int dx, int dy) {
+void move_cursor(EditorState* state, int dx, int dy)
+{
     if (!state || !state -> lines || state -> line_count <= 0) {
         return;
     }
@@ -580,8 +586,9 @@ void move_cursor(EditorState * state, int dx, int dy) {
         if (state->horizontal_scroll_offset > max_off2) state->horizontal_scroll_offset = max_off2;
     }
 }
-void show_status(EditorState * state,
-    const char * message) {
+void show_status(EditorState* state,
+    const char* message)
+{
     int max_y, max_x;
     getmaxyx(stdscr, max_y, max_x);
 
@@ -592,8 +599,9 @@ void show_status(EditorState * state,
     refresh();
     napms(500);
 }
-void show_status_left(EditorState * state,
-    const char * message) {
+void show_status_left(EditorState* state,
+    const char* message)
+{
     int max_y, max_x;
     getmaxyx(stdscr, max_y, max_x);
     
@@ -604,7 +612,8 @@ void show_status_left(EditorState * state,
     refresh();
     napms(500);
 }
-void count_stats(EditorState * state) {
+void count_stats(EditorState* state)
+{
     int words = 0;
     int characters = 0;
     for (int i = 0; i < state -> line_count; i++) {
@@ -625,21 +634,24 @@ void count_stats(EditorState * state) {
 }
 
 static char* internal_clipboard = NULL;
-static char* my_strdup(const char* s) {
+static char* my_strdup(const char* s)
+{
     if (!s) return NULL;
     size_t len = strlen(s) + 1;
     char* dup = (char*)malloc(len);
     if (dup) memcpy(dup, s, len);
     return dup;
 }
-void set_internal_clipboard(const char* text) {
+void set_internal_clipboard(const char* text)
+{
     if (internal_clipboard) {
         free(internal_clipboard);
     }
     internal_clipboard = text ? my_strdup(text) : NULL;
 }
 
-void copy_to_system_clipboard(const char * text) {
+void copy_to_system_clipboard(const char* text)
+{
     if (!text || strlen(text) == 0) return;
 
     
@@ -664,10 +676,12 @@ void copy_to_system_clipboard(const char * text) {
     
     system("rm -f '/tmp/kilo_editor_clipboard_temp.txt' 2>/dev/null &");
 }
-void toggle_help(EditorState * state) {
+void toggle_help(EditorState* state)
+{
     state -> show_help = !state -> show_help;
 }
-void jump_to_line(EditorState * state) {
+void jump_to_line(EditorState* state)
+{
     echo();
     curs_set(1);
     attron(COLOR_PAIR(1));
@@ -757,7 +771,8 @@ void jump_to_line(EditorState * state) {
         show_status(state, "Line not found or not created");
     }
 }
-void render_help_screen(EditorState * state) {
+void render_help_screen(EditorState* state)
+{
     int max_y, max_x;
     getmaxyx(stdscr, max_y, max_x);
 
@@ -849,7 +864,8 @@ void render_help_screen(EditorState * state) {
     
     render_screen(state);
 }
-void toggle_syntax_highlighting(EditorState * state) {
+void toggle_syntax_highlighting(EditorState* state)
+{
     state -> syntax_enabled = !state -> syntax_enabled;
     if (state -> syntax_enabled) {
         init_syntax_highlighting(state);
@@ -859,47 +875,56 @@ void toggle_syntax_highlighting(EditorState * state) {
     save_config(state);
 }
 
-void toggle_word_wrap(EditorState * state) {
+void toggle_word_wrap(EditorState* state)
+{
     state -> word_wrap = !state -> word_wrap;
     save_config(state);
 }
 
-void toggle_syntax_display(EditorState * state) {
+void toggle_syntax_display(EditorState* state)
+{
     state -> syntax_display_enabled = !state -> syntax_display_enabled;
     save_config(state);
 }
 
-void toggle_auto_tabbing(EditorState * state) {
+void toggle_auto_tabbing(EditorState* state)
+{
     state -> auto_tabbing_enabled = !state -> auto_tabbing_enabled;
     save_config(state);
 }
 
-void toggle_auto_complete(EditorState * state) {
+void toggle_auto_complete(EditorState* state)
+{
     state -> auto_complete_enabled = !state -> auto_complete_enabled;
     save_config(state);
 }
 
-void toggle_comment_complete(EditorState * state) {
+void toggle_comment_complete(EditorState* state)
+{
     state -> comment_complete_enabled = !state -> comment_complete_enabled;
     save_config(state);
 }
-int can_process_key(EditorState * state, int key_code) {
+int can_process_key(EditorState* state, int key_code)
+{
     if (key_code < 0 || key_code >= 256) {
         return 1;
     }
     return (state -> key_states[key_code] == 0 || state -> key_states[key_code] == 2);
 }
-void mark_key_processed(EditorState * state, int key_code) {
+void mark_key_processed(EditorState* state, int key_code)
+{
     if (key_code >= 0 && key_code < 256) {
         state -> key_states[key_code] = 2;
         state -> key_timestamps[key_code] = time(NULL);
     }
 }
-void reset_key_states(EditorState * state) {
+void reset_key_states(EditorState* state)
+{
     memset(state -> key_states, 0, sizeof(state -> key_states));
     memset(state -> key_timestamps, 0, sizeof(state -> key_timestamps));
 }
-void save_original_content(EditorState* state) {
+void save_original_content(EditorState* state)
+{
     
     free_original_content(state);
 
@@ -919,7 +944,8 @@ void save_original_content(EditorState* state) {
         strcpy(state->original_lines[i], state->lines[i]);
     }
 }
-void free_original_content(EditorState* state) {
+void free_original_content(EditorState* state)
+{
     if (state->original_lines) {
         for (int i = 0; i < state->original_line_count; i++) {
             if (state->original_lines[i]) {
@@ -931,7 +957,8 @@ void free_original_content(EditorState* state) {
     }
     state->original_line_count = 0;
 }
-int content_matches_original(EditorState* state) {
+int content_matches_original(EditorState* state)
+{
     
     if (!state->original_lines || state->original_line_count == 0) {
         return 0;
@@ -951,7 +978,8 @@ int content_matches_original(EditorState* state) {
 
     return 1; 
 }
-void update_dirty_status(EditorState* state) {
+void update_dirty_status(EditorState* state)
+{
     
     if (state->filename[0] == '\0') {
         

@@ -7,16 +7,17 @@ char * get_system_clipboard();
 
 void highlight_line(EditorState* state, int line_num, int screen_row, int line_num_width, int horizontal_scroll_offset);
 
-void find_all_occurrences(EditorState * state,
-        const char * search_term);
-void navigate_matches(EditorState * state,
-        const char * search_term, int * match_lines, int * match_positions, int match_count);
-void jump_to_match(EditorState * state, int line_num, int position);
-void replace_text_simple(EditorState * state,
-        const char * search_term,
-                const char * replace_term);
+void find_all_occurrences(EditorState* state,
+        const char* search_term);
+void navigate_matches(EditorState* state,
+        const char* search_term, int* match_lines, int* match_positions, int match_count);
+void jump_to_match(EditorState* state, int line_num, int position);
+void replace_text_simple(EditorState* state,
+        const char* search_term,
+                const char* replace_term);
 
-void render_screen(EditorState * state) {
+void render_screen(EditorState* state)
+{
         erase();
 
         int max_y, max_x;
@@ -158,7 +159,8 @@ void render_screen(EditorState * state) {
         refresh();
 }
 
-void find_text(EditorState * state) {
+void find_text(EditorState* state)
+{
          echo();
          curs_set(1);
 
@@ -259,8 +261,9 @@ void find_text(EditorState * state) {
          find_all_occurrences(state, search_term);
 }
 
-void find_all_occurrences(EditorState * state,
-        const char * search_term) {
+void find_all_occurrences(EditorState* state,
+        const char* search_term)
+{
 
         const int initial_capacity = 64;
         int capacity = initial_capacity;
@@ -352,8 +355,9 @@ void find_all_occurrences(EditorState * state,
         free(match_positions);
 }
 
-void navigate_matches(EditorState * state,
-        const char * search_term, int * match_lines, int * match_positions, int match_count) {
+void navigate_matches(EditorState* state,
+        const char* search_term, int* match_lines, int* match_positions, int match_count)
+{
         static int current_match = 0;
 
         if (match_count == 0) return;
@@ -382,7 +386,8 @@ void navigate_matches(EditorState * state,
         timeout(-1);
 }
 
-void jump_to_match(EditorState * state, int line_num, int position) {
+void jump_to_match(EditorState* state, int line_num, int position)
+{
 
         state -> cursor_y = line_num;
         state -> cursor_x = position;
@@ -397,7 +402,8 @@ void jump_to_match(EditorState * state, int line_num, int position) {
         }
 }
 
-void replace_text(EditorState * state) {
+void replace_text(EditorState* state)
+{
          echo();
          curs_set(1);
 
@@ -599,9 +605,10 @@ void replace_text(EditorState * state) {
          replace_text_simple(state, search_term, replace_term);
 }
 
-void replace_text_simple(EditorState * state,
-        const char * search_term,
-                const char * replace_term) {
+void replace_text_simple(EditorState* state,
+        const char* search_term,
+                const char* replace_term)
+{
 
         int replacements = 0;
         for (int i = 0; i < state -> line_count; i++) {
@@ -636,7 +643,8 @@ void replace_text_simple(EditorState * state,
         }
 }
 
-void prompt_root_password(EditorState * state) {
+void prompt_root_password(EditorState* state)
+{
         echo();
         curs_set(1);
 
@@ -726,7 +734,8 @@ void prompt_root_password(EditorState * state) {
         curs_set(0);
 }
 
-void init_theme_colors(EditorState* state) {
+void init_theme_colors(EditorState* state)
+{
     if (find_plugin_by_name(state, "Theme Plugin") != -1) return;
 
     int t = state->theme_id;
@@ -842,7 +851,8 @@ void init_theme_colors(EditorState* state) {
     bkgdset(COLOR_PAIR(13) | ' ');
 }
 
-void cycle_theme(EditorState* state) {
+void cycle_theme(EditorState* state)
+{
     state->theme_id = 1;
     strncpy(state->theme_name, "Frappe", sizeof(state->theme_name)-1);
     state->theme_name[sizeof(state->theme_name)-1] = '\0';
