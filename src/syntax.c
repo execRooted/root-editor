@@ -171,7 +171,7 @@ void detect_file_type(EditorState* state)
     if (!*state->filename)
     {
         state->file_type = FILE_TYPE_PLAIN;
-        state->syntax_enabled = 0;
+        state->syntax_enabled = 1;
         return;
     }
     if (strcmp(state->filename, "Makefile") == 0 || strcmp(state->filename, "makefile") == 0)
@@ -184,14 +184,7 @@ void detect_file_type(EditorState* state)
     if (!ext)
     {
         state->file_type = FILE_TYPE_PLAIN;
-        state->syntax_enabled = 0;
-        return;
-    }
-
-    if (strcmp(ext, ".txt") == 0)
-    {
-        state->file_type = FILE_TYPE_PLAIN;
-        state->syntax_enabled = 0;
+        state->syntax_enabled = 1;
         return;
     }
 
@@ -212,7 +205,7 @@ void detect_file_type(EditorState* state)
         strcmp(ext, ".cfg") == 0 || strcmp(ext, ".conf") == 0 || strcmp(ext, ".md") == 0 ||
         strcmp(ext, ".tex") == 0 || strcmp(ext, ".r") == 0 || strcmp(ext, ".R") == 0 ||
         strcmp(ext, ".m") == 0 || strcmp(ext, ".jl") == 0 || strcmp(ext, ".dart") == 0 ||
-        strcmp(ext, ".dart") == 0)
+        strcmp(ext, ".dart") == 0 || strcmp(ext, ".txt") == 0)
     {
 
         if (strcmp(ext, ".py") == 0) state->file_type = FILE_TYPE_PYTHON;
@@ -271,7 +264,7 @@ void detect_file_type(EditorState* state)
     else
     {
         state->file_type = FILE_TYPE_PLAIN;
-        state->syntax_enabled = 0;
+        state->syntax_enabled = 1;
     }
 }
 
@@ -596,7 +589,7 @@ static int starts_with_preprocessor(const char* line)
 }
 void highlight_line(EditorState* state, int line_num, int screen_row, int line_num_width, int horizontal_scroll_offset)
 {
-    if (!state->syntax_enabled || !state->syntax_display_enabled || state->file_type == FILE_TYPE_PLAIN) {
+    if (!state->syntax_enabled || !state->syntax_display_enabled) {
         char* line = state->lines[line_num];
         attron(COLOR_PAIR(COLOR_DEFAULT));
         mvprintw(screen_row, line_num_width, "%.*s", COLS - line_num_width - 1, line);

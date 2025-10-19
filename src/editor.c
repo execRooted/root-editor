@@ -44,8 +44,9 @@ void init_editor(EditorState* state)
     state -> last_autosave_time = time(NULL);
 
     
-    state -> auto_complete_enabled = 1; 
-    state -> comment_complete_enabled = 1; 
+    state -> auto_complete_enabled = 1;
+    state -> comment_complete_enabled = 1;
+    state -> syntax_enabled = 1;
 
     
     state -> json_rules_count = 0;
@@ -81,7 +82,7 @@ void insert_char(EditorState* state, char c)
     if (state -> cursor_x < 0) state -> cursor_x = 0;
 
     
-    if (state->auto_complete_enabled && state->file_type != FILE_TYPE_PLAIN && c == '(' && len < MAX_LINE_LENGTH - 1) {
+    if (state->auto_complete_enabled && c == '(' && len < MAX_LINE_LENGTH - 1) {
         
         if (state -> cursor_x > len) {
             
@@ -99,7 +100,7 @@ void insert_char(EditorState* state, char c)
         state -> cursor_x++;
         update_dirty_status(state);
         return;
-    } else if (state->auto_complete_enabled && state->file_type != FILE_TYPE_PLAIN && c == '{' && len < MAX_LINE_LENGTH - 1) {
+    } else if (state->auto_complete_enabled && c == '{' && len < MAX_LINE_LENGTH - 1) {
         
         if (state -> cursor_x > len) {
             
@@ -125,7 +126,7 @@ void insert_char(EditorState* state, char c)
         
         state -> cursor_x++;
         return;
-    } else if (state->auto_complete_enabled && state->file_type != FILE_TYPE_PLAIN && c == '[' && len < MAX_LINE_LENGTH - 1) {
+    } else if (state->auto_complete_enabled && c == '[' && len < MAX_LINE_LENGTH - 1) {
         
         if (state -> cursor_x > len) {
             
@@ -147,7 +148,7 @@ void insert_char(EditorState* state, char c)
         
         state -> cursor_x++;
         return;
-    } else if (state->auto_complete_enabled && state->file_type != FILE_TYPE_PLAIN && c == '"' && len < MAX_LINE_LENGTH - 1) {
+    } else if (state->auto_complete_enabled && c == '"' && len < MAX_LINE_LENGTH - 1) {
         
         if (state -> cursor_x > len) {
             
@@ -169,7 +170,7 @@ void insert_char(EditorState* state, char c)
         
         state -> cursor_x++;
         return;
-    } else if (state->auto_complete_enabled && state->file_type != FILE_TYPE_PLAIN && c == '\'' && len < MAX_LINE_LENGTH - 1) {
+    } else if (state->auto_complete_enabled && c == '\'' && len < MAX_LINE_LENGTH - 1) {
         
         if (state -> cursor_x > len) {
             
@@ -194,7 +195,7 @@ void insert_char(EditorState* state, char c)
     }
 
     
-    if (state->comment_complete_enabled && state->file_type != FILE_TYPE_PLAIN && c == '*' && state -> cursor_x > 0 && line[state -> cursor_x - 1] == '/') {
+    if (state->comment_complete_enabled && c == '*' && state -> cursor_x > 0 && line[state -> cursor_x - 1] == '/') {
 
         if (state -> line_count + 2 > MAX_LINES) {
             show_status(state, "Cannot insert block comment: maximum line count exceeded");
