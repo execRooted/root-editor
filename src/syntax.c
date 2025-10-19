@@ -168,24 +168,33 @@ void init_syntax_highlighting(EditorState* state)
 
 void detect_file_type(EditorState* state)
 {
-    if (!*state->filename) {
+    if (!*state->filename)
+    {
         state->file_type = FILE_TYPE_PLAIN;
         state->syntax_enabled = 0;
         return;
     }
-    if (strcmp(state->filename, "Makefile") == 0 || strcmp(state->filename, "makefile") == 0) {
+    if (strcmp(state->filename, "Makefile") == 0 || strcmp(state->filename, "makefile") == 0)
+    {
         state->file_type = FILE_TYPE_MAKEFILE;
         state->syntax_enabled = 1;
         return;
     }
     const char* ext = strrchr(state->filename, '.');
-    if (!ext) {
+    if (!ext)
+    {
         state->file_type = FILE_TYPE_PLAIN;
         state->syntax_enabled = 0;
         return;
     }
 
-    
+    if (strcmp(ext, ".txt") == 0)
+    {
+        state->file_type = FILE_TYPE_PLAIN;
+        state->syntax_enabled = 0;
+        return;
+    }
+
     if (strcmp(ext, ".c") == 0 || strcmp(ext, ".cpp") == 0 || strcmp(ext, ".cc") == 0 ||
         strcmp(ext, ".cxx") == 0 || strcmp(ext, ".h") == 0 || strcmp(ext, ".hpp") == 0 ||
         strcmp(ext, ".py") == 0 || strcmp(ext, ".java") == 0 || strcmp(ext, ".js") == 0 ||
@@ -203,42 +212,66 @@ void detect_file_type(EditorState* state)
         strcmp(ext, ".cfg") == 0 || strcmp(ext, ".conf") == 0 || strcmp(ext, ".md") == 0 ||
         strcmp(ext, ".tex") == 0 || strcmp(ext, ".r") == 0 || strcmp(ext, ".R") == 0 ||
         strcmp(ext, ".m") == 0 || strcmp(ext, ".jl") == 0 || strcmp(ext, ".dart") == 0 ||
-        strcmp(ext, ".dart") == 0) {
+        strcmp(ext, ".dart") == 0)
+    {
 
-        
         if (strcmp(ext, ".py") == 0) state->file_type = FILE_TYPE_PYTHON;
         else if (strcmp(ext, ".c") == 0 || strcmp(ext, ".cpp") == 0 || strcmp(ext, ".cc") == 0 ||
-                  strcmp(ext, ".cxx") == 0 || strcmp(ext, ".h") == 0 || strcmp(ext, ".hpp") == 0) {
+                  strcmp(ext, ".cxx") == 0 || strcmp(ext, ".h") == 0 || strcmp(ext, ".hpp") == 0)
+        {
             state->file_type = FILE_TYPE_C;
-        } else if (strcmp(ext, ".rs") == 0) {
+        }
+        else if (strcmp(ext, ".rs") == 0)
+        {
             state->file_type = FILE_TYPE_RUST;
-        } else if (strcmp(ext, ".js") == 0) {
+        }
+        else if (strcmp(ext, ".js") == 0)
+        {
             state->file_type = FILE_TYPE_JAVASCRIPT;
-        } else if (strcmp(ext, ".ts") == 0) {
+        }
+        else if (strcmp(ext, ".ts") == 0)
+        {
             state->file_type = FILE_TYPE_TYPESCRIPT;
-        } else if (strcmp(ext, ".java") == 0) {
+        }
+        else if (strcmp(ext, ".java") == 0)
+        {
             state->file_type = FILE_TYPE_JAVA;
-        } else if (strcmp(ext, ".php") == 0) {
+        }
+        else if (strcmp(ext, ".php") == 0)
+        {
             state->file_type = FILE_TYPE_PHP;
-        } else if (strcmp(ext, ".rb") == 0) {
+        }
+        else if (strcmp(ext, ".rb") == 0)
+        {
             state->file_type = FILE_TYPE_RUBY;
-        } else if (strcmp(ext, ".sh") == 0 || strcmp(ext, ".bash") == 0 || strcmp(ext, ".bat") == 0 || strcmp(ext, ".cmd") == 0) {
+        }
+        else if (strcmp(ext, ".sh") == 0 || strcmp(ext, ".bash") == 0 || strcmp(ext, ".bat") == 0 || strcmp(ext, ".cmd") == 0)
+        {
             state->file_type = FILE_TYPE_SHELL;
-        } else if (strcmp(ext, ".html") == 0) {
+        }
+        else if (strcmp(ext, ".html") == 0)
+        {
             state->file_type = FILE_TYPE_HTML;
-        } else if (strcmp(ext, ".css") == 0) {
+        }
+        else if (strcmp(ext, ".css") == 0)
+        {
             state->file_type = FILE_TYPE_CSS;
-        } else if (strcmp(ext, ".cs") == 0) {
+        }
+        else if (strcmp(ext, ".cs") == 0)
+        {
             state->file_type = FILE_TYPE_CSHARP;
-        } else {
+        }
+        else
+        {
             state->file_type = FILE_TYPE_PLAIN;
         }
 
-        
         state->syntax_enabled = 1;
-    } else {
+    }
+    else
+    {
         state->file_type = FILE_TYPE_PLAIN;
-        state->syntax_enabled = 0; 
+        state->syntax_enabled = 0;
     }
 }
 
