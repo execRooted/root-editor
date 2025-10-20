@@ -40,8 +40,8 @@ void load_file(EditorState* state, const char* filename)
                 content[read_size] = '\0';
 
                 
-                char * line_start = content;
-                char * ptr = content;
+                char* line_start = content;
+                char* ptr = content;
                 while (*ptr && state -> line_count < MAX_LINES) {
                         if (*ptr == '\n') {
                                 *ptr = '\0';
