@@ -849,7 +849,6 @@ void init_theme_colors(EditorState* state)
         init_pair(27, COLOR_YELLOW,  COLOR_BLACK);
     }
 
-    bkgdset(COLOR_PAIR(13) | ' ');
 }
 
 void cycle_theme(EditorState* state)
@@ -860,7 +859,6 @@ void cycle_theme(EditorState* state)
     if (has_colors()) {
         start_color();
         init_theme_colors(state);
-        bkgdset(COLOR_PAIR(13) | ' ');
         clear();
         refresh();
     }

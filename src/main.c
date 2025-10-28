@@ -4,6 +4,9 @@
 #include <time.h>
 #include <stdlib.h>
 #include <dirent.h>
+#include <signal.h>
+
+volatile sig_atomic_t resized = 0;
 
 static void enable_bracketed_paste(void)
 {
@@ -14,6 +17,11 @@ static void disable_bracketed_paste(void)
 {
         printf("\033[?2004l");
         fflush(stdout);
+}
+
+static void handle_resize(int sig)
+{
+        resized = 1;
 }
 
 void set_window_title()
@@ -112,7 +120,8 @@ int main(int argc, char * argv[])
          noecho();
          curs_set(1);
 
-         
+         signal(SIGWINCH, handle_resize);
+
          mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
          mouseinterval(0);
          set_window_title();
@@ -170,9 +179,16 @@ enable_bracketed_paste();
                          last_syntax_update = now;
                  }
 
+                 if (resized) {
+                         resized = 0;
+                         endwin();
+                         refresh();
+                         clear();
+                 }
+
                  ch = getch();
 
-                 
+
                  call_plugin_keypress_hooks(&state, ch);
 
                  handle_input( & state, ch);
