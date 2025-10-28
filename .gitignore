@@ -1,3 +1,11 @@
-/build
-test.c
-editor
+# CMake build files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# OS / editor
+*.swp
+.DS_Store
+
+
