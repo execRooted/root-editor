@@ -7,40 +7,6 @@
 
 
 
-
-## Project Structure
-
-```
-root-editor/
-├── src/                     # Core source code
-│   ├── editor.c             # Main editor logic
-│   ├── editor.h             # Editor header
-│   ├── main.c               # Entry point
-│   ├── plugin.c             # Plugin management
-│   ├── plugin.h             # Plugin header
-│   ├── file_io.c            # File input/output
-│   ├── input_handling.c     # User input processing
-│   ├── rendering.c          # Screen rendering
-│   ├── selection.c          # Text selection
-│   └── syntax.c             # Syntax highlighting
-├── plugins/                 # Plugin source files and build
-│   ├── word_count_plugin.c  # Source code plugin file (default loaded plugin)
-│   ├── word_count_plugin.so # Compiled plugin file 
-│   ├── Makefile             # Makefile for plugins
-│   └── ...                  # You are welcome to add plugins 
-├── config/                  # Configs
-│   └── syntax.json          # Syntax json file
-├── scripts/                 # Installation scripts
-│   ├── install.sh           # Install
-│   └── uninstall.sh         # Uninstall
-├── github/                  # GitHub
-│   └── logo.png             # Photo   
-├── Makefile                 # Makefile for the editor (not plugins)
-└── README.md                # This file
-```
-
-
-
 ## Installation
 
 1. Clone the repository:

@@ -1,0 +1,409 @@
+.
+├── plugins
+│   ├── build
+│   │   ├── cmake_install.cmake
+│   │   ├── libword_count_plugin.so
+│   │   ├── CMakeCache.txt
+│   │   ├── Makefile
+│   │   └── CMakeFiles
+│   │       ├── 4.1.2
+│   │       │   ├── CMakeSystem.cmake
+│   │       │   ├── CMakeDetermineCompilerABI_C.bin
+│   │       │   ├── CMakeDetermineCompilerABI_CXX.bin
+│   │       │   ├── CompilerIdC
+│   │       │   │   ├── a.out
+│   │       │   │   ├── tmp
+│   │       │   │   └── CMakeCCompilerId.c
+│   │       │   ├── CMakeCCompiler.cmake
+│   │       │   ├── CompilerIdCXX
+│   │       │   │   ├── a.out
+│   │       │   │   ├── tmp
+│   │       │   │   └── CMakeCXXCompilerId.cpp
+│   │       │   └── CMakeCXXCompiler.cmake
+│   │       ├── CMakeScratch
+│   │       ├── Makefile2
+│   │       ├── InstallScripts.json
+│   │       ├── word_count_plugin.dir
+│   │       │   ├── flags.make
+│   │       │   ├── compiler_depend.ts
+│   │       │   ├── cmake_clean.cmake
+│   │       │   ├── progress.make
+│   │       │   ├── word_count_plugin.c.o
+│   │       │   ├── link.txt
+│   │       │   ├── build.make
+│   │       │   ├── word_count_plugin.c.o.d
+│   │       │   ├── DependInfo.cmake
+│   │       │   ├── link.d
+│   │       │   ├── compiler_depend.make
+│   │       │   └── depend.make
+│   │       ├── cmake.check_cache
+│   │       ├── progress.marks
+│   │       ├── CMakeDirectoryInformation.cmake
+│   │       ├── TargetDirectories.txt
+│   │       ├── Makefile.cmake
+│   │       ├── CMakeConfigureLog.yaml
+│   │       └── pkgRedirects
+│   ├── CMakeLists.txt
+│   ├── word_count_plugin.c
+│   └── word_count_plugin.so
+├── .gitignore
+├── CMakeLists.txt
+├── cmake_install.cmake
+├── LICENSE
+├── .git
+│   ├── info
+│   │   └── exclude
+│   ├── packed-refs
+│   ├── logs
+│   │   ├── HEAD
+│   │   └── refs
+│   │       ├── remotes
+│   │       │   └── origin
+│   │       │       ├── HEAD
+│   │       │       └── main
+│   │       └── heads
+│   │           └── main
+│   ├── HEAD
+│   ├── hooks
+│   │   ├── pre-merge-commit.sample
+│   │   ├── prepare-commit-msg.sample
+│   │   ├── sendemail-validate.sample
+│   │   ├── post-update.sample
+│   │   ├── fsmonitor-watchman.sample
+│   │   ├── pre-receive.sample
+│   │   ├── pre-applypatch.sample
+│   │   ├── update.sample
+│   │   ├── pre-commit.sample
+│   │   ├── pre-push.sample
+│   │   ├── applypatch-msg.sample
+│   │   ├── push-to-checkout.sample
+│   │   ├── commit-msg.sample
+│   │   └── pre-rebase.sample
+│   ├── COMMIT_EDITMSG
+│   ├── index
+│   ├── refs
+│   │   ├── remotes
+│   │   │   └── origin
+│   │   │       ├── HEAD
+│   │   │       └── main
+│   │   ├── tags
+│   │   └── heads
+│   │       └── main
+│   ├── config
+│   ├── description
+│   └── objects
+│       ├── 61
+│       │   └── 2128a394620168d0bb1dffb510e767550b35da
+│       ├── be
+│       │   └── 47b778877461388317a407f847b5e455cc527f
+│       ├── info
+│       ├── 8a
+│       │   ├── 1698455b7016766a2a562d929d4422548bcb5c
+│       │   └── 41e28f5ad0046e0ce450db4d191edbce953357
+│       ├── 6c
+│       │   ├── 2f0e9a76944759968774d1684b309eca36f32a
+│       │   └── d0c2b31abc37c65025a796aa961e8a0abf6662
+│       ├── 79
+│       │   └── 5a96f7df8ba7cf1359f646ae6abc58bcb38d0d
+│       ├── fd
+│       │   └── ec58012aa621d44bf7a723605cd2d73a651c2a
+│       ├── 54
+│       │   └── 30180fe00db4f7146ab2b8520330f1fe6d602d
+│       ├── e9
+│       │   └── 9463f662787ac82b0c99e93a2b6c8cbcf9fedd
+│       ├── 5e
+│       │   └── d31c4ef9eb0e98df9e220ee9d01b2e0934e673
+│       ├── 6b
+│       │   └── 3c92844aa418f377954f9e59873b41e9dfadae
+│       ├── 70
+│       │   └── 97dfe2d5e218f61d8c1d0c38166bbff50d0238
+│       ├── 90
+│       │   └── dd656f61ffce0a3be4d81bd26879a2a1a7f69d
+│       ├── db
+│       │   └── 5948afc4d24b4cf5d4a594785bb23d83d73e1c
+│       ├── 47
+│       │   ├── cd3f7b5f92a06e55a8541c8f7741271d29bb61
+│       │   └── a2280375a99736539ff602d279983fae39286e
+│       ├── 52
+│       │   └── bb7213f24a476906af73bfea500960937d305b
+│       ├── b1
+│       │   └── 9b45abd7cf067b61b2b00d75cb73a1dbd1a015
+│       ├── 39
+│       │   └── 52fc7a9179b94d9138505c4571d6cc2a72ed38
+│       ├── 49
+│       │   └── 527e499f20cabf4f0aa62d09ce9b2f6cef8a58
+│       ├── 89
+│       │   └── e70d1eb5969347a030bdb4d03004b4e658ee7a
+│       ├── 85
+│       │   └── 49469c719322bcbd6ed109320b984dbd8fbbee
+│       ├── 5c
+│       │   └── cd317bf223f9ab97384730f34824fce007f9c0
+│       ├── 32
+│       │   └── db1c25109a69ffaa3072a42a7ae1498c58b8d0
+│       ├── 19
+│       │   └── 05c96918c084b6c1a59163d113db4000a115c1
+│       ├── 86
+│       │   └── 818b7f18090dd66ecfe8822dc41e87b27efc9e
+│       ├── f5
+│       │   └── 42201503c78bd520e63c015cf7804b15374982
+│       ├── b3
+│       │   └── 0cd76fd4fd6449d424131e8cc9fec06979f636
+│       ├── bd
+│       │   └── 64e59fccc205a2260077bc772153e7698208d7
+│       ├── 5b
+│       │   └── 0754bc5acb53698851b446f24e6a4ee8220f82
+│       ├── 13
+│       │   └── 3226864efa9fdc92abad0a8f6c5c60e9762b20
+│       ├── 6e
+│       │   └── 5859d90b26781c748bf112c145167ccdae6363
+│       ├── f1
+│       │   └── f9eed9e8e9ea95f6b32b52464c99b84cb37f24
+│       ├── 92
+│       │   └── 7098e40749d531425ca7379162e99bb666c0b3
+│       ├── 9e
+│       │   └── af59414a683cc71610b38b237ef4013baaae9b
+│       ├── 53
+│       │   ├── eba7febcb1d577c2b571da4599c9b7bf40b536
+│       │   └── fddf4e4c95664057b5d08c80729b58ef6b4ee1
+│       ├── 55
+│       │   └── 9d75f2d6b5142576adb290f0850ae8b9415cc1
+│       ├── c5
+│       │   └── 21afc24c023af159198fc80a942e10580a01b8
+│       ├── 71
+│       │   └── 683e38f42c901f061afe34ff703c3e2062ede7
+│       ├── 69
+│       │   ├── da4846f5a33cd84113d9493da07e509469678d
+│       │   └── dd970ab9ba37a2855ab9e5878dbe9fbd4f79be
+│       ├── a8
+│       │   └── ce0b79cc13e09d8dffbe3abcce71f4a4ff3dbf
+│       ├── 7c
+│       │   └── f9ff9ce337d36c9477d544c065eee756862c64
+│       ├── 56
+│       │   └── ac5da3d84ba35c3e940961dc1543558ab8ca44
+│       ├── 94
+│       │   └── dfe0e3fa6449ec52bf256fe41c36a19b70f938
+│       ├── d0
+│       │   ├── 7a352970d0edb13b1f352fc6ceb0ae6147f929
+│       │   └── 86215e5a34cad1bdec16c22c6d29704c6f8a9b
+│       ├── 87
+│       │   └── 69eb674bc0ded3c72eaa9ab3a28af956867c64
+│       ├── 08
+│       │   └── dd9ac14b5a74af091129a14444d1d7b5d27a81
+│       ├── fc
+│       │   └── e6f65ce44075af244eb05a21babb524ac1e285
+│       ├── ef
+│       │   └── 3be19ba4f0fdba9e52069a8a22afce69a5d3fb
+│       ├── 23
+│       │   └── 2eb0b74438f98fea65c1e415b3fa135ac451ef
+│       ├── c0
+│       │   └── c13d85746d00dce593b29d16c83294bf9b6239
+│       ├── dc
+│       │   └── 2efe52307e3eb9fe5811524030ecb8ab694c14
+│       ├── 9a
+│       │   └── f1e71f2eaa61ccad487c3934efff2b6319f3dd
+│       ├── f4
+│       │   └── 181869fadf4cf59f1f58143ce9cd05c94182d1
+│       ├── 65
+│       │   ├── c2dab0b899a22e9374657af5bf08f7fb55b297
+│       │   └── aec68c49a3d44704825eed90242ca686a97e99
+│       ├── 4c
+│       │   └── c85b5d4134e97b6f3261214e8a702c24adb897
+│       ├── 3d
+│       │   └── 4780b0aa2ed2a95be55a52b6c2faa79d768d4a
+│       ├── aa
+│       │   ├── 549ece6a840576066ff637358d13eef497a593
+│       │   └── 8ae212c14b81e65162d7432a975f491a468189
+│       ├── 1e
+│       │   └── 522b08c37de01279d2fba6d81487358a08131c
+│       ├── 1b
+│       │   └── b8034c8045cc8b3f3a3395082428d864b777ad
+│       ├── d3
+│       │   ├── a36ca6b1d06f8a66e367eb5de0d96a1a0e48f7
+│       │   └── e57bf84cf63c9acf162dad87613e8458f29b4d
+│       ├── b4
+│       │   └── 4dd6b0dadcdfd6e395520cd8f7eec42e28f52a
+│       ├── 4a
+│       │   └── 551b1272b52dca1d4ce9cf4cd675640651c515
+│       ├── e4
+│       │   └── f1fc6850b136c5d1947d8f37bd3d98d4465e70
+│       ├── c7
+│       │   ├── 89caed4d6c977d4b4e27ca5343b2a6a30071f8
+│       │   └── 6b724a0d65d4b194c993fbddc747337db6fe80
+│       ├── f7
+│       │   └── b6d3cc59383b2fa4c3ac3076f32d1dd70ce0d1
+│       ├── cb
+│       │   └── 6174e7ca83df2958dbbac6298c921cf9469da9
+│       ├── a6
+│       │   └── 2280231dc483b8388f3f7f149a49c202aab478
+│       ├── pack
+│       │   ├── pack-7867c1a05a89b5f7c5879d072ba6264fbc26616b.idx
+│       │   ├── pack-7867c1a05a89b5f7c5879d072ba6264fbc26616b.rev
+│       │   └── pack-7867c1a05a89b5f7c5879d072ba6264fbc26616b.pack
+│       ├── 8f
+│       │   └── 5f34f9138b5b644b38ca063afa43e903247d55
+│       ├── bb
+│       │   └── 7ac317886b0d219e852c3dc36b8bc88aee0a5d
+│       ├── 00
+│       │   └── a5d21b98770f1c1b210226dd52b6336cd9a076
+│       ├── 43
+│       │   └── a5f360d634112a8ca9881ad4c1b72c6ee17ed7
+│       ├── 0b
+│       │   └── fd2c14ba6cccc1722fead693b2a13b7b11c3b4
+│       ├── 45
+│       │   ├── e1dae6fede0d68376ce5445895ff9c4ab21f9f
+│       │   ├── 163e63b394c5cd8147b1e1235ff2d5623aafc3
+│       │   └── 90200423a972cdc50835dcd644f347b7572237
+│       ├── 36
+│       │   ├── 882645782c5b3cb3fd5d3b556d7efe614c6dea
+│       │   └── 6045d9006bb4d8c8fa673316a771eafb0c9cfa
+│       ├── 02
+│       │   └── 6e9e2f7590a444161a76ded2406dbf7188a181
+│       ├── 78
+│       │   └── 5f6888cc26597b1eec2b1e263c71a569b3b90e
+│       ├── 3e
+│       │   └── 90203444cd7368839752cd1d615f0c6d5e4aba
+│       ├── 66
+│       │   └── 1a099de5cc68bd2be2bf8f154eed55b2b0eb17
+│       ├── 48
+│       │   └── 178221c52751e2128ac00d8bc624d6df7ea01d
+│       ├── 03
+│       │   └── cc734178a4a37ae1bdc38c95833d1c230c0bc2
+│       ├── 63
+│       │   └── 88c48c4af312ee0f85f051b74501b8a0a4600b
+│       ├── ad
+│       │   └── 0709fa6d25be65cbbbe509be70c195dfa7f2ad
+│       ├── bc
+│       │   ├── d8293b40b6bfa35de7040c85a8afdfcb92ccc9
+│       │   └── 957118e34387ddfd50412e6e43e0d9c1b14598
+│       ├── bf
+│       │   └── 2621d57719fb2e2433ca161484175ce6759fa8
+│       ├── 8d
+│       │   └── 4065157feab9522469e362093626dac6a75e44
+│       ├── a2
+│       │   └── a7a27c5aa8a6cbd1f37baf900443d924eb79d3
+│       ├── d7
+│       │   └── 02008af011a6c43079484dea2ec451ca1880a7
+│       ├── 88
+│       │   ├── 2f73e2db8e1027c2f4ecf001c2a25320a84cd4
+│       │   └── cb4e7f57d8d41b8468778bf697972f506311c0
+│       ├── 72
+│       │   └── b9b1169315ca8ffac93a6d184093e6c75317d4
+│       ├── 3a
+│       │   ├── 8f9743e15519c2bf1949cce4a9abcef6cc6e7f
+│       │   └── c92197b0cab7b5b7e796806444d9fdd149e4cf
+│       ├── eb
+│       │   ├── dcc66db5a2aa5d64326b67614a0443263ecd66
+│       │   └── 4e3f09a4e4b41776df580d8e426525581e4d9c
+│       ├── 5a
+│       │   ├── 7ebf34b5791cb466a367629be8a73fda83906d
+│       │   └── 8e69a008d96956c503858882dffd517e484e5a
+│       ├── b2
+│       │   └── 20104e239f64b2b7f8fce07d17587a65088654
+│       ├── a4
+│       │   └── 3ce8704b6a91cbe33505722fd818d7ad130949
+│       ├── 84
+│       │   ├── cbcb4c821d6d9142402c2cc2e2487d2194c8e5
+│       │   └── 04b141e293479adf4932f723ff8a7ce4062268
+│       ├── af
+│       │   └── fd42c64314f099f3d3067274ec48956ef4e0f4
+│       ├── 0a
+│       │   └── f8967bc75b2cb2ae67a190f0cae4185adf2000
+│       ├── 0f
+│       │   ├── f2a762869e2779e09fe01d734998da31226e07
+│       │   └── 8d2acbedc3e3a6af6e2f0521b7a712a0e348a0
+│       ├── 35
+│       │   ├── 5155cbd5fa5448d1de050c6be03d720a3e98e3
+│       │   └── 3d751b9bceec7f70483ebc9cb0f5f2d8f4306d
+│       ├── a5
+│       │   ├── 72819ead72962258caf0d9a23864ff3fe6d63b
+│       │   └── 0f4754feb746090d0e67aae2b038bc90bd6b63
+│       ├── f8
+│       │   └── 2faeb419cc06e47496ed6bd57e9132bf536171
+│       ├── 93
+│       │   └── 64a4eb98ea38b763d9c1a3eb62deac56c75b8b
+│       ├── c8
+│       │   └── 91be1020081680eb8ff862c2a3b566e8f562d9
+│       ├── f9
+│       │   └── 83dd4cd9b0ebaf8713cf700c7fe89f2d96b898
+│       ├── 76
+│       │   └── 1239406c22df74b588d0db39374355e82082d1
+│       ├── b6
+│       │   └── e0826169e395ea6c49c13aa568b7707cc319bc
+│       └── b9
+│           └── 25ea9fd172185fbc4c34f9db181d2be78f005d
+├── github
+│   └── picture0.png
+├── structure.txt
+├── src
+│   ├── rendering.c
+│   ├── editor.c
+│   ├── selection.c
+│   ├── plugin.c
+│   ├── input_handling.c
+│   ├── plugin.h
+│   ├── main.c
+│   ├── syntax.c
+│   ├── file_io.c
+│   └── editor.h
+├── scripts
+│   ├── uninstall.sh
+│   └── install.sh
+├── config
+│   └── syntax.json
+├── CMakeCache.txt
+├── Makefile
+├── CMakeFiles
+│   ├── 4.1.2
+│   │   ├── CMakeSystem.cmake
+│   │   ├── CMakeDetermineCompilerABI_C.bin
+│   │   ├── CMakeDetermineCompilerABI_CXX.bin
+│   │   ├── CompilerIdC
+│   │   │   ├── a.out
+│   │   │   ├── tmp
+│   │   │   └── CMakeCCompilerId.c
+│   │   ├── CMakeCCompiler.cmake
+│   │   ├── CompilerIdCXX
+│   │   │   ├── a.out
+│   │   │   ├── tmp
+│   │   │   └── CMakeCXXCompilerId.cpp
+│   │   └── CMakeCXXCompiler.cmake
+│   ├── CMakeScratch
+│   ├── Makefile2
+│   ├── editor.dir
+│   │   ├── flags.make
+│   │   ├── compiler_depend.ts
+│   │   ├── cmake_clean.cmake
+│   │   ├── progress.make
+│   │   ├── src
+│   │   │   ├── editor.c.o
+│   │   │   ├── selection.c.o.d
+│   │   │   ├── input_handling.c.o.d
+│   │   │   ├── file_io.c.o
+│   │   │   ├── main.c.o.d
+│   │   │   ├── plugin.c.o.d
+│   │   │   ├── rendering.c.o
+│   │   │   ├── main.c.o
+│   │   │   ├── plugin.c.o
+│   │   │   ├── editor.c.o.d
+│   │   │   ├── syntax.c.o.d
+│   │   │   ├── input_handling.c.o
+│   │   │   ├── rendering.c.o.d
+│   │   │   ├── file_io.c.o.d
+│   │   │   ├── selection.c.o
+│   │   │   └── syntax.c.o
+│   │   ├── link.txt
+│   │   ├── compiler_depend.internal
+│   │   ├── build.make
+│   │   ├── DependInfo.cmake
+│   │   ├── link.d
+│   │   ├── compiler_depend.make
+│   │   └── depend.make
+│   ├── InstallScripts.json
+│   ├── cmake.check_cache
+│   ├── progress.marks
+│   ├── CMakeDirectoryInformation.cmake
+│   ├── TargetDirectories.txt
+│   ├── Makefile.cmake
+│   ├── CMakeConfigureLog.yaml
+│   └── pkgRedirects
+└── README.md
