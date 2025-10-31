@@ -2,8 +2,6 @@
 
 > Made and tested on Arch Linux and Debian-based(Tails more specificly), should work fine in all major distros
 
-
-
 ## Installation
 
 1. Clone the repository:
