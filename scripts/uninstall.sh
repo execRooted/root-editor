@@ -1,8 +1,6 @@
 #!/bin/bash
 
-
 set -e
-
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -63,3 +61,4 @@ sudo rm -f /usr/share/applications/root-editor.desktop
 
 echo
 echo -e "${GREEN}[SUCCESS]${NC} Root-Editor has been uninstalled successfully!"
+
