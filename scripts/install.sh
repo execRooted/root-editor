@@ -1,8 +1,6 @@
 #!/bin/bash
 
-
 set -e
-
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -221,3 +219,4 @@ echo "You can now run 'root-editor' or 're' from anywhere, or use the desktop en
 echo "Plugins are installed in /usr/local/lib/root-editor/plugins/"
 echo
 echo -e "${YELLOW}[NOTE]${NC} Make sure /usr/local/bin is in your PATH if it's not already."
+
