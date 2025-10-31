@@ -381,3 +381,8 @@ void load_plugin_interactive(EditorState* state)
         load_plugin(state, plugin_path);
     }
 }
+
+
+
+
+
