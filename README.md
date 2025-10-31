@@ -3,7 +3,7 @@
 > Made and tested on Arch Linux and Debian-based(Tails more specificly), should work fine in all major distros
 
 
-<img src="github/picture0.png" width="500" alt="Root Editor Logo">
+
 
 
 
@@ -242,3 +242,4 @@ It's open source like all things should be.
 ---
 
 ***Made by execRooted***
+
