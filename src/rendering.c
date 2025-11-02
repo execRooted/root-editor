@@ -896,7 +896,7 @@ void init_theme_colors(EditorState* state)
         init_pair(26, COLOR_BLUE,  -1);
         init_pair(27, COLOR_YELLOW,  -1);
         init_pair(29, COLOR_BLACK, COLOR_CYAN); // Selection highlight - cyan background for better visibility
-        init_pair(30, COLOR_BLUE, COLOR_YELLOW); // Blue text on yellow background for selecting mode
+        init_pair(30, COLOR_BLACK, COLOR_WHITE); // Black text on white background for selecting mode
     } else if (t == 3) {
         init_pair(1,  COLOR_WHITE,  -1);
         init_pair(6,  COLOR_WHITE,  -1);
