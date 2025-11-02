@@ -9,9 +9,9 @@ BLUE='\033[0;34m'
 NC='\033[0m' 
 
 clear
-echo "========================================="
-echo "    ROOT-EDITOR UNINSTALLER             "
-echo "========================================="
+echo -e "${BLUE}=========================================${NC}"
+echo -e "${BLUE}    ROOT-EDITOR UNINSTALLER             ${NC}"
+echo -e "${BLUE}=========================================${NC}"
 echo
 
 
