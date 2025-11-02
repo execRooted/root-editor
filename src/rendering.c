@@ -40,92 +40,78 @@ void render_screen(EditorState* state)
 
         const int line_num_width = 8;
         const int start_line = state -> scroll_offset;
-        const int end_line = (start_line + max_y - 5 > state -> line_count) ?
-                state -> line_count : start_line + max_y - 5;
-
         
+
         const int show_line_numbers = 1;
-        const int text_start_col = show_line_numbers ? line_num_width : 0;
+        const int text_start_col = show_line_numbers ? line_num_width - 2 : 0;
+        const int avail_width = max_x - text_start_col - 1;
 
         char ** lines = state -> lines;
 
-        for (int i = start_line; i < end_line; i++) {
-                const int screen_row = i - start_line + 3;
-
+        int screen_row = 3;
+        int logical_line = state->scroll_offset;
+        int offset_in_line = 0;
+        while (screen_row < max_y - 2 && logical_line < state->line_count) {
+                char *line = state->lines[logical_line];
+                int line_len = strlen(line);
+                // print line number or ->
                 if (show_line_numbers) {
                         attron(COLOR_PAIR(28) | A_BOLD);
-                        mvprintw(screen_row, 0, "%5d   ", i + 1);
+                        if (offset_in_line == 0) {
+                                mvprintw(screen_row, 0, "%5d ", logical_line + 1);
+                        } else {
+                                mvprintw(screen_row, 0, "  ->  ");
+                        }
                         attroff(COLOR_PAIR(28) | A_BOLD);
                 }
-
-                char * line = lines[i];
-                const int line_len = strlen(line);
-
-                if (state -> select_mode && i >= state -> select_start_y && i <= state -> select_end_y) {
-                        const int start_x = (i == state -> select_start_y) ? state -> select_start_x : 0;
-                        const int end_x = (i == state -> select_end_y) ? state -> select_end_x : line_len;
-
-                        
-                        int vis_start_x = start_x - state->horizontal_scroll_offset;
-                        int vis_end_x = end_x - state->horizontal_scroll_offset;
-                        int vis_line_start = 0 - state->horizontal_scroll_offset;
-                        int vis_line_end = line_len - state->horizontal_scroll_offset;
-
-                        
-                        if (vis_start_x < 0) vis_start_x = 0;
-                        if (vis_end_x < 0) vis_end_x = 0;
-                        if (vis_line_start < 0) vis_line_start = 0;
-                        if (vis_line_end < 0) vis_line_end = 0;
-
-                        int max_y_local, max_x_local;
-                        getmaxyx(stdscr, max_y_local, max_x_local);
-                        int avail_width = max_x_local - text_start_col - 1;
-                        if (vis_end_x > avail_width) vis_end_x = avail_width;
-                        if (vis_line_end > avail_width) vis_line_end = avail_width;
-
-                        if (vis_start_x > vis_line_start) {
-                                attron(COLOR_PAIR(13));
-                                mvprintw(screen_row, text_start_col + vis_line_start, "%.*s",
-                                        vis_start_x - vis_line_start, line + state->horizontal_scroll_offset + vis_line_start);
-                                attroff(COLOR_PAIR(13));
-                        }
-
-                        if (vis_end_x > vis_start_x) {
-                                attron(A_REVERSE);
-                                for (int j = vis_start_x; j < vis_end_x; j++) {
-                                        char ch = line[state->horizontal_scroll_offset + j];
-                                        if (ch == ' ' || ch == '\t') {
-                                                mvaddch(screen_row, text_start_col + j, ch == ' ' ? 183 : '>');
-                                        } else {
-                                                mvaddch(screen_row, text_start_col + j, ch);
-                                        }
-                                }
-                                attroff(A_REVERSE);
-                        } else if (line_len == 0 && vis_end_x == 0 && vis_start_x == 0) {
-                                
-                                attron(A_REVERSE);
-                                mvaddch(screen_row, text_start_col, ' ');
-                                attroff(A_REVERSE);
-                        }
-
-                        if (vis_line_end > vis_end_x) {
-                                attron(COLOR_PAIR(13));
-                                mvprintw(screen_row, text_start_col + vis_end_x, "%.*s",
-                                        vis_line_end - vis_end_x, line + state->horizontal_scroll_offset + vis_end_x);
-                                attroff(COLOR_PAIR(13));
+                // print text if not blank or not at end
+                if (line_len > 0 && offset_in_line < line_len) {
+                        int start = offset_in_line;
+                        int end = start + avail_width;
+                        if (end > line_len) end = line_len;
+                        mvprintw(screen_row, text_start_col, "%.*s", end - start, line + start);
+                        // update
+                        if (end == line_len) {
+                                logical_line++;
+                                offset_in_line = 0;
+                        } else {
+                                offset_in_line = end;
                         }
                 } else {
-                        highlight_line(state, i, screen_row, text_start_col, state->horizontal_scroll_offset);
+                        // blank line or end of line, move to next logical line
+                        logical_line++;
+                        offset_in_line = 0;
                 }
+                screen_row++;
         }
 
 
         
-        int vis_x = state->cursor_x - state->horizontal_scroll_offset;
-        if (vis_x < 0) vis_x = 0;
-        int max_vis = max_x - text_start_col - 1;
-        if (max_vis < 0) max_vis = 0;
-        if (vis_x > max_vis) vis_x = max_vis;
+        // Calculate cursor visual position
+        int cursor_visual_row = 3;
+        int temp_logical = state->scroll_offset;
+        while (temp_logical < state->cursor_y) {
+                char *line = state->lines[temp_logical];
+                int line_len = strlen(line);
+                if (line_len == 0) {
+                        cursor_visual_row += 1; // blank lines take 1 visual row
+                } else {
+                        int visual_rows = (line_len + avail_width - 1) / avail_width;
+                        cursor_visual_row += visual_rows;
+                }
+                temp_logical++;
+        }
+        // add position in current line
+        char *cursor_line = state->lines[state->cursor_y];
+        int cursor_line_len = strlen(cursor_line);
+        if (cursor_line_len == 0) {
+                cursor_visual_row += 0; // cursor at start of blank line
+        } else {
+                int cursor_visual_in_line = state->cursor_x / avail_width;
+                cursor_visual_row += cursor_visual_in_line;
+        }
+        int screen_cursor_col = text_start_col + (state->cursor_x % avail_width);
+
         int words = 0;
         for (int i = 0; i < state->line_count; i++) {
             char* line = state->lines[i];
@@ -156,7 +142,7 @@ void render_screen(EditorState* state)
                   words);
         attroff(COLOR_PAIR(1) | A_BOLD);
 
-        move(state -> cursor_y - start_line + 3, text_start_col + vis_x);
+        move(cursor_visual_row, screen_cursor_col);
         refresh();
 }
 
@@ -823,6 +809,7 @@ void init_theme_colors(EditorState* state)
         init_pair(25, COLOR_MAGENTA,  -1);
         init_pair(26, COLOR_BLUE,  -1);
         init_pair(27, COLOR_YELLOW,  -1);
+        init_pair(29, COLOR_BLACK, COLOR_WHITE); // Selection highlight
     } else if (t == 3) {
         init_pair(1,  COLOR_WHITE,  -1);
         init_pair(6,  COLOR_WHITE,  -1);
@@ -849,6 +836,7 @@ void init_theme_colors(EditorState* state)
         init_pair(25, COLOR_MAGENTA,  -1);
         init_pair(26, COLOR_BLUE,  -1);
         init_pair(27, COLOR_YELLOW,  -1);
+        init_pair(29, COLOR_BLACK, COLOR_WHITE); // Selection highlight
     }
 
 }

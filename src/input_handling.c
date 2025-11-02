@@ -260,7 +260,26 @@ void handle_input(EditorState* state, int ch)
                 if (state->select_mode) {
                         clear_selection(state);
                 } else {
-                        new_line(state);
+                        // Insert a non-deletable newline
+                        if (state->line_count >= MAX_LINES) {
+                                show_status(state, "Error: Maximum line count reached (1,000,000 lines)");
+                                break;
+                        }
+                        char* new_line_str = (char*)malloc(MAX_LINE_LENGTH);
+                        if (!new_line_str) {
+                                show_status(state, "Memory allocation failed");
+                                break;
+                        }
+                        new_line_str[0] = '\0';
+                        for (int i = state->line_count; i > state->cursor_y + 1; i--) {
+                                state->lines[i] = state->lines[i - 1];
+                        }
+                        state->lines[state->cursor_y + 1] = new_line_str;
+                        state->line_count++;
+                        state->cursor_y++;
+                        state->cursor_x = 0;
+                        move_cursor(state, 0, 0);
+                        update_dirty_status(state);
                 }
                 break;
         case KEY_F(1):
