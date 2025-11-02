@@ -52,7 +52,7 @@ void render_screen(EditorState* state)
         int screen_row = 3;
         int logical_line = state->scroll_offset;
         int offset_in_line = 0;
-        while (screen_row < max_y - 2 && logical_line < state->line_count) {
+        while (screen_row < max_y - 1 && logical_line < state->line_count) {
                 char *line = state->lines[logical_line];
                 int line_len = strlen(line);
                 // print line number or ->
@@ -135,6 +135,35 @@ void render_screen(EditorState* state)
                 cursor_visual_row += cursor_visual_in_line;
         }
         int screen_cursor_col = text_start_col + (state->cursor_x % avail_width);
+
+        // Adjust scroll_offset if cursor is off-screen due to wrapping
+        if (cursor_visual_row >= max_y - 2) {
+            state->scroll_offset += 1;
+            if (state->scroll_offset > state->cursor_y) state->scroll_offset = state->cursor_y;
+            // Recalculate cursor_visual_row with new scroll_offset
+            cursor_visual_row = 3;
+            temp_logical = state->scroll_offset;
+            while (temp_logical < state->cursor_y) {
+                char *line = state->lines[temp_logical];
+                int line_len = strlen(line);
+                if (line_len == 0) {
+                    cursor_visual_row += 1; // blank lines take 1 visual row
+                } else {
+                    int visual_rows = (line_len + avail_width - 1) / avail_width;
+                    cursor_visual_row += visual_rows;
+                }
+                temp_logical++;
+            }
+            // add position in current line
+            char *cursor_line = state->lines[state->cursor_y];
+            int cursor_line_len = strlen(cursor_line);
+            if (cursor_line_len == 0) {
+                cursor_visual_row += 0; // cursor at start of blank line
+            } else {
+                int cursor_visual_in_line = state->cursor_x / avail_width;
+                cursor_visual_row += cursor_visual_in_line;
+            }
+        }
 
         int words = 0;
         for (int i = 0; i < state->line_count; i++) {
