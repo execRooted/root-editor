@@ -2,6 +2,7 @@
 
 #define FILE_TYPE_PLAIN   0
 #define COLOR_DEFAULT     13
+#define COLOR_SELECTION   29
 
 char * get_system_clipboard();
 
@@ -69,7 +70,30 @@ void render_screen(EditorState* state)
                         int start = offset_in_line;
                         int end = start + avail_width;
                         if (end > line_len) end = line_len;
-                        mvprintw(screen_row, text_start_col, "%.*s", end - start, line + start);
+                        if (state->syntax_enabled && state->syntax_display_enabled) {
+                                highlight_line(state, logical_line, screen_row, text_start_col, offset_in_line);
+                        } else {
+                                // Plain text rendering with selection highlighting
+                                int col = text_start_col;
+                                int i = start;
+                                while (i < end) {
+                                        int is_selected = state->select_mode &&
+                                                logical_line >= state->select_start_y &&
+                                                logical_line <= state->select_end_y &&
+                                                i >= (logical_line == state->select_start_y ? state->select_start_x : 0) &&
+                                                i < (logical_line == state->select_end_y ? state->select_end_x : line_len);
+
+                                        if (is_selected) {
+                                                attron(COLOR_PAIR(COLOR_SELECTION));
+                                        } else {
+                                                attron(COLOR_PAIR(COLOR_DEFAULT));
+                                        }
+
+                                        mvaddch(screen_row, col++, line[i]);
+                                        attroff(COLOR_PAIR(is_selected ? COLOR_SELECTION : COLOR_DEFAULT));
+                                        i++;
+                                }
+                        }
                         // update
                         if (end == line_len) {
                                 logical_line++;
@@ -809,7 +833,7 @@ void init_theme_colors(EditorState* state)
         init_pair(25, COLOR_MAGENTA,  -1);
         init_pair(26, COLOR_BLUE,  -1);
         init_pair(27, COLOR_YELLOW,  -1);
-        init_pair(29, COLOR_BLACK, COLOR_WHITE); // Selection highlight
+        init_pair(29, COLOR_BLACK, COLOR_GREEN); // Selection highlight - green background
     } else if (t == 3) {
         init_pair(1,  COLOR_WHITE,  -1);
         init_pair(6,  COLOR_WHITE,  -1);
@@ -836,7 +860,7 @@ void init_theme_colors(EditorState* state)
         init_pair(25, COLOR_MAGENTA,  -1);
         init_pair(26, COLOR_BLUE,  -1);
         init_pair(27, COLOR_YELLOW,  -1);
-        init_pair(29, COLOR_BLACK, COLOR_WHITE); // Selection highlight
+        init_pair(29, COLOR_BLACK, COLOR_WHITE); // Selection highlight - white background
     }
 
 }

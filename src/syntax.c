@@ -18,6 +18,7 @@
 #define FILE_TYPE_CSS     12
 #define FILE_TYPE_MAKEFILE 13
 #define FILE_TYPE_TYPESCRIPT 14
+#define FILE_TYPE_JSON    15
 #define COLOR_DATA_TYPE        7   
 #define COLOR_STRING           8   
 #define COLOR_COMMENT          9   
@@ -161,6 +162,17 @@ int is_number(const char* token)
 }
 void init_syntax_highlighting(EditorState* state)
 {
+    if (!state) return;
+    FILE *f = fopen("/tmp/editor_debug.log", "w");
+    if (f) {
+        fprintf(f, "Syntax highlighting status:\n");
+        fprintf(f, "- syntax_enabled: %d\n", state->syntax_enabled);
+        fprintf(f, "- syntax_display_enabled: %d\n", state->syntax_display_enabled);
+        fprintf(f, "- file_type: %d\n", state->file_type);
+        fprintf(f, "- json_loaded: %d\n", state->json_loaded);
+        fclose(f);
+    }
+
     if (!state->syntax_enabled) return;
     detect_file_type(state);
     load_keywords(state);
@@ -253,6 +265,10 @@ void detect_file_type(EditorState* state)
         else if (strcmp(ext, ".cs") == 0)
         {
             state->file_type = FILE_TYPE_CSHARP;
+        }
+        else if (strcmp(ext, ".json") == 0)
+        {
+            state->file_type = FILE_TYPE_JSON;
         }
         else
         {
@@ -469,7 +485,48 @@ static int get_hierarchical_color(EditorState* state, const char* scope)
     }
     return COLOR_DEFAULT;
 }
-int load_syntax_json(EditorState* state);
+int load_syntax_json(EditorState* state)
+{
+    FILE *f = fopen("/tmp/editor_debug.log", "a");
+    if (f) {
+        fprintf(f, "\nAttempting to load syntax.json...\n");
+
+        FILE *json_file = fopen("/home/rooted/home2/Projects/C/root-editor/config/syntax.json", "r");
+        if (!json_file) {
+            fprintf(f, "Failed to open syntax.json\n");
+            fprintf(f, "Error: %s\n", strerror(errno));
+            fclose(f);
+            return 0;
+        }
+
+        fseek(json_file, 0, SEEK_END);
+        long size = ftell(json_file);
+        fseek(json_file, 0, SEEK_SET);
+
+        char *buffer = malloc(size + 1);
+        if (!buffer) {
+            fprintf(f, "Failed to allocate memory for syntax.json\n");
+            fclose(json_file);
+            fclose(f);
+            return 0;
+        }
+
+        size_t read = fread(buffer, 1, size, json_file);
+        buffer[read] = '\0';
+
+        fprintf(f, "Read %ld bytes from syntax.json\n", read);
+        fprintf(f, "Parsing JSON...\n");
+
+        int result = parse_json_token_colors(buffer, state);
+        fprintf(f, "JSON parsing result: %d\n", result);
+
+        free(buffer);
+        fclose(json_file);
+        fclose(f);
+        return result;
+    }
+    return 0;
+}
 int parse_json_token_colors(const char* json_content, EditorState* state);
 int hex_to_color_pair(const char* hex_color);
 int match_scope(const char* token_scope, const char* rule_scope);
@@ -488,6 +545,13 @@ int hex_to_color_pair(const char* hex_color)
     if (strcmp(hex_color, "#1e66f5") == 0) return COLOR_FUNCTION;
     if (strcmp(hex_color, "#df8e1d") == 0) return COLOR_CONSTANT;
     if (strcmp(hex_color, "#4c4f69") == 0) return COLOR_DEFAULT;
+    if (strcmp(hex_color, "#e5c07b") == 0) return COLOR_DATA_TYPE;  // storage.type, support.type
+    if (strcmp(hex_color, "#56b6c2") == 0) return COLOR_OPERATOR;   // keyword.operator
+    if (strcmp(hex_color, "#abb2bf") == 0) return COLOR_DELIMITER; // punctuation
+    if (strcmp(hex_color, "#61afef") == 0) return COLOR_FUNCTION;  // support.function
+    if (strcmp(hex_color, "#c678dd") == 0) return COLOR_MODIFIER;  // keyword.operator.expression
+    if (strcmp(hex_color, "#98c379") == 0) return COLOR_STRING;    // string.quoted
+    if (strcmp(hex_color, "#e06c75") == 0) return COLOR_FUNCTION;  // entity.name.function
     return COLOR_DEFAULT;
 }
 
@@ -781,7 +845,21 @@ void highlight_line(EditorState* state, int line_num, int screen_row, int line_n
                 if (is_control_flow(word)) color = COLOR_MODIFIER;
                 else if (strcmp(word, "echo") == 0 || strcmp(word, "clear") == 0 || strcmp(word, "cd") == 0 || strcmp(word, "sudo") == 0 || strcmp(word, "rm") == 0 || strcmp(word, "cp") == 0 || strcmp(word, "mkdir") == 0) color = COLOR_INTEGER_LITERAL;
             }
-
+        
+            if (state->file_type == FILE_TYPE_JSON) {
+                // JSON syntax highlighting
+                if (strcmp(word, "true") == 0 || strcmp(word, "false") == 0) {
+                    color = COLOR_CONSTANT;
+                } else if (strcmp(word, "null") == 0) {
+                    color = COLOR_CONSTANT;
+                } else if (is_number(word)) {
+                    color = COLOR_INTEGER_LITERAL;
+                } else {
+                    // String values in JSON
+                    color = COLOR_STRING;
+                }
+            }
+        
             attron(COLOR_PAIR(color));
             mvprintw(screen_row, col, "%.*s", word_len, &line[start]);
             col += word_len;
@@ -1311,9 +1389,9 @@ void highlight_line_segment(EditorState* state, int line_num, int screen_row, in
             const char* font_style = get_dynamic_font_style(state, "comment");
             int seg_len = (endpos >= 0 ? endpos : end_col) - i;
 
-            
+
             if (strcmp(font_style, "italic") == 0) {
-                attron(A_DIM);  
+                attron(A_DIM);
             }
 
             attron(COLOR_PAIR(is_selected ? COLOR_SELECTION : cmt_color));
@@ -1322,10 +1400,26 @@ void highlight_line_segment(EditorState* state, int line_num, int screen_row, in
             i += seg_len;
             attroff(COLOR_PAIR(is_selected ? COLOR_SELECTION : cmt_color));
 
-            
+
             if (strcmp(font_style, "italic") == 0) {
                 attroff(A_DIM);
             }
+            continue;
+        }
+
+        if (state->file_type == FILE_TYPE_JSON && ch == '"' && i < end_col) {
+            // JSON string highlighting
+            int start = i++;
+            int escaped = 0;
+            while (i < end_col) {
+                if (line[i] == '\\' && !escaped) { escaped = 1; i++; }
+                else if (line[i] == '"' && !escaped) { i++; break; }
+                else { escaped = 0; i++; }
+            }
+            int str_color = get_hierarchical_color(state, "string");
+            attron(COLOR_PAIR(is_selected ? COLOR_SELECTION : str_color));
+            mvprintw(screen_row, col, "%.*s", i - start, &line[start]);
+            col += (i - start);
             continue;
         }
 

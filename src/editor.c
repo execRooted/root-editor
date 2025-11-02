@@ -27,7 +27,7 @@ void init_editor(EditorState* state)
     state -> needs_sudo = 0;
     memset(state -> key_states, 0, sizeof(state -> key_states));
     memset(state -> key_timestamps, 0, sizeof(state -> key_timestamps));
-    state -> syntax_enabled = 0;
+    state -> syntax_enabled = 1;  // Enable syntax highlighting by default
     state -> syntax_display_enabled = 1;
     state -> auto_tabbing_enabled = 1;    
     state -> file_type = 0;
@@ -35,8 +35,8 @@ void init_editor(EditorState* state)
     state -> keyword_count = 0;
 
     
-    state -> theme_id = 1;
-    strncpy(state -> theme_name, "Frappé", sizeof(state -> theme_name) - 1);
+    state -> theme_id = 3;
+    strncpy(state -> theme_name, "White Selection", sizeof(state -> theme_name) - 1);
     state -> theme_name[sizeof(state -> theme_name) - 1] = '\0';
 
     state -> autosave_enabled = 0;
@@ -46,7 +46,6 @@ void init_editor(EditorState* state)
     
     state -> auto_complete_enabled = 1;
     state -> comment_complete_enabled = 1;
-    state -> syntax_enabled = 1;
 
     
     state -> json_rules_count = 0;
@@ -66,6 +65,17 @@ void init_editor(EditorState* state)
     
     state -> plugin_count = 0;
     memset(state -> plugins, 0, sizeof(state -> plugins));
+
+    FILE *f = fopen("/tmp/editor_debug.log", "w");
+    if (f) {
+        fprintf(f, "Editor initialization\n");
+        fprintf(f, "Loading syntax configuration...\n");
+        int result = load_syntax_json(state);
+        fprintf(f, "Syntax config loaded: %d\n", result);
+        fclose(f);
+    }
+
+    init_syntax_highlighting(state);
 }
 void toggle_dark_mode(EditorState* state)
 {
