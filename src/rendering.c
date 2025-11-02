@@ -84,8 +84,8 @@ void render_screen(EditorState* state)
                                                 i < (logical_line == state->select_end_y ? state->select_end_x : line_len);
 
                                         if (is_selected) {
-                                                if (state->editor_mode == 1) { // selecting mode - white background
-                                                        attron(COLOR_PAIR(30)); // white background
+                                                if (state->editor_mode == 1) { // selecting mode - reverse video
+                                                        attron(A_REVERSE);
                                                 } else {
                                                         attron(COLOR_PAIR(COLOR_SELECTION));
                                                         attron(A_BOLD);
@@ -97,8 +97,10 @@ void render_screen(EditorState* state)
                                         mvaddch(screen_row, col++, line[i]);
                                         if (is_selected && state->editor_mode == 0) {
                                                 attroff(A_BOLD);
+                                        } else if (is_selected && state->editor_mode == 1) {
+                                                attroff(A_REVERSE);
                                         }
-                                        attroff(COLOR_PAIR(is_selected ? (state->editor_mode == 1 ? 30 : COLOR_SELECTION) : COLOR_DEFAULT));
+                                        attroff(COLOR_PAIR(is_selected ? (state->editor_mode == 1 ? COLOR_DEFAULT : COLOR_SELECTION) : COLOR_DEFAULT));
                                         i++;
                                 }
                         }
@@ -873,7 +875,7 @@ void init_theme_colors(EditorState* state)
         init_pair(26, COLOR_BLUE,  -1);
         init_pair(27, COLOR_YELLOW,  -1);
         init_pair(29, COLOR_BLACK, COLOR_CYAN); // Selection highlight - cyan background for better visibility
-        init_pair(30, COLOR_WHITE, COLOR_BLACK); // White text on black background for selecting mode
+        init_pair(30, COLOR_BLUE, COLOR_YELLOW); // Blue text on yellow background for selecting mode
     } else if (t == 3) {
         init_pair(1,  COLOR_WHITE,  -1);
         init_pair(6,  COLOR_WHITE,  -1);
