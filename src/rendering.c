@@ -37,6 +37,10 @@ void render_screen(EditorState* state)
                 mvprintw(0, 0, "Current File: [Untitled]");
                 mvprintw(1, 0, "Path: %s", cwd);
         }
+
+        // Display mode indicator in status bar
+        const char* mode_text = (state->select_mode == 1 || state->select_mode == 2) ? "SELECT" : "TEXT";
+
         attroff(COLOR_PAIR(1) | A_BOLD);
 
         const int line_num_width = 8;
@@ -116,7 +120,7 @@ void render_screen(EditorState* state)
                         if (state->select_mode &&
                             logical_line >= state->select_start_y &&
                             logical_line <= state->select_end_y) {
-                            int is_selected = (logical_line == state->select_start_y ? state->select_start_x : 0) == 0;
+                            int is_selected = 1; // Always select blank lines in selection range
                             if (is_selected) {
                                 if (state->editor_mode == 1) { // selecting mode - reverse video
                                     attron(A_REVERSE);
@@ -216,15 +220,18 @@ void render_screen(EditorState* state)
         const char* syntax_status = (state->syntax_enabled ? "ON" : "OFF");
         const char* brackets_status = (state->auto_complete_enabled ? "ON" : "OFF");
         const char* comment_status = (state->comment_complete_enabled ? "ON" : "OFF");
+        const char* sticky_cursor_status = (state->sticky_cursor_enabled ? "ON" : "OFF");
         const char* edited_indicator = (state->dirty ? " [edited]" : "");
-        mvprintw(max_y - 1, 0, "Line: %d, Col: %d | %s%s | Syntax HL: %s | Autocomplete: %s | Brackets and Quotes Autocomplete: %s | Auto Tabbing: %s | Words: %d",
+        mvprintw(max_y - 1, 0, "Line: %d, Col: %d | %s%s | Mode: %s | Syntax HL: %s | Autocomplete: %s | Brackets and Quotes Autocomplete: %s | Auto Tabbing: %s | Sticky Cursor: %s | Words: %d",
                   state->cursor_y + 1, state->cursor_x + 1,
                   state->filename[0] ? state->filename : "[Untitled]",
                   edited_indicator,
+                  mode_text,
                   syntax_status,
                   comment_status,
                   brackets_status,
                   state->auto_tabbing_enabled ? "ON" : "OFF",
+                  sticky_cursor_status,
                   words);
         attroff(COLOR_PAIR(1) | A_BOLD);
 

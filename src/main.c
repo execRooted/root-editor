@@ -152,7 +152,6 @@ init_syntax_highlighting(&state);
 enable_bracketed_paste();
 
          int ch;
-         time_t last_autosave_check = time(NULL);
          while (1) {
                  
                  curs_set(1);
@@ -166,13 +165,10 @@ enable_bracketed_paste();
                  }
 
                  
-                 time_t now = time(NULL);
-                 if (now - last_autosave_check >= 5) {
-                         autosave_check(&state);
-                         last_autosave_check = now;
-                 }
 
                  
+                 time_t now = time(NULL);
+
                  static time_t last_syntax_update = 0;
                  if (state.rapid_input_mode && now - last_syntax_update >= 1) {
                          update_syntax_highlighting(&state);

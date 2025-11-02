@@ -249,17 +249,24 @@ void handle_input(EditorState* state, int ch)
         case KEY_DC:
         case 127:
                 if (state -> select_mode && has_selection(state)) {
-
                         delete_selected_text(state);
+                } else if (state -> select_mode) {
+                        // In selection mode but no selection - do nothing
                 } else {
                         delete_char(state);
                 }
                 break;
         case KEY_ENTER:
         case '\n':
-                if (state->select_mode) {
+                if (state->select_mode == 2) { // Esc was pressed, now Enter exits
                         clear_selection(state);
+                        state->syntax_display_enabled = 1; // re-enable syntax highlighting
+                        return; // Don't create new line
+                } else if (state->select_mode == 1) {
+                        // Do nothing - require Esc first to exit selection mode
+                        return; // Don't create new line
                 } else {
+
                         // Insert a non-deletable newline
                         if (state->line_count >= MAX_LINES) {
                                 show_status(state, "Error: Maximum line count reached (1,000,000 lines)");
@@ -323,12 +330,8 @@ void handle_input(EditorState* state, int ch)
                 toggle_syntax_highlighting(state);
                 save_config(state);
                 break;
-        case KEY_F(9):
-                toggle_autosave(state);
-                save_config(state);
-                break;
         case KEY_F(10):
-                toggle_syntax_display(state);
+                toggle_sticky_cursor(state);
                 save_config(state);
                 break;
         case KEY_IC:
@@ -338,18 +341,25 @@ void handle_input(EditorState* state, int ch)
                 handle_mouse_event(state);
                 break;
         case '\t':
-                for (int i = 0; i < state -> tab_size; i++) {
-                        insert_char(state, ' ');
+                if (state->select_mode) {
+                        // In selection mode - do nothing
+                } else {
+                        for (int i = 0; i < state -> tab_size; i++) {
+                                insert_char(state, ' ');
+                        }
+                        move_cursor(state, 0, 0);
                 }
-                move_cursor(state, 0, 0);
                 break;
         case 27:
                 if (state->editor_mode == 1) { // selecting mode
                         exit_selecting_mode(state);
                 } else if (state->char_select_mode) {
                         state->char_select_mode = 0;
+                        // Don't re-enable syntax highlighting yet - wait for Enter
                 } else if (state -> select_mode) {
-                        clear_selection(state);
+                        // Don't clear selection yet - wait for Enter
+                        // Just mark that we've pressed Esc while in selection mode
+                        state->select_mode = 2; // Special state: Esc pressed, waiting for Enter
                 } else if (state -> show_help) {
                         state -> show_help = 0;
                 } else {
@@ -364,14 +374,18 @@ void handle_input(EditorState* state, int ch)
                 break;
         default:
                 if (isprint(ch)) {
-                        if (selection_started_with_shift && state->select_mode) {
-                                copy_selected_text(state);
-                                clear_selection(state);
-                                selection_started_with_shift = 0;
+                        if (state->select_mode) {
+                                // In selection mode - do nothing for printable characters
+                        } else {
+                                if (selection_started_with_shift && state->select_mode) {
+                                        copy_selected_text(state);
+                                        clear_selection(state);
+                                        selection_started_with_shift = 0;
+                                }
+                                reset_key_states(state);
+                                insert_char(state, ch);
+                                move_cursor(state, 0, 0);
                         }
-                        reset_key_states(state);
-                        insert_char(state, ch);
-                        move_cursor(state, 0, 0);
                 }
                 break;
         }
@@ -421,10 +435,12 @@ void handle_ctrl_keys(EditorState* state, int ch)
                 mark_key_processed(state, ch);
                 break;
         case 1:
-                select_all(state);
+                if (state->select_mode) {
+                        select_all(state);
+                }
                 break;
-        case 2:  
-                select_current_line(state);
+        case 2:
+                // Ctrl+B functionality removed
                 break;
         case 3:
                 if (state -> select_mode) {
@@ -473,7 +489,9 @@ void handle_ctrl_keys(EditorState* state, int ch)
                 mark_key_processed(state, ch);
                 break;
         case 23:
-                enter_selecting_mode(state);
+                if (!state->select_mode) {
+                        start_selection(state);
+                }
                 mark_key_processed(state, ch);
                 break;
         case 5:

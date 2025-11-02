@@ -39,13 +39,12 @@ void init_editor(EditorState* state)
     strncpy(state -> theme_name, "White Selection", sizeof(state -> theme_name) - 1);
     state -> theme_name[sizeof(state -> theme_name) - 1] = '\0';
 
-    state -> autosave_enabled = 0;
-    state -> autosave_interval_sec = 30;
-    state -> last_autosave_time = time(NULL);
+    // Autosave removed
 
     
     state -> auto_complete_enabled = 1;
     state -> comment_complete_enabled = 1;
+    state -> sticky_cursor_enabled = 1;
 
     
     state -> json_rules_count = 0;
@@ -160,9 +159,9 @@ void insert_char(EditorState* state, char c)
         state -> cursor_x++;
         return;
     } else if (state->auto_complete_enabled && c == '"' && len < MAX_LINE_LENGTH - 1) {
-        
+
         if (state -> cursor_x > len) {
-            
+
             for (int i = len; i < state -> cursor_x; i++) {
                 line[i] = ' ';
             }
@@ -178,13 +177,13 @@ void insert_char(EditorState* state, char c)
         update_dirty_status(state);
         return;
     } else if (c == '"' && state -> cursor_x < len && line[state -> cursor_x] == '"') {
-        
+
         state -> cursor_x++;
         return;
     } else if (state->auto_complete_enabled && c == '\'' && len < MAX_LINE_LENGTH - 1) {
-        
+
         if (state -> cursor_x > len) {
-            
+
             for (int i = len; i < state -> cursor_x; i++) {
                 line[i] = ' ';
             }
@@ -200,7 +199,7 @@ void insert_char(EditorState* state, char c)
         update_dirty_status(state);
         return;
     } else if (c == '\'' && state -> cursor_x < len && line[state -> cursor_x] == '\'') {
-        
+
         state -> cursor_x++;
         return;
     }
@@ -512,23 +511,29 @@ void move_cursor(EditorState* state, int dx, int dy)
     
     if (dy != 0 && !state->select_mode) {
 
-        if (dy < 0 && new_y >= 0 && new_y < state -> line_count && strlen(state -> lines[new_y]) > 0) {
-            new_x = strlen(state -> lines[new_y]);
-        }
-
-        else if (dy > 0 && new_y >= 0 && new_y < state -> line_count && strlen(state -> lines[new_y]) > 0) {
-            new_x = strlen(state -> lines[new_y]);
-        }
-
-        else if (dy > 0 && state -> cursor_y >= 0 && state -> cursor_y < state -> line_count && strlen(state -> lines[state -> cursor_y]) == 0) {
-            new_x = 0;
-        }
-
-        else {
+        if (state->sticky_cursor_enabled) {
+            // Sticky cursor: keep the same column position
             if (new_x >= max_x) new_x = max_x;
             if (new_x < 0) new_x = 0;
-        }
+        } else {
+            // Non-sticky cursor: jump to end of line
+            if (dy < 0 && new_y >= 0 && new_y < state -> line_count && strlen(state -> lines[new_y]) > 0) {
+                new_x = strlen(state -> lines[new_y]);
+            }
 
+            else if (dy > 0 && new_y >= 0 && new_y < state -> line_count && strlen(state -> lines[new_y]) > 0) {
+                new_x = strlen(state -> lines[new_y]);
+            }
+
+            else if (dy > 0 && state -> cursor_y >= 0 && state -> cursor_y < state -> line_count && strlen(state -> lines[state -> cursor_y]) == 0) {
+                new_x = 0;
+            }
+
+            else {
+                if (new_x >= max_x) new_x = max_x;
+                if (new_x < 0) new_x = 0;
+            }
+        }
 
         if (dy != 0 && new_y >= 0 && new_y < state -> line_count) {
             int target_line_len = strlen(state -> lines[new_y]);
@@ -929,6 +934,12 @@ void toggle_auto_complete(EditorState* state)
 void toggle_comment_complete(EditorState* state)
 {
     state -> comment_complete_enabled = !state -> comment_complete_enabled;
+    save_config(state);
+}
+
+void toggle_sticky_cursor(EditorState* state)
+{
+    state -> sticky_cursor_enabled = !state -> sticky_cursor_enabled;
     save_config(state);
 }
 int can_process_key(EditorState* state, int key_code)

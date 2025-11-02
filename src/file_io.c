@@ -466,23 +466,6 @@ void prompt_open_file(EditorState* state)
         } else {
         }
 }
-void autosave_check(EditorState* state)
-{
-        if (!state) return;
-        if (!state->autosave_enabled) return;
-        if (state->filename[0] == '\0') return; 
-        time_t now = time(NULL);
-        if (state->dirty && difftime(now, state->last_autosave_time) >= state->autosave_interval_sec) {
-                save_file(state);
-                state->last_autosave_time = now;
-        }
-}
-
-void toggle_autosave(EditorState* state)
-{
-        state->autosave_enabled = !state->autosave_enabled;
-        state->last_autosave_time = time(NULL);
-}
 static void ensure_config_dir(char *out_dir, size_t out_sz)
 {
         const char *home = getenv("HOME");
@@ -522,17 +505,14 @@ void load_config(EditorState* state)
                                 if (t >= 1 && t <= 8) state->tab_size = t;
                         } else if (strcmp(key, "syntax_enabled")==0) {
                                 state->syntax_enabled = atoi(val) ? 1 : 0;
-                        } else if (strcmp(key, "autosave_enabled")==0) {
-                                state->autosave_enabled = atoi(val) ? 1 : 0;
-                        } else if (strcmp(key, "autosave_interval_sec")==0) {
-                                int s = atoi(val);
-                                if (s >= 5 && s <= 600) state->autosave_interval_sec = s;
                         } else if (strcmp(key, "auto_complete_enabled")==0) {
                                 state->auto_complete_enabled = atoi(val) ? 1 : 0;
                         } else if (strcmp(key, "comment_complete_enabled")==0) {
                                 state->comment_complete_enabled = atoi(val) ? 1 : 0;
                         } else if (strcmp(key, "auto_tabbing_enabled")==0) {
                                 state->auto_tabbing_enabled = atoi(val) ? 1 : 0;
+                        } else if (strcmp(key, "sticky_cursor_enabled")==0) {
+                                state->sticky_cursor_enabled = atoi(val) ? 1 : 0;
                         }
                 }
         }
@@ -554,11 +534,10 @@ void save_config(EditorState* state)
         }
         fprintf(fp, "tab_size=%d\n", state->tab_size);
         fprintf(fp, "syntax_enabled=%d\n", state->syntax_enabled);
-        fprintf(fp, "autosave_enabled=%d\n", state->autosave_enabled);
-        fprintf(fp, "autosave_interval_sec=%d\n", state->autosave_interval_sec);
         fprintf(fp, "auto_complete_enabled=%d\n", state->auto_complete_enabled);
         fprintf(fp, "comment_complete_enabled=%d\n", state->comment_complete_enabled);
         fprintf(fp, "auto_tabbing_enabled=%d\n", state->auto_tabbing_enabled);
+        fprintf(fp, "sticky_cursor_enabled=%d\n", state->sticky_cursor_enabled);
         fclose(fp);
 }
 

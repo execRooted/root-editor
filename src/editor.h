@@ -88,12 +88,11 @@ typedef struct EditorState {
     int theme_id;
     char theme_name[32];
 
-    int autosave_enabled;
-    int autosave_interval_sec;
-    time_t last_autosave_time;
+    // Autosave removed
 
     int auto_complete_enabled;
     int comment_complete_enabled;
+    int sticky_cursor_enabled;
 
     int json_rules_count;
     char json_scopes[MAX_JSON_RULES][MAX_SCOPE_LENGTH];
@@ -127,9 +126,8 @@ void exit_selecting_mode(EditorState* state);
 void toggle_auto_tabbing(EditorState* state);
 void toggle_auto_complete(EditorState* state);
 void toggle_comment_complete(EditorState* state);
+void toggle_sticky_cursor(EditorState* state);
 
-void autosave_check(EditorState* state);
-void toggle_autosave(EditorState* state);
 void load_config(EditorState* state);
 void save_config(EditorState* state);
 void safe_quit(EditorState* state);

@@ -72,7 +72,7 @@ void copy_selected_text(EditorState* state)
 
         system("rm -f '/tmp/kilo_editor_clipboard_temp.txt' 2>/dev/null &");
 
-        clear_selection(state);
+        // Don't clear selection after delete - keep in select mode
 }
 
 void clear_selection(EditorState* state)
@@ -90,20 +90,9 @@ void start_selection(EditorState* state)
         state -> select_start_x = state -> cursor_x;
         state -> select_start_y = state -> cursor_y;
 
-        if (state->char_select_mode) {
-                int line_len = 0;
-                if (state->cursor_y >= 0 && state->cursor_y < state->line_count && state->lines[state->cursor_y]) {
-                        line_len = (int)strlen(state->lines[state->cursor_y]);
-                }
-                int ex = state->cursor_x + 1;
-                if (ex > line_len) ex = line_len;
-
-                state -> select_end_x = ex;
-                state -> select_end_y = state -> cursor_y;
-        } else {
-                state -> select_end_x = state -> cursor_x;
-                state -> select_end_y = state -> cursor_y;
-        }
+        // Select every character - always select up to cursor position
+        state -> select_end_x = state -> cursor_x;
+        state -> select_end_y = state -> cursor_y;
 }
 
 void extend_selection(EditorState* state)
