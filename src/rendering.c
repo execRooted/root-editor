@@ -112,6 +112,29 @@ void render_screen(EditorState* state)
                                 offset_in_line = end;
                         }
                 } else {
+                        // blank line - show at least one space if selected
+                        if (state->select_mode &&
+                            logical_line >= state->select_start_y &&
+                            logical_line <= state->select_end_y) {
+                            int is_selected = (logical_line == state->select_start_y ? state->select_start_x : 0) == 0;
+                            if (is_selected) {
+                                if (state->editor_mode == 1) { // selecting mode - reverse video
+                                    attron(A_REVERSE);
+                                } else {
+                                    attron(COLOR_PAIR(COLOR_SELECTION));
+                                    attron(A_BOLD);
+                                }
+                            } else {
+                                attron(COLOR_PAIR(COLOR_DEFAULT));
+                            }
+                            mvaddch(screen_row, text_start_col, ' ');
+                            if (is_selected && state->editor_mode == 0) {
+                                attroff(A_BOLD);
+                            } else if (is_selected && state->editor_mode == 1) {
+                                attroff(A_REVERSE);
+                            }
+                            attroff(COLOR_PAIR(is_selected ? (state->editor_mode == 1 ? COLOR_DEFAULT : COLOR_SELECTION) : COLOR_DEFAULT));
+                        }
                         // blank line or end of line, move to next logical line
                         logical_line++;
                         offset_in_line = 0;
@@ -193,13 +216,11 @@ void render_screen(EditorState* state)
         const char* syntax_status = (state->syntax_enabled ? "ON" : "OFF");
         const char* brackets_status = (state->auto_complete_enabled ? "ON" : "OFF");
         const char* comment_status = (state->comment_complete_enabled ? "ON" : "OFF");
-        const char* mode_status = (state->editor_mode == 0 ? "TEXT" : "SELECTING");
         const char* edited_indicator = (state->dirty ? " [edited]" : "");
-        mvprintw(max_y - 1, 0, "Line: %d, Col: %d | %s%s | Mode: %s | Syntax HL: %s | Autocomplete: %s | Brackets and Quotes Autocomplete: %s | Auto Tabbing: %s | Words: %d",
+        mvprintw(max_y - 1, 0, "Line: %d, Col: %d | %s%s | Syntax HL: %s | Autocomplete: %s | Brackets and Quotes Autocomplete: %s | Auto Tabbing: %s | Words: %d",
                   state->cursor_y + 1, state->cursor_x + 1,
                   state->filename[0] ? state->filename : "[Untitled]",
                   edited_indicator,
-                  mode_status,
                   syntax_status,
                   comment_status,
                   brackets_status,
