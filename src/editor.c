@@ -61,6 +61,7 @@ void init_editor(EditorState* state)
     state -> last_input_time = time(NULL);
     state -> rapid_input_mode = 0;
     state -> char_select_mode = 0;
+    state -> editor_mode = 0; // text mode
 
     
     state -> plugin_count = 0;
@@ -896,6 +897,21 @@ void toggle_syntax_display(EditorState* state)
 {
     state -> syntax_display_enabled = !state -> syntax_display_enabled;
     save_config(state);
+}
+
+void enter_selecting_mode(EditorState* state)
+{
+    state->editor_mode = 1; // selecting mode
+    state->syntax_display_enabled = 0; // disable syntax highlighting
+    clear_selection(state);
+    start_selection(state);
+}
+
+void exit_selecting_mode(EditorState* state)
+{
+    state->editor_mode = 0; // text mode
+    state->syntax_display_enabled = 1; // re-enable syntax highlighting
+    clear_selection(state);
 }
 
 void toggle_auto_tabbing(EditorState* state)

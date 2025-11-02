@@ -70,7 +70,7 @@ void render_screen(EditorState* state)
                         int start = offset_in_line;
                         int end = start + avail_width;
                         if (end > line_len) end = line_len;
-                        if (state->syntax_enabled && state->syntax_display_enabled) {
+                        if (state->syntax_enabled && state->syntax_display_enabled && state->editor_mode == 0) {
                                 highlight_line(state, logical_line, screen_row, text_start_col, offset_in_line);
                         } else {
                                 // Plain text rendering with selection highlighting
@@ -84,13 +84,21 @@ void render_screen(EditorState* state)
                                                 i < (logical_line == state->select_end_y ? state->select_end_x : line_len);
 
                                         if (is_selected) {
-                                                attron(COLOR_PAIR(COLOR_SELECTION));
+                                                if (state->editor_mode == 1) { // selecting mode - white background
+                                                        attron(COLOR_PAIR(30)); // white background
+                                                } else {
+                                                        attron(COLOR_PAIR(COLOR_SELECTION));
+                                                        attron(A_BOLD);
+                                                }
                                         } else {
                                                 attron(COLOR_PAIR(COLOR_DEFAULT));
                                         }
 
                                         mvaddch(screen_row, col++, line[i]);
-                                        attroff(COLOR_PAIR(is_selected ? COLOR_SELECTION : COLOR_DEFAULT));
+                                        if (is_selected && state->editor_mode == 0) {
+                                                attroff(A_BOLD);
+                                        }
+                                        attroff(COLOR_PAIR(is_selected ? (state->editor_mode == 1 ? 30 : COLOR_SELECTION) : COLOR_DEFAULT));
                                         i++;
                                 }
                         }
@@ -183,11 +191,13 @@ void render_screen(EditorState* state)
         const char* syntax_status = (state->syntax_enabled ? "ON" : "OFF");
         const char* brackets_status = (state->auto_complete_enabled ? "ON" : "OFF");
         const char* comment_status = (state->comment_complete_enabled ? "ON" : "OFF");
+        const char* mode_status = (state->editor_mode == 0 ? "TEXT" : "SELECTING");
         const char* edited_indicator = (state->dirty ? " [edited]" : "");
-        mvprintw(max_y - 1, 0, "Line: %d, Col: %d | %s%s | Syntax HL: %s | Autocomplete: %s | Brackets and Quotes Autocomplete: %s | Auto Tabbing: %s | Words: %d",
+        mvprintw(max_y - 1, 0, "Line: %d, Col: %d | %s%s | Mode: %s | Syntax HL: %s | Autocomplete: %s | Brackets and Quotes Autocomplete: %s | Auto Tabbing: %s | Words: %d",
                   state->cursor_y + 1, state->cursor_x + 1,
                   state->filename[0] ? state->filename : "[Untitled]",
                   edited_indicator,
+                  mode_status,
                   syntax_status,
                   comment_status,
                   brackets_status,
@@ -862,7 +872,8 @@ void init_theme_colors(EditorState* state)
         init_pair(25, COLOR_MAGENTA,  -1);
         init_pair(26, COLOR_BLUE,  -1);
         init_pair(27, COLOR_YELLOW,  -1);
-        init_pair(29, COLOR_BLACK, COLOR_GREEN); // Selection highlight - green background
+        init_pair(29, COLOR_BLACK, COLOR_CYAN); // Selection highlight - cyan background for better visibility
+        init_pair(30, COLOR_WHITE, COLOR_BLACK); // White text on black background for selecting mode
     } else if (t == 3) {
         init_pair(1,  COLOR_WHITE,  -1);
         init_pair(6,  COLOR_WHITE,  -1);
@@ -889,7 +900,7 @@ void init_theme_colors(EditorState* state)
         init_pair(25, COLOR_MAGENTA,  -1);
         init_pair(26, COLOR_BLUE,  -1);
         init_pair(27, COLOR_YELLOW,  -1);
-        init_pair(29, COLOR_BLACK, COLOR_WHITE); // Selection highlight - white background
+        init_pair(29, COLOR_BLACK, COLOR_MAGENTA); // Selection highlight - magenta background for better visibility
     }
 
 }

@@ -79,6 +79,7 @@ typedef struct EditorState {
     time_t key_timestamps[256];
     int syntax_enabled;
     int syntax_display_enabled;
+    int editor_mode; // 0 = text, 1 = selecting
     int auto_tabbing_enabled;
     int file_type;
     char** keywords;
@@ -121,6 +122,8 @@ void prompt_filename(EditorState* state);
 void prompt_open_file(EditorState* state);
 void toggle_syntax_highlighting(EditorState* state);
 void toggle_syntax_display(EditorState* state);
+void enter_selecting_mode(EditorState* state);
+void exit_selecting_mode(EditorState* state);
 void toggle_auto_tabbing(EditorState* state);
 void toggle_auto_complete(EditorState* state);
 void toggle_comment_complete(EditorState* state);

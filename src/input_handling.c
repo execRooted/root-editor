@@ -344,7 +344,9 @@ void handle_input(EditorState* state, int ch)
                 move_cursor(state, 0, 0);
                 break;
         case 27:
-                if (state->char_select_mode) {
+                if (state->editor_mode == 1) { // selecting mode
+                        exit_selecting_mode(state);
+                } else if (state->char_select_mode) {
                         state->char_select_mode = 0;
                 } else if (state -> select_mode) {
                         clear_selection(state);
@@ -471,10 +473,7 @@ void handle_ctrl_keys(EditorState* state, int ch)
                 mark_key_processed(state, ch);
                 break;
         case 23:
-                state->char_select_mode = 1;
-                clear_selection(state);
-
-                start_selection(state);
+                enter_selecting_mode(state);
                 mark_key_processed(state, ch);
                 break;
         case 5:

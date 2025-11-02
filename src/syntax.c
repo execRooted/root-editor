@@ -40,7 +40,7 @@
 #define COLOR_POINTER_REF     25   
 #define COLOR_STDLIB_FUNCTION 26   
 #define COLOR_STDLIB_TYPE     27   
-#define COLOR_SELECTION       6    
+#define COLOR_SELECTION       29
 
 
 
@@ -901,6 +901,13 @@ void highlight_line_segment(EditorState* state, int line_num, int screen_row, in
     int sel_start_x = has_selection ? (line_num == state->select_start_y ? state->select_start_x : 0) : -1;
     int sel_end_x   = has_selection ? (line_num == state->select_end_y   ? state->select_end_x   : len) : -1;
 
+    // Adjust selection bounds for the visible segment
+    if (has_selection) {
+        if (sel_start_x < start_col) sel_start_x = start_col;
+        if (sel_end_x > end_col) sel_end_x = end_col;
+        if (sel_start_x >= sel_end_x) has_selection = 0;
+    }
+
     
     int is_preproc = starts_with_preprocessor(line);
     if (is_preproc) {
@@ -962,7 +969,10 @@ void highlight_line_segment(EditorState* state, int line_num, int screen_row, in
             char ch = line[i];
             int is_selected = has_selection && i >= sel_start_x && i < sel_end_x;
 
-            
+            if (is_selected) {
+                attron(A_BOLD);
+            }
+
             if (in_block_comment) {
                 int close_pos = -1;
                 for (int j = i; j < normal_end - 1; j++) {
@@ -980,6 +990,9 @@ void highlight_line_segment(EditorState* state, int line_num, int screen_row, in
                 mvprintw(screen_row, col, "%.*s", seg_len, &line[i]);
                 col += seg_len;
                 i += seg_len;
+                if (is_selected) {
+                    attroff(A_BOLD);
+                }
                 continue;
             }
 
@@ -988,6 +1001,9 @@ void highlight_line_segment(EditorState* state, int line_num, int screen_row, in
                 attron(COLOR_PAIR(is_selected ? COLOR_SELECTION : COLOR_DEFAULT));
                 mvaddch(screen_row, col++, ch);
                 attroff(COLOR_PAIR(is_selected ? COLOR_SELECTION : COLOR_DEFAULT));
+                if (is_selected) {
+                    attroff(A_BOLD);
+                }
                 i++;
                 continue;
             }
@@ -1011,6 +1027,9 @@ void highlight_line_segment(EditorState* state, int line_num, int screen_row, in
                 attron(COLOR_PAIR(is_selected ? COLOR_SELECTION : pcolor));
                 mvaddch(screen_row, col++, ch);
                 attroff(COLOR_PAIR(is_selected ? COLOR_SELECTION : pcolor));
+                if (is_selected) {
+                    attroff(A_BOLD);
+                }
                 i++;
                 continue;
             }
@@ -1045,6 +1064,9 @@ void highlight_line_segment(EditorState* state, int line_num, int screen_row, in
                     mvaddch(screen_row, col++, line[i + k]);
                 }
                 attroff(COLOR_PAIR(is_selected ? COLOR_SELECTION : op_color));
+                if (is_selected) {
+                    attroff(A_BOLD);
+                }
                 i += op_len;
                 continue;
             }
@@ -1079,6 +1101,9 @@ void highlight_line_segment(EditorState* state, int line_num, int screen_row, in
                 attron(COLOR_PAIR(is_selected ? COLOR_SELECTION : num_color));
                 mvprintw(screen_row, col, "%.*s", seg_len, &line[num_start]);
                 col += seg_len;
+                if (is_selected) {
+                    attroff(A_BOLD);
+                }
                 continue;
             }
 
@@ -1096,6 +1121,9 @@ void highlight_line_segment(EditorState* state, int line_num, int screen_row, in
                 attron(COLOR_PAIR(is_selected ? COLOR_SELECTION : str_color));
                 mvprintw(screen_row, col, "%.*s", i - start, &line[start]);
                 col += (i - start);
+                if (is_selected) {
+                    attroff(A_BOLD);
+                }
                 continue;
             }
 
@@ -1117,6 +1145,9 @@ void highlight_line_segment(EditorState* state, int line_num, int screen_row, in
                 attron(COLOR_PAIR(is_selected ? COLOR_SELECTION : color));
                 mvprintw(screen_row, col, "%.*s", word_len, &line[start]);
                 col += word_len;
+                if (is_selected) {
+                    attroff(A_BOLD);
+                }
                 continue;
             }
 
@@ -1124,6 +1155,9 @@ void highlight_line_segment(EditorState* state, int line_num, int screen_row, in
             attron(COLOR_PAIR(is_selected ? COLOR_SELECTION : COLOR_DEFAULT));
             mvaddch(screen_row, col++, ch);
             attroff(COLOR_PAIR(is_selected ? COLOR_SELECTION : COLOR_DEFAULT));
+            if (is_selected) {
+                attroff(A_BOLD);
+            }
             i++;
         }
 
@@ -1131,10 +1165,16 @@ void highlight_line_segment(EditorState* state, int line_num, int screen_row, in
         int comment_len = end_col - comment_start;
         if (comment_len > 0) {
             int is_selected_comment = has_selection && comment_start >= sel_start_x && comment_start < sel_end_x;
+            if (is_selected_comment) {
+                attron(A_BOLD);
+            }
             attron(COLOR_PAIR(is_selected_comment ? COLOR_SELECTION : COLOR_OPERATOR));
             mvprintw(screen_row, col, "%.*s", comment_len, &line[comment_start]);
             col += comment_len;
             attroff(COLOR_PAIR(is_selected_comment ? COLOR_SELECTION : COLOR_OPERATOR));
+            if (is_selected_comment) {
+                attroff(A_BOLD);
+            }
         }
         return;
     }
