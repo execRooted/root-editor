@@ -23,7 +23,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 
-echo -e "${YELLOW}[WARNING]${NC} This will remove Root-Editor from your system."
+echo -e "${YELLOW}[WARNING]${NC} This will remove root-editor from your system."
 echo
 read -p "Continue with uninstallation? (Y/n): " -n 1 -r
 echo
@@ -60,5 +60,5 @@ sudo rm -f /usr/share/applications/root-editor.desktop
 
 
 echo
-echo -e "${GREEN}[SUCCESS]${NC} Root-Editor has been uninstalled successfully!"
+echo -e "${GREEN}[SUCCESS]${NC} root-editor has been uninstalled successfully!"
 

@@ -26,13 +26,12 @@ fi
 
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
 
-cd "$PROJECT_DIR"
+cd "$SCRIPT_DIR"
 
 
-echo -e "${YELLOW}[WARNING]${NC} This will install Root-Editor system-wide."
+echo -e "${YELLOW}[WARNING]${NC} This will install root-editor system-wide."
 echo
 read -p "Continue with installation? (Y/n): " -n 1 -r
 echo
@@ -130,7 +129,7 @@ check_dependencies
 
 clear
 
-echo -e "${BLUE}[INFO]${NC} Building Root-Editor..."
+echo -e "${BLUE}[INFO]${NC} Building root-Editor..."
 export PATH=/usr/bin:/bin:/usr/local/bin:$PATH
 
 echo -e "${BLUE}[INFO]${NC} Cleaning up any build artifacts..."
@@ -213,7 +212,7 @@ EOF
 
 clear
 
-echo -e "${GREEN}[SUCCESS]${NC} Root-Editor has been installed successfully!"
+echo -e "${GREEN}[SUCCESS]${NC} root-editor has been installed successfully!"
 echo
 echo "You can now run 'root-editor' or 're' from anywhere, or use the desktop entry."
 echo "Plugins are installed in /usr/local/lib/root-editor/plugins/"
