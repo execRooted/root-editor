@@ -74,7 +74,7 @@ void render_screen(EditorState* state)
                         int start = offset_in_line;
                         int end = start + avail_width;
                         if (end > line_len) end = line_len;
-                        if (state->syntax_enabled && state->syntax_display_enabled && state->editor_mode == 0) {
+                        if (state->syntax_enabled && state->syntax_display_enabled && !state->select_mode) {
                                 highlight_line(state, logical_line, screen_row, text_start_col, offset_in_line);
                         } else {
                                 // Plain text rendering with selection highlighting
@@ -88,23 +88,16 @@ void render_screen(EditorState* state)
                                                 i < (logical_line == state->select_end_y ? state->select_end_x : line_len);
 
                                         if (is_selected) {
-                                                if (state->editor_mode == 1) { // selecting mode - reverse video
-                                                        attron(A_REVERSE);
-                                                } else {
-                                                        attron(COLOR_PAIR(COLOR_SELECTION));
-                                                        attron(A_BOLD);
-                                                }
+                                                attron(A_REVERSE);
                                         } else {
                                                 attron(COLOR_PAIR(COLOR_DEFAULT));
                                         }
 
                                         mvaddch(screen_row, col++, line[i]);
-                                        if (is_selected && state->editor_mode == 0) {
-                                                attroff(A_BOLD);
-                                        } else if (is_selected && state->editor_mode == 1) {
+                                        if (is_selected) {
                                                 attroff(A_REVERSE);
                                         }
-                                        attroff(COLOR_PAIR(is_selected ? (state->editor_mode == 1 ? COLOR_DEFAULT : COLOR_SELECTION) : COLOR_DEFAULT));
+                                        attroff(COLOR_PAIR(COLOR_DEFAULT));
                                         i++;
                                 }
                         }
@@ -122,22 +115,15 @@ void render_screen(EditorState* state)
                             logical_line <= state->select_end_y) {
                             int is_selected = 1; // Always select blank lines in selection range
                             if (is_selected) {
-                                if (state->editor_mode == 1) { // selecting mode - reverse video
-                                    attron(A_REVERSE);
-                                } else {
-                                    attron(COLOR_PAIR(COLOR_SELECTION));
-                                    attron(A_BOLD);
-                                }
+                                attron(A_REVERSE);
                             } else {
                                 attron(COLOR_PAIR(COLOR_DEFAULT));
                             }
                             mvaddch(screen_row, text_start_col, ' ');
-                            if (is_selected && state->editor_mode == 0) {
-                                attroff(A_BOLD);
-                            } else if (is_selected && state->editor_mode == 1) {
+                            if (is_selected) {
                                 attroff(A_REVERSE);
                             }
-                            attroff(COLOR_PAIR(is_selected ? (state->editor_mode == 1 ? COLOR_DEFAULT : COLOR_SELECTION) : COLOR_DEFAULT));
+                            attroff(COLOR_PAIR(COLOR_DEFAULT));
                         }
                         // blank line or end of line, move to next logical line
                         logical_line++;

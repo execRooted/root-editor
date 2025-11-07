@@ -1206,11 +1206,11 @@ void highlight_line_segment(EditorState* state, int line_num, int screen_row, in
                 attron(A_DIM);  
             }
 
-            attron(COLOR_PAIR(is_selected ? COLOR_SELECTION : cmt_color));
+            if (is_selected) attron(A_REVERSE); else attron(COLOR_PAIR(cmt_color));
             mvprintw(screen_row, col, "%.*s", seg_len, &line[i]);
             col += seg_len;
             i += seg_len;
-            attroff(COLOR_PAIR(is_selected ? COLOR_SELECTION : cmt_color));
+            if (is_selected) attroff(A_REVERSE); else attroff(COLOR_PAIR(cmt_color));
 
             
             if (strcmp(font_style, "italic") == 0) {
