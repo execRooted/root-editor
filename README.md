@@ -55,6 +55,7 @@ root-editor [filename]
    - **Ctrl+X**: Cut
    - **Ctrl+C**: Copy
    - **Ctrl+V**: Paste
+
 - **Ctrl+F**: Find
 - **Ctrl+R**: Replace
 - **Ctrl+L**: Jump to line
