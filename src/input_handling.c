@@ -263,7 +263,9 @@ void handle_input(EditorState* state, int ch)
                         state->syntax_display_enabled = 1; // re-enable syntax highlighting
                         return; // Don't create new line
                 } else if (state->select_mode == 1) {
-                        // Do nothing - require Esc first to exit selection mode
+                        // Act like down arrow in select mode
+                        move_cursor(state, 0, 1);
+                        extend_selection(state);
                         return; // Don't create new line
                 } else {
 
