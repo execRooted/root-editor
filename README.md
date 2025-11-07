@@ -1,6 +1,6 @@
 # Root Editor
 
-> Made and tested on Arch Linux and Debian-based(Tails more specificly), should work fine in all major distros
+> Made and tested on Arch Linux and Debian-based (Tails more specificly), should work fine in all major distros
 
 ## Installation
 
@@ -17,7 +17,7 @@
 
 3. Run the installer for system-wide installation:
    ```bash
-   sudo ./scripts/install.sh
+   sudo ./install.sh
    ```
 
 If installed system-wide, simply run:
@@ -38,10 +38,8 @@ root-editor [filename]
 
 - **Syntax Highlighting**: Supports highlighting for various programming languages.
 - **Themes**: Customizable color schemes for a personalized editing experience.
-- **Autosave**: Automatic saving to prevent data loss.
 - **Plugin Support**: Extensible architecture allowing users to add custom functionality via shared libraries.
 - **Cross-Platform**: Built for Linux systems with ncurses.
-- **Efficient**: Optimized C code with fast rendering and input handling.
 
 
 
@@ -51,19 +49,19 @@ root-editor [filename]
 - **Ctrl+Q**: Quit
 - **Ctrl+S**: Save
 - **Ctrl+O**: Open file
-- **Ctrl+A**: Select all
-- **Ctrl+B**: Select line
-- **Ctrl+W**: Select word
-- **Ctrl+X**: Cut
-- **Ctrl+C**: Copy
-- **Ctrl+V**: Paste
+   ### Select mode:
+   - **Ctrl+W**: Enter select mode
+   - **Ctrl+A**: Select all
+   - **Ctrl+X**: Cut
+   - **Ctrl+C**: Copy
+   - **Ctrl+V**: Paste
 - **Ctrl+F**: Find
 - **Ctrl+R**: Replace
 - **Ctrl+L**: Jump to line
 - **Ctrl+T**: Auto Indent
 - **Ctrl+K**: Auto Complete
 - **Ctrl+U**: Comment Complete
-- **Ctrl+H**: Help
+- **Ctrl+H or F1**: Help
 
 ### Function Keys
 - **F1**: Help
@@ -75,7 +73,35 @@ root-editor [filename]
 - **F7**: Word Wrap
 - **F8**: Syntax HL
 - **F9**: Autosave
-- **F10**: Syntax Disp
+
+### Selection Mode
+Root editor features a selection mode that allows you to select and edit text efficiently. When in selection mode, syntax highlighting is disabled to ensure clear visibility of selected text.
+
+#### Entering Selection Mode
+- **Ctrl + W**: Enter selection mode
+- **Shift + Arrow Keys**: Start selection and extend it (only works from left -> right and from up -> down)
+
+#### Navigation in Selection Mode
+- **Arrow Keys**: Move cursor and extend selection
+- **Enter**: Move cursor down (like down arrow)
+- **Backspace**: Deletes selection/word and exits selection mode
+- **Home/End**: Move to line start/end and extend selection
+
+#### Exiting Selection Mode
+- **Esc**: First press marks for exit (shows "SELECT" in status)
+- **Enter**: Second press exits selection mode and re-enables syntax highlighting
+
+#### Selection Operations
+- **Ctrl+W**: Starts selection mode
+- **Ctrl+A**: Select all text
+- **Ctrl+X**: Cut selected text
+- **Ctrl+C**: Copy selected text
+- **Delete/Backspace**: Delete selected text (when selection exists)
+
+#### Visual Feedback
+- Selected text appears with reverse video (highlighted background)
+- Status bar shows "SELECT" when in selection mode
+- Syntax highlighting is disabled during selection for better visibility
 
 
 
@@ -192,7 +218,7 @@ Plugins receive a pointer to the `EditorState` struct, which contains all the ed
 
 - **Automatic loading**: Plugins in the `plugins/` directory are automatically loaded when the editor starts.
 - **Manual loading**: Use the interactive plugin loader (accessible via editor commands) to load plugins from custom locations.
-- **System-wide installation**: After building new plugins, run `sudo ./scripts/install.sh` to install them system-wide.
+- **System-wide installation**: After building new plugins, run `sudo ./install.sh` to install them system-wide.
 - **Plugin management**: The editor provides commands to list, load, and unload plugins dynamically.
 
 ### Best Practices and Safety
