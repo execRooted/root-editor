@@ -76,7 +76,7 @@ root-editor [filename]
 - **F9**: Autosave
 
 ### Selection Mode
-Root editor features a selection mode that allows you to select and edit text efficiently. When in selection mode, syntax highlighting is disabled to ensure clear visibility of selected text.
+root-editor features a selection mode that allows you to select and edit text efficiently. When in selection mode, syntax highlighting is disabled to ensure clear visibility of selected text.
 
 #### Entering Selection Mode
 - **Ctrl + W**: Enter selection mode
@@ -108,7 +108,7 @@ Root editor features a selection mode that allows you to select and edit text ef
 
 ## Plugins
 
-Root Editor features a powerful and flexible plugin system that allows developers to extend the editor's functionality through shared libraries (.so files on Linux). Plugins can hook into various editor events, enabling custom features such as enhanced rendering, specialized key handling, file processing, syntax highlighting extensions, and much more. This modular architecture makes Root Editor highly customizable and extensible, allowing users to tailor the editor to their specific workflow and needs.
+root-editor features a powerful and flexible plugin system that allows developers to extend the editor's functionality through shared libraries (.so files on Linux). Plugins can hook into various editor events, enabling custom features such as enhanced rendering, specialized key handling, file processing, syntax highlighting extensions, and much more. This modular architecture makes root-editor highly customizable and extensible, allowing users to tailor the editor to their specific workflow and needs.
 
 Plugins are loaded dynamically at runtime and can access the full editor state, including the current file content, cursor position, selection, and configuration settings. The plugin system is designed to be safe and stable, with proper error handling to prevent crashes from malfunctioning plugins.
 
