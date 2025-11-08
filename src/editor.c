@@ -384,17 +384,37 @@ void new_line(EditorState* state)
     }
     char * line = state -> lines[state -> cursor_y];
 
-    
+    // Check if cursor is between a pair and split it
+    int split_pair = 0;
+    char closing_char = 0;
+    int after_pos = 0;
+    if (state->cursor_x > 0 && state->cursor_x < (int)strlen(line)) {
+        char before = line[state->cursor_x - 1];
+        after_pos = state->cursor_x;
+        while (after_pos < (int)strlen(line) && (line[after_pos] == ' ' || line[after_pos] == '\t')) after_pos++;
+        char after = (after_pos < (int)strlen(line)) ? line[after_pos] : 0;
+        if ((before == '{' && after == '}') ||
+            (before == '(' && after == ')') ||
+            (before == '[' && after == ']')) {
+            split_pair = 1;
+            closing_char = after;
+            // Remove from cursor_x to after_pos + 1
+            int remove_start = state->cursor_x;
+            int remove_end = after_pos + 1;
+            memmove(&line[remove_start], &line[remove_end], strlen(line) - remove_end + 1);
+        }
+    }
+
     int base_indent = 0;
 
     if (state->auto_tabbing_enabled) {
-        
+
         while (base_indent < strlen(line) && (line[base_indent] == ' ' || line[base_indent] == '\t')) {
             base_indent++;
         }
     }
 
-    
+
     int extra_indent = 0;
     if (state->cursor_x > 0) {
         char before = line[state->cursor_x - 1];
@@ -452,43 +472,92 @@ void new_line(EditorState* state)
     
     
 
-    char * new_line = (char * ) malloc(MAX_LINE_LENGTH);
-    if (!new_line) {
-        show_status(state, "Memory allocation failed");
-        return;
-    }
+    if (split_pair) {
+        // Create two new lines for pair splitting
+        char * empty_line = (char * ) malloc(MAX_LINE_LENGTH);
+        if (!empty_line) {
+            show_status(state, "Memory allocation failed");
+            return;
+        }
+        char * closing_line = (char * ) malloc(MAX_LINE_LENGTH);
+        if (!closing_line) {
+            free(empty_line);
+            show_status(state, "Memory allocation failed");
+            return;
+        }
 
-    
-    int indent_len = 0;
-    for (int i = 0; i < base_indent && indent_len < MAX_LINE_LENGTH - 1; i++) {
-        new_line[indent_len++] = line[i]; 
-    }
-    for (int i = 0; i < extra_indent && indent_len < MAX_LINE_LENGTH - 1; i++) {
-        new_line[indent_len++] = ' ';
-    }
+        // Empty line with indentation
+        int indent_len = 0;
+        for (int i = 0; i < base_indent && indent_len < MAX_LINE_LENGTH - 1; i++) {
+            empty_line[indent_len++] = line[i];
+        }
+        for (int i = 0; i < extra_indent && indent_len < MAX_LINE_LENGTH - 1; i++) {
+            empty_line[indent_len++] = ' ';
+        }
+        empty_line[indent_len] = '\0';
 
-    const char *tail = &line[state->cursor_x];
-    int tail_len = strlen(tail);
-    if (indent_len + tail_len >= MAX_LINE_LENGTH) {
-        tail_len = MAX_LINE_LENGTH - 1 - indent_len;
-    }
-    memcpy(new_line + indent_len, tail, tail_len);
-    new_line[indent_len + tail_len] = '\0';
+        // Closing line with same indentation + closing char
+        indent_len = 0;
+        for (int i = 0; i < base_indent && indent_len < MAX_LINE_LENGTH - 1; i++) {
+            closing_line[indent_len++] = line[i];
+        }
+        for (int i = 0; i < extra_indent && indent_len < MAX_LINE_LENGTH - 1; i++) {
+            closing_line[indent_len++] = ' ';
+        }
+        closing_line[indent_len++] = closing_char;
+        closing_line[indent_len] = '\0';
 
-    
-    line[state -> cursor_x] = '\0';
+        line[state -> cursor_x] = '\0';
 
-    
-    for (int i = state -> line_count; i > state -> cursor_y + 1; i--) {
-        state -> lines[i] = state -> lines[i - 1];
+        // Insert two lines
+        for (int i = state -> line_count + 1; i > state -> cursor_y + 2; i--) {
+            state -> lines[i] = state -> lines[i - 2];
+        }
+        state -> lines[state -> cursor_y + 1] = empty_line;
+        state -> lines[state -> cursor_y + 2] = closing_line;
+        state -> line_count += 2;
+        state -> cursor_y++;
+        state -> cursor_x = indent_len - 1; // Position at end of indentation on empty line
+        move_cursor(state, 0, 0);
+        napms(10);
+        update_dirty_status(state);
+    } else {
+        // Original logic for non-pair splitting
+        char * new_line = (char * ) malloc(MAX_LINE_LENGTH);
+        if (!new_line) {
+            show_status(state, "Memory allocation failed");
+            return;
+        }
+
+        int indent_len = 0;
+        for (int i = 0; i < base_indent && indent_len < MAX_LINE_LENGTH - 1; i++) {
+            new_line[indent_len++] = line[i];
+        }
+        for (int i = 0; i < extra_indent && indent_len < MAX_LINE_LENGTH - 1; i++) {
+            new_line[indent_len++] = ' ';
+        }
+
+        const char *tail = &line[state->cursor_x];
+        int tail_len = strlen(tail);
+        if (indent_len + tail_len >= MAX_LINE_LENGTH) {
+            tail_len = MAX_LINE_LENGTH - 1 - indent_len;
+        }
+        memcpy(new_line + indent_len, tail, tail_len);
+        new_line[indent_len + tail_len] = '\0';
+
+        line[state -> cursor_x] = '\0';
+
+        for (int i = state -> line_count; i > state -> cursor_y + 1; i--) {
+            state -> lines[i] = state -> lines[i - 1];
+        }
+        state -> lines[state -> cursor_y + 1] = new_line;
+        state -> line_count++;
+        state -> cursor_y++;
+        state -> cursor_x = indent_len;
+        move_cursor(state, 0, 0);
+        napms(10);
+        update_dirty_status(state);
     }
-    state -> lines[state -> cursor_y + 1] = new_line;
-    state -> line_count++;
-    state -> cursor_y++;
-    state -> cursor_x = indent_len;
-    move_cursor(state, 0, 0);
-    napms(10);
-    update_dirty_status(state);
 }
 void move_cursor(EditorState* state, int dx, int dy)
 {
@@ -839,19 +908,19 @@ void render_help_screen(EditorState* state)
     mvprintw(line++, col1, "Ctrl+Q  Quit");
     mvprintw(line++, col1, "Ctrl+S  Save");
     mvprintw(line++, col1, "Ctrl+O  Open");
-    mvprintw(line++, col1, "Ctrl+A  Select all");
-    mvprintw(line++, col1, "Ctrl+B  Select line");
-    mvprintw(line++, col1, "Ctrl+W  Select word");
-    mvprintw(line++, col1, "Ctrl+X  Cut");
-    mvprintw(line++, col1, "Ctrl+C  Copy");
     mvprintw(line++, col1, "Ctrl+V  Paste");
     mvprintw(line++, col1, "Ctrl+F  Find");
     mvprintw(line++, col1, "Ctrl+R  Replace");
     mvprintw(line++, col1, "Ctrl+L  Jump to line");
-    mvprintw(line++, col1, "Ctrl+T  Auto Indent");
+    mvprintw(line++, col1, "Ctrl+T  Auto Tab");
     mvprintw(line++, col1, "Ctrl+K  Auto Complete");
     mvprintw(line++, col1, "Ctrl+U  Comment Complete");
     mvprintw(line++, col1, "Ctrl+H  Help");
+    mvprintw(line++, col1, "Ctrl+W Select mode");
+    mvprintw(line++, col1, "Ctrl+A  Select all");
+    mvprintw(line++, col1, "Ctrl+X  Cut");
+    mvprintw(line++, col1, "Ctrl+C  Copy");
+    mvprintw(line++, col1, "Esc then Enter Exit select mode");
 
     line = popup_y + 3;
     mvprintw(line++, col2, "F1   Help");
@@ -862,8 +931,8 @@ void render_help_screen(EditorState* state)
     mvprintw(line++, col2, "F6   Paste");
     mvprintw(line++, col2, "F7   Word Wrap");
     mvprintw(line++, col2, "F8   Syntax HL");
-    mvprintw(line++, col2, "F9   Autosave");
     mvprintw(line++, col2, "F10  Syntax Disp");
+    mvprintw(line++, col2, "F11  Sticky Cursor");
 
     
     attron(COLOR_PAIR(1));
@@ -871,12 +940,7 @@ void render_help_screen(EditorState* state)
     attroff(COLOR_PAIR(1));
 
     refresh();
-    timeout(15000); 
     int ch = getch();
-    timeout(-1);
-    if (ch == ERR) {
-        show_status(state, "Help timeout - press F1 to show help again");
-    }
     state -> show_help = 0;
 
     

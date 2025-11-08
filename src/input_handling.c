@@ -258,37 +258,115 @@ void handle_input(EditorState* state, int ch)
                 break;
         case KEY_ENTER:
         case '\n':
-                if (state->select_mode == 2) { 
+                if (state->select_mode == 2) {
                         clear_selection(state);
-                        state->syntax_display_enabled = 1; 
-                        return; 
+                        state->syntax_display_enabled = 1;
+                        return;
                 } else if (state->select_mode == 1) {
-                        
+
                         move_cursor(state, 0, 1);
                         extend_selection(state);
-                        return; 
+                        return;
                 } else {
+                        // Check if cursor is between a pair and split it
+                        int split_pair = 0;
+                        char closing_char = 0;
+                        char * line = state -> lines[state -> cursor_y];
+                        int after_pos = 0;
+                        if (state->cursor_x > 0 && state->cursor_x < (int)strlen(line)) {
+                                char before = line[state->cursor_x - 1];
+                                after_pos = state->cursor_x;
+                                while (after_pos < (int)strlen(line) && (line[after_pos] == ' ' || line[after_pos] == '\t')) after_pos++;
+                                char after = (after_pos < (int)strlen(line)) ? line[after_pos] : 0;
+                                if ((before == '{' && after == '}') ||
+                                    (before == '(' && after == ')') ||
+                                    (before == '[' && after == ']')) {
+                                        split_pair = 1;
+                                        closing_char = after;
+                                        // Remove from cursor_x to after_pos + 1
+                                        int remove_start = state->cursor_x;
+                                        int remove_end = after_pos + 1;
+                                        memmove(&line[remove_start], &line[remove_end], strlen(line) - remove_end + 1);
+                                }
+                        }
 
-                        
-                        if (state->line_count >= MAX_LINES) {
-                                show_status(state, "Error: Maximum line count reached (1,000,000 lines)");
-                                break;
+                        if (split_pair) {
+                                // Create two new lines for pair splitting
+                                if (state->line_count + 1 >= MAX_LINES) {
+                                        show_status(state, "Error: Maximum line count reached (1,000,000 lines)");
+                                        break;
+                                }
+                                char * empty_line = (char * ) malloc(MAX_LINE_LENGTH);
+                                if (!empty_line) {
+                                        show_status(state, "Memory allocation failed");
+                                        break;
+                                }
+                                char * closing_line = (char * ) malloc(MAX_LINE_LENGTH);
+                                if (!closing_line) {
+                                        free(empty_line);
+                                        show_status(state, "Memory allocation failed");
+                                        break;
+                                }
+
+                                // Calculate base indentation
+                                int base_indent = 0;
+                                if (state->auto_tabbing_enabled) {
+                                        while (base_indent < strlen(line) && (line[base_indent] == ' ' || line[base_indent] == '\t')) {
+                                                base_indent++;
+                                        }
+                                }
+
+                                // Empty line with indentation + extra tab
+                                int indent_len = 0;
+                                for (int i = 0; i < base_indent && indent_len < MAX_LINE_LENGTH - 1; i++) {
+                                        empty_line[indent_len++] = line[i];
+                                }
+                                for (int i = 0; i < state->tab_size && indent_len < MAX_LINE_LENGTH - 1; i++) {
+                                        empty_line[indent_len++] = ' ';
+                                }
+                                empty_line[indent_len] = '\0';
+
+                                // Closing line with same indentation + closing char
+                                indent_len = 0;
+                                for (int i = 0; i < base_indent && indent_len < MAX_LINE_LENGTH - 1; i++) {
+                                        closing_line[indent_len++] = line[i];
+                                }
+                                closing_line[indent_len++] = closing_char;
+                                closing_line[indent_len] = '\0';
+
+                                // Insert two lines
+                                for (int i = state -> line_count + 1; i > state -> cursor_y + 2; i--) {
+                                        state -> lines[i] = state -> lines[i - 2];
+                                }
+                                state -> lines[state -> cursor_y + 1] = empty_line;
+                                state -> lines[state -> cursor_y + 2] = closing_line;
+                                state -> line_count += 2;
+                                state -> cursor_y++;
+                                state -> cursor_x = base_indent; // Position at end of indentation on empty line
+                                move_cursor(state, 0, 0);
+                                update_dirty_status(state);
+                        } else {
+                                // Original logic for non-pair splitting
+                                if (state->line_count >= MAX_LINES) {
+                                        show_status(state, "Error: Maximum line count reached (1,000,000 lines)");
+                                        break;
+                                }
+                                char* new_line_str = (char*)malloc(MAX_LINE_LENGTH);
+                                if (!new_line_str) {
+                                        show_status(state, "Memory allocation failed");
+                                        break;
+                                }
+                                new_line_str[0] = '\0';
+                                for (int i = state->line_count; i > state->cursor_y + 1; i--) {
+                                        state->lines[i] = state->lines[i - 1];
+                                }
+                                state->lines[state->cursor_y + 1] = new_line_str;
+                                state->line_count++;
+                                state->cursor_y++;
+                                state->cursor_x = 0;
+                                move_cursor(state, 0, 0);
+                                update_dirty_status(state);
                         }
-                        char* new_line_str = (char*)malloc(MAX_LINE_LENGTH);
-                        if (!new_line_str) {
-                                show_status(state, "Memory allocation failed");
-                                break;
-                        }
-                        new_line_str[0] = '\0';
-                        for (int i = state->line_count; i > state->cursor_y + 1; i--) {
-                                state->lines[i] = state->lines[i - 1];
-                        }
-                        state->lines[state->cursor_y + 1] = new_line_str;
-                        state->line_count++;
-                        state->cursor_y++;
-                        state->cursor_x = 0;
-                        move_cursor(state, 0, 0);
-                        update_dirty_status(state);
                 }
                 break;
         case KEY_F(1):
