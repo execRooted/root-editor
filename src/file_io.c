@@ -8,6 +8,7 @@ void load_file(EditorState* state, const char* filename)
 
 
         FILE* file = fopen(filename, "r");
+        int file_created = 0;
         if (!file) {
 
                 file = fopen(filename, "w+");
@@ -15,6 +16,7 @@ void load_file(EditorState* state, const char* filename)
                         show_status(state, "Error: Could not create file");
                         return;
                 }
+                file_created = 1;
         }
 
         for (int i = 0; i < state -> line_count; i++) {
@@ -102,13 +104,16 @@ void load_file(EditorState* state, const char* filename)
         state -> cursor_y = 0;
         state -> scroll_offset = 0;
 
-        
+        if (file_created) {
+                show_status(state, "Created file");
+        }
+
         save_original_content(state);
         update_dirty_status(state);
 
         detect_file_type(state);
 
-        
+
         load_config(state);
 
         if (state->syntax_enabled) {
