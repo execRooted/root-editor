@@ -251,25 +251,25 @@ void handle_input(EditorState* state, int ch)
                 if (state -> select_mode && has_selection(state)) {
                         delete_selected_text(state);
                 } else if (state -> select_mode) {
-                        // In selection mode but no selection - do nothing
+                        
                 } else {
                         delete_char(state);
                 }
                 break;
         case KEY_ENTER:
         case '\n':
-                if (state->select_mode == 2) { // Esc was pressed, now Enter exits
+                if (state->select_mode == 2) { 
                         clear_selection(state);
-                        state->syntax_display_enabled = 1; // re-enable syntax highlighting
-                        return; // Don't create new line
+                        state->syntax_display_enabled = 1; 
+                        return; 
                 } else if (state->select_mode == 1) {
-                        // Act like down arrow in select mode
+                        
                         move_cursor(state, 0, 1);
                         extend_selection(state);
-                        return; // Don't create new line
+                        return; 
                 } else {
 
-                        // Insert a non-deletable newline
+                        
                         if (state->line_count >= MAX_LINES) {
                                 show_status(state, "Error: Maximum line count reached (1,000,000 lines)");
                                 break;
@@ -344,7 +344,7 @@ void handle_input(EditorState* state, int ch)
                 break;
         case '\t':
                 if (state->select_mode) {
-                        // In selection mode - do nothing
+                        
                 } else {
                         for (int i = 0; i < state -> tab_size; i++) {
                                 insert_char(state, ' ');
@@ -353,15 +353,15 @@ void handle_input(EditorState* state, int ch)
                 }
                 break;
         case 27:
-                if (state->editor_mode == 1) { // selecting mode
+                if (state->editor_mode == 1) { 
                         exit_selecting_mode(state);
                 } else if (state->char_select_mode) {
                         state->char_select_mode = 0;
-                        // Don't re-enable syntax highlighting yet - wait for Enter
+                        
                 } else if (state -> select_mode) {
-                        // Don't clear selection yet - wait for Enter
-                        // Just mark that we've pressed Esc while in selection mode
-                        state->select_mode = 2; // Special state: Esc pressed, waiting for Enter
+                        
+                        
+                        state->select_mode = 2; 
                 } else if (state -> show_help) {
                         state -> show_help = 0;
                 } else {
@@ -377,7 +377,7 @@ void handle_input(EditorState* state, int ch)
         default:
                 if (isprint(ch)) {
                         if (state->select_mode) {
-                                // In selection mode - do nothing for printable characters
+                                
                         } else {
                                 if (selection_started_with_shift && state->select_mode) {
                                         copy_selected_text(state);
@@ -442,7 +442,7 @@ void handle_ctrl_keys(EditorState* state, int ch)
                 }
                 break;
         case 2:
-                // Ctrl+B functionality removed
+                
                 break;
         case 3:
                 if (state -> select_mode) {

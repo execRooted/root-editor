@@ -38,7 +38,7 @@ void render_screen(EditorState* state)
                 mvprintw(1, 0, "Path: %s", cwd);
         }
 
-        // Display mode indicator in status bar
+        
         const char* mode_text = (state->select_mode == 1 || state->select_mode == 2) ? "SELECT" : "TEXT";
 
         attroff(COLOR_PAIR(1) | A_BOLD);
@@ -59,7 +59,7 @@ void render_screen(EditorState* state)
         while (screen_row < max_y - 2 && logical_line < state->line_count) {
                 char *line = state->lines[logical_line];
                 int line_len = strlen(line);
-                // print line number or ->
+                
                 if (show_line_numbers) {
                         attron(COLOR_PAIR(28) | A_BOLD);
                         if (offset_in_line == 0) {
@@ -69,7 +69,7 @@ void render_screen(EditorState* state)
                         }
                         attroff(COLOR_PAIR(28) | A_BOLD);
                 }
-                // print text if not blank or not at end
+                
                 if (line_len > 0 && offset_in_line < line_len) {
                         int start = offset_in_line;
                         int end = start + avail_width;
@@ -77,7 +77,7 @@ void render_screen(EditorState* state)
                         if (state->syntax_enabled && state->syntax_display_enabled && !state->select_mode) {
                                 highlight_line(state, logical_line, screen_row, text_start_col, offset_in_line);
                         } else {
-                                // Plain text rendering with selection highlighting
+                                
                                 int col = text_start_col;
                                 int i = start;
                                 while (i < end) {
@@ -101,7 +101,7 @@ void render_screen(EditorState* state)
                                         i++;
                                 }
                         }
-                        // update
+                        
                         if (end == line_len) {
                                 logical_line++;
                                 offset_in_line = 0;
@@ -109,11 +109,11 @@ void render_screen(EditorState* state)
                                 offset_in_line = end;
                         }
                 } else {
-                        // blank line - show at least one space if selected
+                        
                         if (state->select_mode &&
                             logical_line >= state->select_start_y &&
                             logical_line <= state->select_end_y) {
-                            int is_selected = 1; // Always select blank lines in selection range
+                            int is_selected = 1; 
                             if (is_selected) {
                                 attron(A_REVERSE);
                             } else {
@@ -125,7 +125,7 @@ void render_screen(EditorState* state)
                             }
                             attroff(COLOR_PAIR(COLOR_DEFAULT));
                         }
-                        // blank line or end of line, move to next logical line
+                        
                         logical_line++;
                         offset_in_line = 0;
                 }
@@ -134,54 +134,54 @@ void render_screen(EditorState* state)
 
 
         
-        // Calculate cursor visual position
+        
         int cursor_visual_row = 3;
         int temp_logical = state->scroll_offset;
         while (temp_logical < state->cursor_y) {
                 char *line = state->lines[temp_logical];
                 int line_len = strlen(line);
                 if (line_len == 0) {
-                        cursor_visual_row += 1; // blank lines take 1 visual row
+                        cursor_visual_row += 1; 
                 } else {
                         int visual_rows = (line_len + avail_width - 1) / avail_width;
                         cursor_visual_row += visual_rows;
                 }
                 temp_logical++;
         }
-        // add position in current line
+        
         char *cursor_line = state->lines[state->cursor_y];
         int cursor_line_len = strlen(cursor_line);
         if (cursor_line_len == 0) {
-                cursor_visual_row += 0; // cursor at start of blank line
+                cursor_visual_row += 0; 
         } else {
                 int cursor_visual_in_line = state->cursor_x / avail_width;
                 cursor_visual_row += cursor_visual_in_line;
         }
         int screen_cursor_col = text_start_col + (state->cursor_x % avail_width);
 
-        // Adjust scroll_offset if cursor is off-screen due to wrapping
+        
         if (cursor_visual_row >= max_y - 2) {
             state->scroll_offset += 1;
             if (state->scroll_offset > state->cursor_y) state->scroll_offset = state->cursor_y;
-            // Recalculate cursor_visual_row with new scroll_offset
+            
             cursor_visual_row = 3;
             temp_logical = state->scroll_offset;
             while (temp_logical < state->cursor_y) {
                 char *line = state->lines[temp_logical];
                 int line_len = strlen(line);
                 if (line_len == 0) {
-                    cursor_visual_row += 1; // blank lines take 1 visual row
+                    cursor_visual_row += 1; 
                 } else {
                     int visual_rows = (line_len + avail_width - 1) / avail_width;
                     cursor_visual_row += visual_rows;
                 }
                 temp_logical++;
             }
-            // add position in current line
+            
             char *cursor_line = state->lines[state->cursor_y];
             int cursor_line_len = strlen(cursor_line);
             if (cursor_line_len == 0) {
-                cursor_visual_row += 0; // cursor at start of blank line
+                cursor_visual_row += 0; 
             } else {
                 int cursor_visual_in_line = state->cursor_x / avail_width;
                 cursor_visual_row += cursor_visual_in_line;
@@ -463,8 +463,8 @@ void jump_to_match(EditorState* state, int line_num, int position)
 
         if (state -> cursor_y < state -> scroll_offset) {
                 state -> scroll_offset = state -> cursor_y;
-        } else if (state -> cursor_y >= state -> scroll_offset + max_y - 2) {
-                state -> scroll_offset = state -> cursor_y - max_y + 3;
+        } else if (state -> cursor_y >= state -> scroll_offset + max_y - 32) {
+                state -> scroll_offset = state -> cursor_y - max_y + 6;
         }
 }
 
@@ -888,8 +888,8 @@ void init_theme_colors(EditorState* state)
         init_pair(25, COLOR_MAGENTA,  -1);
         init_pair(26, COLOR_BLUE,  -1);
         init_pair(27, COLOR_YELLOW,  -1);
-        init_pair(29, COLOR_BLACK, COLOR_CYAN); // Selection highlight - cyan background for better visibility
-        init_pair(30, COLOR_BLACK, COLOR_WHITE); // Black text on white background for selecting mode
+        init_pair(29, COLOR_BLACK, COLOR_CYAN); 
+        init_pair(30, COLOR_BLACK, COLOR_WHITE); 
     } else if (t == 3) {
         init_pair(1,  COLOR_WHITE,  -1);
         init_pair(6,  COLOR_WHITE,  -1);
@@ -916,7 +916,7 @@ void init_theme_colors(EditorState* state)
         init_pair(25, COLOR_MAGENTA,  -1);
         init_pair(26, COLOR_BLUE,  -1);
         init_pair(27, COLOR_YELLOW,  -1);
-        init_pair(29, COLOR_BLACK, COLOR_MAGENTA); // Selection highlight - magenta background for better visibility
+        init_pair(29, COLOR_BLACK, COLOR_MAGENTA); 
     }
 
 }

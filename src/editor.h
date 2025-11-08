@@ -79,7 +79,7 @@ typedef struct EditorState {
     time_t key_timestamps[256];
     int syntax_enabled;
     int syntax_display_enabled;
-    int editor_mode; // 0 = text, 1 = selecting
+    int editor_mode; 
     int auto_tabbing_enabled;
     int file_type;
     char** keywords;
@@ -88,7 +88,7 @@ typedef struct EditorState {
     int theme_id;
     char theme_name[32];
 
-    // Autosave removed
+    
 
     int auto_complete_enabled;
     int comment_complete_enabled;

@@ -108,7 +108,7 @@ void load_file(EditorState* state, const char* filename)
 
         detect_file_type(state);
 
-        // Load config settings
+        
         load_config(state);
 
         if (state->syntax_enabled) {
@@ -488,7 +488,7 @@ void load_config(EditorState* state)
         get_config_path(path, sizeof(path));
         FILE *fp = fopen(path, "r");
         if (!fp) {
-                // Create default config file if it doesn't exist
+                
                 save_config(state);
                 return;
         }

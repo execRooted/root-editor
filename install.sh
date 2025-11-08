@@ -129,7 +129,7 @@ check_dependencies
 
 clear
 
-echo -e "${BLUE}[INFO]${NC} Building root-Editor..."
+echo -e "${BLUE}[INFO]${NC} Building root-editor..."
 export PATH=/usr/bin:/bin:/usr/local/bin:$PATH
 
 echo -e "${BLUE}[INFO]${NC} Cleaning up any build artifacts..."

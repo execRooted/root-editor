@@ -27,7 +27,7 @@ void init_editor(EditorState* state)
     state -> needs_sudo = 0;
     memset(state -> key_states, 0, sizeof(state -> key_states));
     memset(state -> key_timestamps, 0, sizeof(state -> key_timestamps));
-    state -> syntax_enabled = 1;  // Enable syntax highlighting by default
+    state -> syntax_enabled = 1;  
     state -> syntax_display_enabled = 1;
     state -> auto_tabbing_enabled = 1;    
     state -> file_type = 0;
@@ -39,7 +39,7 @@ void init_editor(EditorState* state)
     strncpy(state -> theme_name, "White Selection", sizeof(state -> theme_name) - 1);
     state -> theme_name[sizeof(state -> theme_name) - 1] = '\0';
 
-    // Autosave removed
+    
 
     
     state -> auto_complete_enabled = 1;
@@ -60,14 +60,15 @@ void init_editor(EditorState* state)
     state -> last_input_time = time(NULL);
     state -> rapid_input_mode = 0;
     state -> char_select_mode = 0;
-    state -> editor_mode = 0; // text mode
+    state -> editor_mode = 0; 
 
     
     state -> plugin_count = 0;
     memset(state -> plugins, 0, sizeof(state -> plugins));
 
     FILE *f = fopen("/tmp/editor_debug.log", "w");
-    if (f) {
+    if (f) 
+    {
         fprintf(f, "Editor initialization\n");
         fprintf(f, "Loading syntax configuration...\n");
         int result = load_syntax_json(state);
@@ -512,11 +513,11 @@ void move_cursor(EditorState* state, int dx, int dy)
     if (dy != 0 && !state->select_mode) {
 
         if (state->sticky_cursor_enabled) {
-            // Sticky cursor: keep the same column position
+            
             if (new_x >= max_x) new_x = max_x;
             if (new_x < 0) new_x = 0;
         } else {
-            // Non-sticky cursor: jump to end of line
+            
             if (dy < 0 && new_y >= 0 && new_y < state -> line_count && strlen(state -> lines[new_y]) > 0) {
                 new_x = strlen(state -> lines[new_y]);
             }
@@ -576,9 +577,10 @@ void move_cursor(EditorState* state, int dx, int dy)
     }
 
     int max_y = max_y_screen;
-    if (state -> cursor_y <= state -> scroll_offset + 2) {
-        state -> scroll_offset = state -> cursor_y - 3;
+    if (state -> cursor_y <= state -> scroll_offset - 1) {
+        state -> scroll_offset = state -> cursor_y - 1;
         if (state -> scroll_offset < 0) state -> scroll_offset = 0;
+        state -> cursor_y = state -> scroll_offset;
     } else if (state -> cursor_y >= state -> scroll_offset + max_y - 5) {
         state -> scroll_offset = state -> cursor_y - max_y + 6;
     }
@@ -906,16 +908,16 @@ void toggle_syntax_display(EditorState* state)
 
 void enter_selecting_mode(EditorState* state)
 {
-    state->editor_mode = 1; // selecting mode
-    state->syntax_display_enabled = 0; // disable syntax highlighting
+    state->editor_mode = 1; 
+    state->syntax_display_enabled = 0; 
     clear_selection(state);
     start_selection(state);
 }
 
 void exit_selecting_mode(EditorState* state)
 {
-    state->editor_mode = 0; // text mode
-    state->syntax_display_enabled = 1; // re-enable syntax highlighting
+    state->editor_mode = 0; 
+    state->syntax_display_enabled = 1; 
     clear_selection(state);
 }
 

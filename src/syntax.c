@@ -545,13 +545,13 @@ int hex_to_color_pair(const char* hex_color)
     if (strcmp(hex_color, "#1e66f5") == 0) return COLOR_FUNCTION;
     if (strcmp(hex_color, "#df8e1d") == 0) return COLOR_CONSTANT;
     if (strcmp(hex_color, "#4c4f69") == 0) return COLOR_DEFAULT;
-    if (strcmp(hex_color, "#e5c07b") == 0) return COLOR_DATA_TYPE;  // storage.type, support.type
-    if (strcmp(hex_color, "#56b6c2") == 0) return COLOR_OPERATOR;   // keyword.operator
-    if (strcmp(hex_color, "#abb2bf") == 0) return COLOR_DELIMITER; // punctuation
-    if (strcmp(hex_color, "#61afef") == 0) return COLOR_FUNCTION;  // support.function
-    if (strcmp(hex_color, "#c678dd") == 0) return COLOR_MODIFIER;  // keyword.operator.expression
-    if (strcmp(hex_color, "#98c379") == 0) return COLOR_STRING;    // string.quoted
-    if (strcmp(hex_color, "#e06c75") == 0) return COLOR_FUNCTION;  // entity.name.function
+    if (strcmp(hex_color, "#e5c07b") == 0) return COLOR_DATA_TYPE;  
+    if (strcmp(hex_color, "#56b6c2") == 0) return COLOR_OPERATOR;   
+    if (strcmp(hex_color, "#abb2bf") == 0) return COLOR_DELIMITER; 
+    if (strcmp(hex_color, "#61afef") == 0) return COLOR_FUNCTION;  
+    if (strcmp(hex_color, "#c678dd") == 0) return COLOR_MODIFIER;  
+    if (strcmp(hex_color, "#98c379") == 0) return COLOR_STRING;    
+    if (strcmp(hex_color, "#e06c75") == 0) return COLOR_FUNCTION;  
     return COLOR_DEFAULT;
 }
 
@@ -847,7 +847,7 @@ void highlight_line(EditorState* state, int line_num, int screen_row, int line_n
             }
         
             if (state->file_type == FILE_TYPE_JSON) {
-                // JSON syntax highlighting
+                
                 if (strcmp(word, "true") == 0 || strcmp(word, "false") == 0) {
                     color = COLOR_CONSTANT;
                 } else if (strcmp(word, "null") == 0) {
@@ -855,7 +855,7 @@ void highlight_line(EditorState* state, int line_num, int screen_row, int line_n
                 } else if (is_number(word)) {
                     color = COLOR_INTEGER_LITERAL;
                 } else {
-                    // String values in JSON
+                    
                     color = COLOR_STRING;
                 }
             }
@@ -901,7 +901,7 @@ void highlight_line_segment(EditorState* state, int line_num, int screen_row, in
     int sel_start_x = has_selection ? (line_num == state->select_start_y ? state->select_start_x : 0) : -1;
     int sel_end_x   = has_selection ? (line_num == state->select_end_y   ? state->select_end_x   : len) : -1;
 
-    // Adjust selection bounds for the visible segment
+    
     if (has_selection) {
         if (sel_start_x < start_col) sel_start_x = start_col;
         if (sel_end_x > end_col) sel_end_x = end_col;
@@ -1448,7 +1448,7 @@ void highlight_line_segment(EditorState* state, int line_num, int screen_row, in
         }
 
         if (state->file_type == FILE_TYPE_JSON && ch == '"' && i < end_col) {
-            // JSON string highlighting
+            
             int start = i++;
             int escaped = 0;
             while (i < end_col) {
