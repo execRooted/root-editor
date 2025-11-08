@@ -204,20 +204,18 @@ void render_screen(EditorState* state)
 
         attron(COLOR_PAIR(1) | A_BOLD);
         const char* syntax_status = (state->syntax_enabled ? "ON" : "OFF");
-        const char* brackets_status = (state->auto_complete_enabled ? "ON" : "OFF");
-        const char* comment_status = (state->comment_complete_enabled ? "ON" : "OFF");
         const char* sticky_cursor_status = (state->sticky_cursor_enabled ? "ON" : "OFF");
+        const char* autocomplete_status = (state->auto_complete_enabled ? "ON" : "OFF");
         const char* edited_indicator = (state->dirty ? " [edited]" : "");
-        mvprintw(max_y - 1, 0, "Line: %d, Col: %d | %s%s | Mode: %s | Syntax HL: %s | Autocomplete: %s | Brackets and Quotes Autocomplete: %s | Auto Tabbing: %s | Sticky Cursor: %s | Words: %d",
+        mvprintw(max_y - 1, 0, "Line: %d, Col: %d | %s%s | Mode: %s | Syntax HL: %s | Auto Tabbing: %s | Sticky Cursor: %s | Autocomplete: %s | Words: %d",
                   state->cursor_y + 1, state->cursor_x + 1,
                   state->filename[0] ? state->filename : "[Untitled]",
                   edited_indicator,
                   mode_text,
                   syntax_status,
-                  comment_status,
-                  brackets_status,
                   state->auto_tabbing_enabled ? "ON" : "OFF",
                   sticky_cursor_status,
+                  autocomplete_status,
                   words);
         attroff(COLOR_PAIR(1) | A_BOLD);
 

@@ -42,7 +42,6 @@ void init_editor(EditorState* state)
 
     
     state -> auto_complete_enabled = 1;
-    state -> comment_complete_enabled = 1;
     state -> sticky_cursor_enabled = 1;
 
     
@@ -92,181 +91,13 @@ void insert_char(EditorState* state, char c)
     if (state -> cursor_x < 0) state -> cursor_x = 0;
 
     
-    if (state->auto_complete_enabled && c == '(' && len < MAX_LINE_LENGTH - 1) {
-        
-        if (state -> cursor_x > len) {
-            
-            for (int i = len; i < state -> cursor_x; i++) {
-                line[i] = ' ';
-            }
-            line[state -> cursor_x] = '(';
-            line[state -> cursor_x + 1] = ')';
-            line[state -> cursor_x + 2] = '\0';
-        } else {
-            memmove( & line[state -> cursor_x + 2], & line[state -> cursor_x], len - state -> cursor_x + 1);
-            line[state -> cursor_x] = '(';
-            line[state -> cursor_x + 1] = ')';
-        }
-        state -> cursor_x++;
-        update_dirty_status(state);
-        return;
-    } else if (state->auto_complete_enabled && c == '{' && len < MAX_LINE_LENGTH - 1) {
-        
-        if (state -> cursor_x > len) {
-            
-            for (int i = len; i < state -> cursor_x; i++) {
-                line[i] = ' ';
-            }
-            line[state -> cursor_x] = '{';
-            line[state -> cursor_x + 1] = '}';
-            line[state -> cursor_x + 2] = '\0';
-        } else {
-            memmove( & line[state -> cursor_x + 2], & line[state -> cursor_x], len - state -> cursor_x + 1);
-            line[state -> cursor_x] = '{';
-            line[state -> cursor_x + 1] = '}';
-        }
-        state -> cursor_x++;
-        update_dirty_status(state);
-        return;
-    } else if (c == ')' && state -> cursor_x < len && line[state -> cursor_x] == ')') {
-        
-        state -> cursor_x++;
-        return;
-    } else if (c == '}' && state -> cursor_x < len && line[state -> cursor_x] == '}') {
-        
-        state -> cursor_x++;
-        return;
-    } else if (state->auto_complete_enabled && c == '[' && len < MAX_LINE_LENGTH - 1) {
-        
-        if (state -> cursor_x > len) {
-            
-            for (int i = len; i < state -> cursor_x; i++) {
-                line[i] = ' ';
-            }
-            line[state -> cursor_x] = '[';
-            line[state -> cursor_x + 1] = ']';
-            line[state -> cursor_x + 2] = '\0';
-        } else {
-            memmove( & line[state -> cursor_x + 2], & line[state -> cursor_x], len - state -> cursor_x + 1);
-            line[state -> cursor_x] = '[';
-            line[state -> cursor_x + 1] = ']';
-        }
-        state -> cursor_x++;
-        update_dirty_status(state);
-        return;
-    } else if (c == ']' && state -> cursor_x < len && line[state -> cursor_x] == ']') {
-        
-        state -> cursor_x++;
-        return;
-    } else if (state->auto_complete_enabled && c == '"' && len < MAX_LINE_LENGTH - 1) {
-
-        if (state -> cursor_x > len) {
-
-            for (int i = len; i < state -> cursor_x; i++) {
-                line[i] = ' ';
-            }
-            line[state -> cursor_x] = '"';
-            line[state -> cursor_x + 1] = '"';
-            line[state -> cursor_x + 2] = '\0';
-        } else {
-            memmove( & line[state -> cursor_x + 2], & line[state -> cursor_x], len - state -> cursor_x + 1);
-            line[state -> cursor_x] = '"';
-            line[state -> cursor_x + 1] = '"';
-        }
-        state -> cursor_x++;
-        update_dirty_status(state);
-        return;
-    } else if (c == '"' && state -> cursor_x < len && line[state -> cursor_x] == '"') {
-
-        state -> cursor_x++;
-        return;
-    } else if (state->auto_complete_enabled && c == '\'' && len < MAX_LINE_LENGTH - 1) {
-
-        if (state -> cursor_x > len) {
-
-            for (int i = len; i < state -> cursor_x; i++) {
-                line[i] = ' ';
-            }
-            line[state -> cursor_x] = '\'';
-            line[state -> cursor_x + 1] = '\'';
-            line[state -> cursor_x + 2] = '\0';
-        } else {
-            memmove( & line[state -> cursor_x + 2], & line[state -> cursor_x], len - state -> cursor_x + 1);
-            line[state -> cursor_x] = '\'';
-            line[state -> cursor_x + 1] = '\'';
-        }
-        state -> cursor_x++;
-        update_dirty_status(state);
-        return;
-    } else if (c == '\'' && state -> cursor_x < len && line[state -> cursor_x] == '\'') {
-
-        state -> cursor_x++;
-        return;
-    }
 
     
-    if (state->comment_complete_enabled && c == '*' && state -> cursor_x > 0 && line[state -> cursor_x - 1] == '/') {
-
-        if (state -> line_count + 2 > MAX_LINES) {
-            show_status(state, "Cannot insert block comment: maximum line count exceeded");
-            return;
-        }
-
-        
-        if (len < MAX_LINE_LENGTH - 1) {
-            if (state -> cursor_x > len) {
-                for (int i = len; i < state -> cursor_x; i++) {
-                    line[i] = ' ';
-                }
-                line[state -> cursor_x] = c;
-                line[state -> cursor_x + 1] = '\0';
-            } else {
-                memmove( & line[state -> cursor_x + 1], & line[state -> cursor_x], len - state -> cursor_x + 1);
-                line[state -> cursor_x] = c;
-            }
-            state -> cursor_x++;
-        }
-
-        
-        char * comment_line = (char * ) malloc(MAX_LINE_LENGTH);
-        if (!comment_line) {
-            show_status(state, "Memory allocation failed");
-            update_dirty_status(state);
-            return;
-        }
-        strcpy(comment_line, "*/");
-
-        
-        char * empty_line = (char * ) malloc(MAX_LINE_LENGTH);
-        if (!empty_line) {
-            free(comment_line);
-            show_status(state, "Memory allocation failed");
-            update_dirty_status(state);
-            return;
-        }
-        empty_line[0] = '\0';
-
-        int insert_pos = state -> cursor_y + 1;
-        for (int i = state -> line_count + 1; i >= insert_pos + 2; i--) {
-            state -> lines[i] = state -> lines[i - 2];
-        }
-        state -> lines[insert_pos] = empty_line;
-        state -> lines[insert_pos + 1] = comment_line;
-        state -> line_count += 2;
-    
-        
-        state -> cursor_y += 1;
-        state -> cursor_x = 0;
-        move_cursor(state, 0, 0);
-
-        update_dirty_status(state);
-        return;
-    }
 
     
     if (len < MAX_LINE_LENGTH - 1) {
         if (state -> cursor_x > len) {
-            
+
             for (int i = len; i < state -> cursor_x; i++) {
                 line[i] = ' ';
             }
@@ -278,6 +109,96 @@ void insert_char(EditorState* state, char c)
         }
         state -> cursor_x++;
         update_dirty_status(state);
+    }
+
+    // Auto-complete logic
+    if (state->auto_complete_enabled) {
+        if (c == '(' && len < MAX_LINE_LENGTH - 1) {
+            if (state -> cursor_x > len) {
+                for (int i = len; i < state -> cursor_x; i++) {
+                    line[i] = ' ';
+                }
+                line[state -> cursor_x] = '(';
+                line[state -> cursor_x + 1] = ')';
+                line[state -> cursor_x + 2] = '\0';
+            } else {
+                memmove( & line[state -> cursor_x + 2], & line[state -> cursor_x], len - state -> cursor_x + 1);
+                line[state -> cursor_x] = '(';
+                line[state -> cursor_x + 1] = ')';
+            }
+            state -> cursor_x++;
+            update_dirty_status(state);
+        } else if (c == '{' && len < MAX_LINE_LENGTH - 1) {
+            if (state -> cursor_x > len) {
+                for (int i = len; i < state -> cursor_x; i++) {
+                    line[i] = ' ';
+                }
+                line[state -> cursor_x] = '{';
+                line[state -> cursor_x + 1] = '}';
+                line[state -> cursor_x + 2] = '\0';
+            } else {
+                memmove( & line[state -> cursor_x + 2], & line[state -> cursor_x], len - state -> cursor_x + 1);
+                line[state -> cursor_x] = '{';
+                line[state -> cursor_x + 1] = '}';
+            }
+            state -> cursor_x++;
+            update_dirty_status(state);
+        } else if (c == '[' && len < MAX_LINE_LENGTH - 1) {
+            if (state -> cursor_x > len) {
+                for (int i = len; i < state -> cursor_x; i++) {
+                    line[i] = ' ';
+                }
+                line[state -> cursor_x] = '[';
+                line[state -> cursor_x + 1] = ']';
+                line[state -> cursor_x + 2] = '\0';
+            } else {
+                memmove( & line[state -> cursor_x + 2], & line[state -> cursor_x], len - state -> cursor_x + 1);
+                line[state -> cursor_x] = '[';
+                line[state -> cursor_x + 1] = ']';
+            }
+            state -> cursor_x++;
+            update_dirty_status(state);
+        } else if (c == '"' && len < MAX_LINE_LENGTH - 1) {
+            if (state -> cursor_x > len) {
+                for (int i = len; i < state -> cursor_x; i++) {
+                    line[i] = ' ';
+                }
+                line[state -> cursor_x] = '"';
+                line[state -> cursor_x + 1] = '"';
+                line[state -> cursor_x + 2] = '\0';
+            } else {
+                memmove( & line[state -> cursor_x + 2], & line[state -> cursor_x], len - state -> cursor_x + 1);
+                line[state -> cursor_x] = '"';
+                line[state -> cursor_x + 1] = '"';
+            }
+            state -> cursor_x++;
+            update_dirty_status(state);
+        } else if (c == '\'' && len < MAX_LINE_LENGTH - 1) {
+            if (state -> cursor_x > len) {
+                for (int i = len; i < state -> cursor_x; i++) {
+                    line[i] = ' ';
+                }
+                line[state -> cursor_x] = '\'';
+                line[state -> cursor_x + 1] = '\'';
+                line[state -> cursor_x + 2] = '\0';
+            } else {
+                memmove( & line[state -> cursor_x + 2], & line[state -> cursor_x], len - state -> cursor_x + 1);
+                line[state -> cursor_x] = '\'';
+                line[state -> cursor_x + 1] = '\'';
+            }
+            state -> cursor_x++;
+            update_dirty_status(state);
+        } else if (c == ')' && state -> cursor_x < len && line[state -> cursor_x] == ')') {
+            state -> cursor_x++;
+        } else if (c == '}' && state -> cursor_x < len && line[state -> cursor_x] == '}') {
+            state -> cursor_x++;
+        } else if (c == ']' && state -> cursor_x < len && line[state -> cursor_x] == ']') {
+            state -> cursor_x++;
+        } else if (c == '"' && state -> cursor_x < len && line[state -> cursor_x] == '"') {
+            state -> cursor_x++;
+        } else if (c == '\'' && state -> cursor_x < len && line[state -> cursor_x] == '\'') {
+            state -> cursor_x++;
+        }
     }
 }
 void delete_char(EditorState* state)
@@ -914,7 +835,6 @@ void render_help_screen(EditorState* state)
     mvprintw(line++, col1, "Ctrl+L  Jump to line");
     mvprintw(line++, col1, "Ctrl+T  Auto Tab");
     mvprintw(line++, col1, "Ctrl+K  Auto Complete");
-    mvprintw(line++, col1, "Ctrl+U  Comment Complete");
     mvprintw(line++, col1, "Ctrl+H  Help");
     mvprintw(line++, col1, "Ctrl+W Select mode");
     mvprintw(line++, col1, "Ctrl+A  Select all");
@@ -929,10 +849,11 @@ void render_help_screen(EditorState* state)
     mvprintw(line++, col2, "F4   Cut");
     mvprintw(line++, col2, "F5   Copy");
     mvprintw(line++, col2, "F6   Paste");
-    mvprintw(line++, col2, "F7   Word Wrap");
-    mvprintw(line++, col2, "F8   Syntax HL");
-    mvprintw(line++, col2, "F10  Syntax Disp");
-    mvprintw(line++, col2, "F11  Sticky Cursor");
+    mvprintw(line++, col2, "F7   Syntax HL");
+    mvprintw(line++, col2, "F8   Sticky Cursor");
+    mvprintw(line++, col2, "F9   Autocomplete");
+
+
 
     
     attron(COLOR_PAIR(1));
@@ -998,7 +919,7 @@ void toggle_auto_complete(EditorState* state)
 
 void toggle_comment_complete(EditorState* state)
 {
-    state -> comment_complete_enabled = !state -> comment_complete_enabled;
+    state -> auto_complete_enabled = !state -> auto_complete_enabled;
     save_config(state);
 }
 

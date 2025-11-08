@@ -90,7 +90,6 @@ typedef struct EditorState {
     
 
     int auto_complete_enabled;
-    int comment_complete_enabled;
     int sticky_cursor_enabled;
 
     int json_rules_count;

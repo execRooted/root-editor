@@ -434,15 +434,15 @@ void handle_input(EditorState* state, int ch)
                 }
                 break;
         case KEY_F(7):
-                toggle_word_wrap(state);
-                save_config(state);
-                break;
-        case KEY_F(8):
                 toggle_syntax_highlighting(state);
                 save_config(state);
                 break;
-        case KEY_F(10):
+        case KEY_F(8):
                 toggle_sticky_cursor(state);
+                save_config(state);
+                break;
+        case KEY_F(9):
+                toggle_auto_complete(state);
                 save_config(state);
                 break;
         case KEY_IC:
@@ -591,11 +591,6 @@ void handle_ctrl_keys(EditorState* state, int ch)
                 break;
         case 11:
                 toggle_auto_complete(state);
-                save_config(state);
-                mark_key_processed(state, ch);
-                break;
-        case 21:
-                toggle_comment_complete(state);
                 save_config(state);
                 mark_key_processed(state, ch);
                 break;

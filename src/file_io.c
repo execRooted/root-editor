@@ -475,7 +475,7 @@ void load_config(EditorState* state)
                         } else if (strcmp(key, "auto_complete_enabled")==0) {
                                 state->auto_complete_enabled = atoi(val) ? 1 : 0;
                         } else if (strcmp(key, "comment_complete_enabled")==0) {
-                                state->comment_complete_enabled = atoi(val) ? 1 : 0;
+                                state->auto_complete_enabled = atoi(val) ? 1 : 0;
                         } else if (strcmp(key, "auto_tabbing_enabled")==0) {
                                 state->auto_tabbing_enabled = atoi(val) ? 1 : 0;
                         } else if (strcmp(key, "sticky_cursor_enabled")==0) {
@@ -502,7 +502,7 @@ void save_config(EditorState* state)
         fprintf(fp, "tab_size=%d\n", state->tab_size);
         fprintf(fp, "syntax_enabled=%d\n", state->syntax_enabled);
         fprintf(fp, "auto_complete_enabled=%d\n", state->auto_complete_enabled);
-        fprintf(fp, "comment_complete_enabled=%d\n", state->comment_complete_enabled);
+        fprintf(fp, "auto_complete_enabled=%d\n", state->auto_complete_enabled);
         fprintf(fp, "auto_tabbing_enabled=%d\n", state->auto_tabbing_enabled);
         fprintf(fp, "sticky_cursor_enabled=%d\n", state->sticky_cursor_enabled);
         fclose(fp);
