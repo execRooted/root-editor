@@ -31,7 +31,7 @@ void load_file(EditorState* state, const char* filename)
         fseek(file, 0, SEEK_SET);
 
         if (file_size > 0) {
-                char * content = (char *) malloc(file_size + 1);
+                char * content = (char * ) malloc(file_size + 1);
                 if (!content) {
                         show_status(state, "Memory allocation failed for file content");
                         fclose(file);
@@ -139,8 +139,7 @@ void save_file(EditorState* state)
         if (!file) {
 
                 if (errno == EACCES || errno == EPERM) {
-                        state -> needs_sudo = 1;
-                        prompt_root_password(state);
+                        show_status(state, "Error: There aren't enough permissions to save the file");
                         return;
                 }
                 char error_msg[256];
@@ -170,45 +169,8 @@ void save_file(EditorState* state)
 
         save_original_content(state);
         update_dirty_status(state);
-        state -> needs_sudo = 0;
 }
 
-void save_file_with_sudo(EditorState* state)
-{
-        if (state -> filename[0] == '\0') {
-                show_status(state, "Error: No filename specified");
-                return;
-        }
-
-        char temp_path[256];
-        snprintf(temp_path, sizeof(temp_path), "/tmp/kilo_editor_temp_%d.txt", getpid());
-
-        FILE * temp_file = fopen(temp_path, "w");
-        if (!temp_file) {
-                show_status(state, "Error: Could not create temporary file");
-                return;
-        }
-
-        for (int i = 0; i < state -> line_count; i++) {
-                fprintf(temp_file, "%s\n", state -> lines[i]);
-        }
-        fclose(temp_file);
-
-        char command[512];
-        snprintf(command, sizeof(command), "sudo cp %s %s", temp_path, state -> filename);
-
-        int result = system(command);
-        unlink(temp_path);
-
-        if (result == 0) {
-
-                save_original_content(state);
-                update_dirty_status(state);
-                state -> needs_sudo = 0;
-        } else {
-                show_status(state, "Error: Failed to save with sudo privileges");
-        }
-}
 
 void prompt_filename(EditorState* state)
 {

@@ -74,7 +74,6 @@ typedef struct EditorState {
     int select_start_x, select_start_y;
     int select_end_x, select_end_y;
     int show_help;
-    int needs_sudo;
     int key_states[256];
     time_t key_timestamps[256];
     int syntax_enabled;
@@ -146,7 +145,6 @@ void new_line(EditorState* state);
 void move_cursor(EditorState* state, int dx, int dy);
 void find_text(EditorState* state);
 void replace_text(EditorState* state);
-void prompt_root_password(EditorState* state);
 void render_screen(EditorState* state);
 void show_status(EditorState* state, const char* message);
 void show_status_left(EditorState* state, const char* message);

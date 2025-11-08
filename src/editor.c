@@ -24,7 +24,6 @@ void init_editor(EditorState* state)
     state -> select_end_x = 0;
     state -> select_end_y = 0;
     state -> show_help = 0;
-    state -> needs_sudo = 0;
     memset(state -> key_states, 0, sizeof(state -> key_states));
     memset(state -> key_timestamps, 0, sizeof(state -> key_timestamps));
     state -> syntax_enabled = 1;  
