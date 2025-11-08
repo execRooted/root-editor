@@ -195,7 +195,15 @@ void handle_input(EditorState* state, int ch)
                         move_cursor(state, -1, 0);
                         extend_selection(state);
                 } else {
-                        move_cursor(state, -1, 0);
+                        // Handle tab as single character
+                        char *line = state->lines[state->cursor_y];
+                        if (state->cursor_x > 0 && (line[state->cursor_x - 1] == '\t' || (line[state->cursor_x - 1] == ' ' &&
+                            state->cursor_x >= state->tab_size &&
+                            strncmp(&line[state->cursor_x - state->tab_size], &"        "[8 - state->tab_size], state->tab_size) == 0))) {
+                                move_cursor(state, -state->tab_size, 0);
+                        } else {
+                                move_cursor(state, -1, 0);
+                        }
                         if (state->select_mode) {
                                 extend_selection(state);
                         }
@@ -209,7 +217,15 @@ void handle_input(EditorState* state, int ch)
                         move_cursor(state, 1, 0);
                         extend_selection(state);
                 } else {
-                        move_cursor(state, 1, 0);
+                        // Handle tab as single character
+                        char *line = state->lines[state->cursor_y];
+                        if (state->cursor_x < (int)strlen(line) && (line[state->cursor_x] == '\t' || (line[state->cursor_x] == ' ' &&
+                            state->cursor_x + state->tab_size <= (int)strlen(line) &&
+                            strncmp(&line[state->cursor_x], &"        "[8 - state->tab_size], state->tab_size) == 0))) {
+                                move_cursor(state, state->tab_size, 0);
+                        } else {
+                                move_cursor(state, 1, 0);
+                        }
                         if (state->select_mode) {
                                 extend_selection(state);
                         }
@@ -342,7 +358,7 @@ void handle_input(EditorState* state, int ch)
                                 state -> lines[state -> cursor_y + 2] = closing_line;
                                 state -> line_count += 2;
                                 state -> cursor_y++;
-                                state -> cursor_x = base_indent; // Position at end of indentation on empty line
+                                state -> cursor_x = base_indent + state->tab_size; // Position at end of indentation on empty line
                                 move_cursor(state, 0, 0);
                                 update_dirty_status(state);
                         } else {
@@ -356,14 +372,29 @@ void handle_input(EditorState* state, int ch)
                                         show_status(state, "Memory allocation failed");
                                         break;
                                 }
-                                new_line_str[0] = '\0';
+
+                                // Copy indentation if auto tabbing is enabled
+                                int indent_len = 0;
+                                if (state->auto_tabbing_enabled) {
+                                        char *current_line = state->lines[state->cursor_y];
+                                        while (indent_len < (int)strlen(current_line) && (current_line[indent_len] == ' ' || current_line[indent_len] == '\t')) {
+                                                if (indent_len < MAX_LINE_LENGTH - 1) {
+                                                        new_line_str[indent_len] = current_line[indent_len];
+                                                        indent_len++;
+                                                } else {
+                                                        break;
+                                                }
+                                        }
+                                }
+                                new_line_str[indent_len] = '\0';
+
                                 for (int i = state->line_count; i > state->cursor_y + 1; i--) {
                                         state->lines[i] = state->lines[i - 1];
                                 }
                                 state->lines[state->cursor_y + 1] = new_line_str;
                                 state->line_count++;
                                 state->cursor_y++;
-                                state->cursor_x = 0;
+                                state->cursor_x = indent_len;
                                 move_cursor(state, 0, 0);
                                 update_dirty_status(state);
                         }
