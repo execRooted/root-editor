@@ -1,10 +1,10 @@
 CMakeFiles/
+build/
+.vscode/
 CMakeCache.txt
 cmake_install.cmake
 Makefile
-build/
 test.c
 test.txt
 *.swp
 .DS_Store
-
