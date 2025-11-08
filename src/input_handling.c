@@ -195,7 +195,7 @@ void handle_input(EditorState* state, int ch)
                         move_cursor(state, -1, 0);
                         extend_selection(state);
                 } else {
-                        // Handle tab as single character
+                        
                         char *line = state->lines[state->cursor_y];
                         if (state->cursor_x > 0 && (line[state->cursor_x - 1] == '\t' || (line[state->cursor_x - 1] == ' ' &&
                             state->cursor_x >= state->tab_size &&
@@ -217,7 +217,7 @@ void handle_input(EditorState* state, int ch)
                         move_cursor(state, 1, 0);
                         extend_selection(state);
                 } else {
-                        // Handle tab as single character
+                        
                         char *line = state->lines[state->cursor_y];
                         if (state->cursor_x < (int)strlen(line) && (line[state->cursor_x] == '\t' || (line[state->cursor_x] == ' ' &&
                             state->cursor_x + state->tab_size <= (int)strlen(line) &&
@@ -284,7 +284,7 @@ void handle_input(EditorState* state, int ch)
                         extend_selection(state);
                         return;
                 } else {
-                        // Check if cursor is between a pair and split it
+                        
                         int split_pair = 0;
                         char closing_char = 0;
                         char * line = state -> lines[state -> cursor_y];
@@ -299,7 +299,7 @@ void handle_input(EditorState* state, int ch)
                                     (before == '[' && after == ']')) {
                                         split_pair = 1;
                                         closing_char = after;
-                                        // Remove from cursor_x to after_pos + 1
+                                        
                                         int remove_start = state->cursor_x;
                                         int remove_end = after_pos + 1;
                                         memmove(&line[remove_start], &line[remove_end], strlen(line) - remove_end + 1);
@@ -307,7 +307,7 @@ void handle_input(EditorState* state, int ch)
                         }
 
                         if (split_pair) {
-                                // Create two new lines for pair splitting
+                                
                                 if (state->line_count + 1 >= MAX_LINES) {
                                         show_status(state, "Error: Maximum line count reached (1,000,000 lines)");
                                         break;
@@ -324,7 +324,7 @@ void handle_input(EditorState* state, int ch)
                                         break;
                                 }
 
-                                // Calculate base indentation
+                                
                                 int base_indent = 0;
                                 if (state->auto_tabbing_enabled) {
                                         while (base_indent < strlen(line) && (line[base_indent] == ' ' || line[base_indent] == '\t')) {
@@ -332,7 +332,7 @@ void handle_input(EditorState* state, int ch)
                                         }
                                 }
 
-                                // Empty line with indentation + extra tab
+                                
                                 int indent_len = 0;
                                 for (int i = 0; i < base_indent && indent_len < MAX_LINE_LENGTH - 1; i++) {
                                         empty_line[indent_len++] = line[i];
@@ -342,7 +342,7 @@ void handle_input(EditorState* state, int ch)
                                 }
                                 empty_line[indent_len] = '\0';
 
-                                // Closing line with same indentation + closing char
+                                
                                 indent_len = 0;
                                 for (int i = 0; i < base_indent && indent_len < MAX_LINE_LENGTH - 1; i++) {
                                         closing_line[indent_len++] = line[i];
@@ -350,7 +350,7 @@ void handle_input(EditorState* state, int ch)
                                 closing_line[indent_len++] = closing_char;
                                 closing_line[indent_len] = '\0';
 
-                                // Insert two lines
+                                
                                 for (int i = state -> line_count + 1; i > state -> cursor_y + 2; i--) {
                                         state -> lines[i] = state -> lines[i - 2];
                                 }
@@ -358,11 +358,11 @@ void handle_input(EditorState* state, int ch)
                                 state -> lines[state -> cursor_y + 2] = closing_line;
                                 state -> line_count += 2;
                                 state -> cursor_y++;
-                                state -> cursor_x = base_indent + state->tab_size; // Position at end of indentation on empty line
+                                state -> cursor_x = base_indent + state->tab_size; 
                                 move_cursor(state, 0, 0);
                                 update_dirty_status(state);
                         } else {
-                                // Original logic for non-pair splitting
+                                
                                 if (state->line_count >= MAX_LINES) {
                                         show_status(state, "Error: Maximum line count reached (1,000,000 lines)");
                                         break;
@@ -373,7 +373,7 @@ void handle_input(EditorState* state, int ch)
                                         break;
                                 }
 
-                                // Copy indentation if auto tabbing is enabled
+                                
                                 int indent_len = 0;
                                 if (state->auto_tabbing_enabled) {
                                         char *current_line = state->lines[state->cursor_y];

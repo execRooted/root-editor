@@ -95,7 +95,7 @@ void insert_char(EditorState* state, char c)
     
 
     
-    // Auto-complete logic
+    
     if (state->auto_complete_enabled) {
         if (c == '(' && len < MAX_LINE_LENGTH - 1) {
             if (state -> cursor_x > len) {
