@@ -1,12 +1,10 @@
-# CMake build files
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
 Makefile
 build/
-
-# OS / editor
+test.c
+test.txt
 *.swp
 .DS_Store
-
 
