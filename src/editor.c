@@ -850,7 +850,7 @@ void render_help_screen(EditorState* state)
     mvprintw(line++, col2, "F5   Copy");
     mvprintw(line++, col2, "F6   Paste");
     mvprintw(line++, col2, "F7   Syntax HL");
-    mvprintw(line++, col2, "F8   Sticky Cursor");
+    mvprintw(line++, col2, "F8   Sticky Curs.");
     mvprintw(line++, col2, "F9   Autocomplete");
 
 
