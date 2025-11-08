@@ -149,6 +149,9 @@ void save_file(EditorState* state)
         }
 
         for (int i = 0; i < state -> line_count; i++) {
+                if (i == state->line_count - 1 && strlen(state->lines[i]) == 0) {
+                        continue;
+                }
                 if (fprintf(file, "%s\n", state -> lines[i]) < 0) {
                         char error_msg[256];
                         snprintf(error_msg, sizeof(error_msg), "Error: Failed to write to file (%s)", strerror(errno));

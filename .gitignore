@@ -8,3 +8,5 @@ test.c
 test.txt
 *.swp
 .DS_Store
+plugins/build/
+
