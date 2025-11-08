@@ -1,5 +1,5 @@
-#include "editor.h"
-#include "plugin.h"
+#include "../core/editor.h"
+#include "../core/plugin.h"
 #include <unistd.h>
 #include <time.h>
 #include <stdlib.h>

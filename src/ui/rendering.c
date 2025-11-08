@@ -1,4 +1,4 @@
-#include "editor.h"
+#include "../core/editor.h"
 
 #define FILE_TYPE_PLAIN   0
 #define COLOR_DEFAULT     13

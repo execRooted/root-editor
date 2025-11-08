@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(root-editor)
 find_package(Curses REQUIRED)
-set(SOURCES src/main.c src/editor.c src/file_io.c src/input_handling.c src/rendering.c src/selection.c src/syntax.c src/plugin.c src/syntax_json.c)
+set(SOURCES src/core/main.c src/core/editor.c src/io/file_io.c src/ui/input_handling.c src/ui/rendering.c src/selection/selection.c src/syntax/syntax.c src/core/plugin.c src/syntax/syntax_json.c)
 add_executable(editor ${SOURCES})
 target_link_libraries(editor ${CURSES_LIBRARIES} dl)
 target_compile_options(editor PRIVATE -Wall -Wextra -std=c99 -O2 -march=native -flto)

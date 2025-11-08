@@ -1,7 +1,7 @@
 #define _GNU_SOURCE
 #define _POSIX_C_SOURCE 200809L
-#include "editor.h"
-#include "plugin.h"
+#include "../core/editor.h"
+#include "../core/plugin.h"
 
 void load_file(EditorState* state, const char* filename)
 {

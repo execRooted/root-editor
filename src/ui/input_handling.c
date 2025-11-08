@@ -1,6 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
-#include "editor.h"
-#include "plugin.h"
+#include "../core/editor.h"
+#include "../core/plugin.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -556,6 +556,7 @@ void handle_ctrl_keys(EditorState* state, int ch)
         case 3:
                 if (state -> select_mode) {
                         copy_selected_text(state);
+                        clear_selection(state);
                 } else {
                         copy_text(state);
                 }

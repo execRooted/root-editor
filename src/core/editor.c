@@ -935,7 +935,7 @@ void render_help_screen(EditorState* state)
     mvprintw(line++, col1, "Ctrl+T  Auto Tab");
     mvprintw(line++, col1, "Ctrl+K  Auto Complete");
     mvprintw(line++, col1, "Ctrl+H  Help");
-    mvprintw(line++, col1, "Ctrl+W Select mode");
+    mvprintw(line++, col1, "Ctrl+W  Select mode");
     mvprintw(line++, col1, "Ctrl+A  Select all");
     mvprintw(line++, col1, "Ctrl+X  Cut");
     mvprintw(line++, col1, "Ctrl+C  Copy");
