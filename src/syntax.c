@@ -64,7 +64,7 @@ const char* data_types[] = {
 const int data_types_count = sizeof(data_types) / sizeof(data_types[0]);
 
 const char* modifiers[] = {
-    "long","short","unsigned","signed","mut","const","static","volatile",
+    "long","short","unsigned","signed","mut","const","static","public","volatile",
     "extern","register","auto","pub","priv","ref","async","await","unsafe"
 };
 const int modifiers_count = sizeof(modifiers) / sizeof(modifiers[0]);

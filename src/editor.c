@@ -64,7 +64,7 @@ void init_editor(EditorState* state)
     state -> plugin_count = 0;
     memset(state -> plugins, 0, sizeof(state -> plugins));
 
-    FILE *f = fopen("/tmp/editor_debug.log", "w");
+    FILE *f = fopen("/tmp/root_editor_debug.log", "w");
     if (f) 
     {
         fprintf(f, "Editor initialization\n");
@@ -95,9 +95,108 @@ void insert_char(EditorState* state, char c)
     
 
     
+    // Auto-complete logic
+    if (state->auto_complete_enabled) {
+        if (c == '(' && len < MAX_LINE_LENGTH - 1) {
+            if (state -> cursor_x > len) {
+                for (int i = len; i < state -> cursor_x; i++) {
+                    line[i] = ' ';
+                }
+                line[state -> cursor_x] = '(';
+                line[state -> cursor_x + 1] = ')';
+                line[state -> cursor_x + 2] = '\0';
+            } else {
+                memmove( & line[state -> cursor_x + 2], & line[state -> cursor_x], len - state -> cursor_x + 1);
+                line[state -> cursor_x] = '(';
+                line[state -> cursor_x + 1] = ')';
+            }
+            state -> cursor_x++;
+            update_dirty_status(state);
+            return;
+        } else if (c == '{' && len < MAX_LINE_LENGTH - 1) {
+            if (state -> cursor_x > len) {
+                for (int i = len; i < state -> cursor_x; i++) {
+                    line[i] = ' ';
+                }
+                line[state -> cursor_x] = '{';
+                line[state -> cursor_x + 1] = '}';
+                line[state -> cursor_x + 2] = '\0';
+            } else {
+                memmove( & line[state -> cursor_x + 2], & line[state -> cursor_x], len - state -> cursor_x + 1);
+                line[state -> cursor_x] = '{';
+                line[state -> cursor_x + 1] = '}';
+            }
+            state -> cursor_x++;
+            update_dirty_status(state);
+            return;
+        } else if (c == '[' && len < MAX_LINE_LENGTH - 1) {
+            if (state -> cursor_x > len) {
+                for (int i = len; i < state -> cursor_x; i++) {
+                    line[i] = ' ';
+                }
+                line[state -> cursor_x] = '[';
+                line[state -> cursor_x + 1] = ']';
+                line[state -> cursor_x + 2] = '\0';
+            } else {
+                memmove( & line[state -> cursor_x + 2], & line[state -> cursor_x], len - state -> cursor_x + 1);
+                line[state -> cursor_x] = '[';
+                line[state -> cursor_x + 1] = ']';
+            }
+            state -> cursor_x++;
+            update_dirty_status(state);
+            return;
+        } else if (c == '"' && len < MAX_LINE_LENGTH - 1) {
+            if (state -> cursor_x > len) {
+                for (int i = len; i < state -> cursor_x; i++) {
+                    line[i] = ' ';
+                }
+                line[state -> cursor_x] = '"';
+                line[state -> cursor_x + 1] = '"';
+                line[state -> cursor_x + 2] = '\0';
+            } else {
+                memmove( & line[state -> cursor_x + 2], & line[state -> cursor_x], len - state -> cursor_x + 1);
+                line[state -> cursor_x] = '"';
+                line[state -> cursor_x + 1] = '"';
+            }
+            state -> cursor_x++;
+            update_dirty_status(state);
+            return;
+        } else if (c == '\'' && len < MAX_LINE_LENGTH - 1) {
+            if (state -> cursor_x > len) {
+                for (int i = len; i < state -> cursor_x; i++) {
+                    line[i] = ' ';
+                }
+                line[state -> cursor_x] = '\'';
+                line[state -> cursor_x + 1] = '\'';
+                line[state -> cursor_x + 2] = '\0';
+            } else {
+                memmove( & line[state -> cursor_x + 2], & line[state -> cursor_x], len - state -> cursor_x + 1);
+                line[state -> cursor_x] = '\'';
+                line[state -> cursor_x + 1] = '\'';
+            }
+            state -> cursor_x++;
+            update_dirty_status(state);
+            return;
+        } else if (c == ')' && state -> cursor_x < len && line[state -> cursor_x] == ')') {
+            state -> cursor_x++;
+            return;
+        } else if (c == '}' && state -> cursor_x < len && line[state -> cursor_x] == '}') {
+            state -> cursor_x++;
+            return;
+        } else if (c == ']' && state -> cursor_x < len && line[state -> cursor_x] == ']') {
+            state -> cursor_x++;
+            return;
+        } else if (c == '"' && state -> cursor_x < len && line[state -> cursor_x] == '"') {
+            state -> cursor_x++;
+            return;
+        } else if (c == '\'' && state -> cursor_x < len && line[state -> cursor_x] == '\'') {
+            state -> cursor_x++;
+            return;
+        }
+    }
+
     if (len < MAX_LINE_LENGTH - 1) {
         if (state -> cursor_x > len) {
-
             for (int i = len; i < state -> cursor_x; i++) {
                 line[i] = ' ';
             }
@@ -111,7 +210,7 @@ void insert_char(EditorState* state, char c)
         update_dirty_status(state);
     }
 
-    // Auto-complete logic
+    
     if (state->auto_complete_enabled) {
         if (c == '(' && len < MAX_LINE_LENGTH - 1) {
             if (state -> cursor_x > len) {
@@ -305,7 +404,7 @@ void new_line(EditorState* state)
     }
     char * line = state -> lines[state -> cursor_y];
 
-    // Check if cursor is between a pair and split it
+    
     int split_pair = 0;
     char closing_char = 0;
     int after_pos = 0;
@@ -319,7 +418,7 @@ void new_line(EditorState* state)
             (before == '[' && after == ']')) {
             split_pair = 1;
             closing_char = after;
-            // Remove from cursor_x to after_pos + 1
+            
             int remove_start = state->cursor_x;
             int remove_end = after_pos + 1;
             memmove(&line[remove_start], &line[remove_end], strlen(line) - remove_end + 1);
@@ -394,7 +493,7 @@ void new_line(EditorState* state)
     
 
     if (split_pair) {
-        // Create two new lines for pair splitting
+        
         char * empty_line = (char * ) malloc(MAX_LINE_LENGTH);
         if (!empty_line) {
             show_status(state, "Memory allocation failed");
@@ -407,7 +506,7 @@ void new_line(EditorState* state)
             return;
         }
 
-        // Empty line with indentation
+        
         int indent_len = 0;
         for (int i = 0; i < base_indent && indent_len < MAX_LINE_LENGTH - 1; i++) {
             empty_line[indent_len++] = line[i];
@@ -417,7 +516,7 @@ void new_line(EditorState* state)
         }
         empty_line[indent_len] = '\0';
 
-        // Closing line with same indentation + closing char
+        
         indent_len = 0;
         for (int i = 0; i < base_indent && indent_len < MAX_LINE_LENGTH - 1; i++) {
             closing_line[indent_len++] = line[i];
@@ -430,7 +529,7 @@ void new_line(EditorState* state)
 
         line[state -> cursor_x] = '\0';
 
-        // Insert two lines
+        
         for (int i = state -> line_count + 1; i > state -> cursor_y + 2; i--) {
             state -> lines[i] = state -> lines[i - 2];
         }
@@ -438,12 +537,12 @@ void new_line(EditorState* state)
         state -> lines[state -> cursor_y + 2] = closing_line;
         state -> line_count += 2;
         state -> cursor_y++;
-        state -> cursor_x = indent_len - 1; // Position at end of indentation on empty line
+        state -> cursor_x = indent_len - 1; 
         move_cursor(state, 0, 0);
         napms(10);
         update_dirty_status(state);
     } else {
-        // Original logic for non-pair splitting
+        
         char * new_line = (char * ) malloc(MAX_LINE_LENGTH);
         if (!new_line) {
             show_status(state, "Memory allocation failed");
@@ -675,14 +774,14 @@ void copy_to_system_clipboard(const char* text)
     
     int is_wayland = getenv("WAYLAND_DISPLAY") != NULL;
     if (is_wayland) {
-        system("cat '/tmp/kilo_editor_clipboard_temp.txt' | wl-copy 2>/dev/null &");
+        system("cat '/tmp/root_editor_clipboard_temp.txt' | wl-copy 2>/dev/null &");
     } else {
-        system("cat '/tmp/kilo_editor_clipboard_temp.txt' | xclip -selection clipboard 2>/dev/null &");
-        system("cat '/tmp/kilo_editor_clipboard_temp.txt' | xclip -selection primary 2>/dev/null &");
+        system("cat '/tmp/root_editor_clipboard_temp.txt' | xclip -selection clipboard 2>/dev/null &");
+        system("cat '/tmp/root_editor_clipboard_temp.txt' | xclip -selection primary 2>/dev/null &");
     }
 
     
-    system("rm -f '/tmp/kilo_editor_clipboard_temp.txt' 2>/dev/null &");
+    system("rm -f '/tmp/root_editor_clipboard_temp.txt' 2>/dev/null &");
 }
 void toggle_help(EditorState* state)
 {
