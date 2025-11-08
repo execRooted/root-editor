@@ -56,7 +56,7 @@ void render_screen(EditorState* state)
         int screen_row = 3;
         int logical_line = state->scroll_offset;
         int offset_in_line = 0;
-        while (screen_row < max_y - 1 && logical_line < state->line_count) {
+        while (screen_row < max_y - 2 && logical_line < state->line_count) {
                 char *line = state->lines[logical_line];
                 int line_len = strlen(line);
                 // print line number or ->
