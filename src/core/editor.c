@@ -665,10 +665,9 @@ void move_cursor(EditorState* state, int dx, int dy)
     }
 
     int max_y = max_y_screen;
-    if (state -> cursor_y <= state -> scroll_offset - 1) {
-        state -> scroll_offset = state -> cursor_y - 1;
+    if (state -> cursor_y < state -> scroll_offset) {
+        state -> scroll_offset = state -> cursor_y;
         if (state -> scroll_offset < 0) state -> scroll_offset = 0;
-        state -> cursor_y = state -> scroll_offset;
     } else if (state -> cursor_y >= state -> scroll_offset + max_y - 5) {
         state -> scroll_offset = state -> cursor_y - max_y + 6;
     }
