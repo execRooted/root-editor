@@ -103,8 +103,8 @@ typedef struct EditorState {
     time_t last_input_time;
     int rapid_input_mode;
     int char_select_mode;
+    int has_trailing_newline;
 
-    
     Plugin plugins[MAX_PLUGINS];
     int plugin_count;
 

@@ -41,7 +41,14 @@ void load_file(EditorState* state, const char* filename)
                 size_t read_size = fread(content, 1, file_size, file);
                 content[read_size] = '\0';
 
+                state->has_trailing_newline = (read_size > 0 && content[read_size - 1] == '\n');
+
                 
+                if (read_size > 0 && content[read_size - 1] == '\n') {
+                        content[read_size - 1] = '\0';
+                        read_size--;
+                }
+
                 char* line_start = content;
                 char* ptr = content;
                 while (*ptr && state -> line_count < MAX_LINES) {
@@ -62,7 +69,7 @@ void load_file(EditorState* state, const char* filename)
                         ptr++;
                 }
 
-                
+
                 if (line_start < ptr && state -> line_count < MAX_LINES) {
                         state -> lines[state -> line_count] = (char * ) malloc(MAX_LINE_LENGTH);
                         if (!state -> lines[state -> line_count]) {
@@ -74,14 +81,6 @@ void load_file(EditorState* state, const char* filename)
                         strncpy(state -> lines[state -> line_count], line_start, MAX_LINE_LENGTH - 1);
                         state -> lines[state -> line_count][MAX_LINE_LENGTH - 1] = '\0';
                         state -> line_count++;
-                }
-
-                if (state->line_count > 0 && strlen(state->lines[state->line_count - 1]) > 0 && state->line_count < MAX_LINES) {
-                        state->lines[state->line_count] = (char*)malloc(MAX_LINE_LENGTH);
-                        if (state->lines[state->line_count]) {
-                                state->lines[state->line_count][0] = '\0';
-                                state->line_count++;
-                        }
                 }
 
                 free(content);
@@ -149,15 +148,21 @@ void save_file(EditorState* state)
         }
 
         for (int i = 0; i < state -> line_count; i++) {
-                if (i == state->line_count - 1 && strlen(state->lines[i]) == 0) {
-                        continue;
-                }
-                if (fprintf(file, "%s\n", state -> lines[i]) < 0) {
+                if (fprintf(file, "%s", state -> lines[i]) < 0) {
                         char error_msg[256];
                         snprintf(error_msg, sizeof(error_msg), "Error: Failed to write to file (%s)", strerror(errno));
                         show_status(state, error_msg);
                         fclose(file);
                         return;
+                }
+                if (i < state->line_count - 1 || state->has_trailing_newline) {
+                        if (fprintf(file, "\n") < 0) {
+                                char error_msg[256];
+                                snprintf(error_msg, sizeof(error_msg), "Error: Failed to write to file (%s)", strerror(errno));
+                                show_status(state, error_msg);
+                                fclose(file);
+                                return;
+                        }
                 }
         }
 
