@@ -707,6 +707,16 @@ void highlight_line(EditorState* state, int line_num, int screen_row, int line_n
 
     int col = line_num_width;
 
+    int in_double_quote = 0;
+    int in_single_quote = 0;
+    for (int check_i = 0; check_i < start_col; check_i++) {
+        if (line[check_i] == '"' && (check_i == 0 || line[check_i-1] != '\\')) {
+            in_double_quote = !in_double_quote;
+        } else if (line[check_i] == '\'' && (check_i == 0 || line[check_i-1] != '\\')) {
+            in_single_quote = !in_single_quote;
+        }
+    }
+
     for (int i = start_col; i < end_col && col < max_x - 1; ) {
         if (in_block_comment) {
             int close_pos = -1;
@@ -883,30 +893,41 @@ void highlight_line(EditorState* state, int line_num, int screen_row, int line_n
              int start = i++;
              int found_closing = 0;
              
-             while (i < len && line[i] != quote) {
-                 if (line[i]=='\\' && i+1<len) i++;
-                 i++;
+             int string_end = i;
+             while (string_end < len && line[string_end] != quote) {
+                 if (line[string_end]=='\\' && string_end+1<len) string_end++;
+                 string_end++;
              }
-             if (i < len) {
-                 i++;
+             if (string_end < len) {
+                 string_end++;
                  found_closing = 1;
              } else {
                  
-                 for (int ln = line_num + 1; ln < state->line_count && !found_closing; ln++) {
-                     char* check_line = state->lines[ln];
-                     if (!check_line) continue;
-                     int check_len = strlen(check_line);
-                     for (int j = 0; j < check_len; j++) {
-                         if (check_line[j] == quote) {
-                             found_closing = 1;
-                             break;
-                         }
-                     }
+                 int full_string_end = i;
+                 while (full_string_end < len && line[full_string_end] != quote) {
+                     if (line[full_string_end]=='\\' && full_string_end+1<len) full_string_end++;
+                     full_string_end++;
+                 }
+                 if (full_string_end < len) {
+                     found_closing = 1;
                  }
              }
+             
+             if ((quote == '"' && in_double_quote) || (quote == '\'' && in_single_quote)) {
+                 found_closing = 1;
+             }
+
+             int print_len = (string_end <= end_col) ? string_end - start : end_col - start;
              attron(COLOR_PAIR(found_closing ? COLOR_STRING : COLOR_ERROR));
-             mvprintw(screen_row, col, "%.*s", i-start, &line[start]);
-             col += i-start;
+             mvprintw(screen_row, col, "%.*s", print_len, &line[start]);
+             col += print_len;
+             i = (string_end <= end_col) ? string_end : end_col;
+
+             
+             if (quote == '"' && !in_double_quote) in_double_quote = 1;
+             else if (quote == '"' && in_double_quote) in_double_quote = 0;
+             else if (quote == '\'' && !in_single_quote) in_single_quote = 1;
+             else if (quote == '\'' && in_single_quote) in_single_quote = 0;
              attroff(COLOR_PAIR(found_closing ? COLOR_STRING : COLOR_ERROR));
              continue;
          }
