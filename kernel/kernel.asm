@@ -213,22 +213,6 @@ execute_command:
     mov di, cmd_shutdown
     call compare_string
     je .shutdown
-
-    
-    mov di, cmd_ifconfig
-    call compare_string
-    je .show_ifconfig
-
-    
-    mov di, cmd_connect
-    call compare_string
-    je .connect_internet
-
-    
-    mov di, cmd_ping
-    call compare_string
-    je .ping_command
-
     mov di, cmd_echo
     call compare_string
     je .echo_command
@@ -312,26 +296,6 @@ execute_command:
     
     jmp $
 
-.show_ifconfig:
-    call show_interfaces
-    ret
-
-.connect_internet:
-    call connect_to_internet
-    ret
-
-.ping_command:
-    
-    add si, 5
-    cmp byte [si], 0
-    je .ping_no_ip
-    call ping_ip
-    ret
-
-.ping_no_ip:
-    mov si, ping_usage_msg
-    call print_string
-    ret
 
 .echo_command:
     add si, 5
@@ -658,20 +622,6 @@ compare_string:
     ret
 
 
-show_interfaces:
-    mov si, ifconfig_msg
-    call print_string
-    ret
-
-connect_to_internet:
-    mov si, connect_msg
-    call print_string
-    ret
-
-ping_ip:
-    mov si, ping_msg
-    call print_string
-    ret
 
 
 
@@ -685,9 +635,6 @@ cmd_make db "make", 0
 cmd_delete db "delete", 0
 cmd_clear db "clear", 0
 cmd_shutdown db "shutdown", 0
-cmd_ifconfig db "ifconfig", 0
-cmd_connect db "connect", 0
-cmd_ping db "ping", 0
 cmd_echo db "echo", 0
 cmd_show db "show", 0
 cmd_edit db "edit", 0
@@ -703,9 +650,6 @@ help_msg db "Available commands:", 0x0D, 0x0A
           db "  make    - Create a file (make filename)", 0x0D, 0x0A
           db "  delete  - Delete a file (delete filename)", 0x0D, 0x0A
           db "  clear   - Clear screen", 0x0D, 0x0A
-          db "  ifconfig- Show network interfaces", 0x0D, 0x0A
-          db "  connect - Connect to internet", 0x0D, 0x0A
-          db "  ping    - Ping an IP address (ping ip)", 0x0D, 0x0A
           db "  echo    - Print text", 0x0D, 0x0A
           db "  show    - Display file contents (show filename)", 0x0D, 0x0A
           db "  edit    - Edit file content (edit filename content)", 0x0D, 0x0A
@@ -726,16 +670,6 @@ unknown_msg db "Unknown command. Type 'help' for available commands.", 0x0D, 0x0
 empty_file_msg db "File is empty", 0x0D, 0x0A, 0
 shutdown_msg db "Shutting down root_OS by execRooted...", 0x0D, 0x0A, 0
 
-ifconfig_msg db "Network interfaces:", 0x0D, 0x0A
-             db "eth0: RTL8139 (MAC: 52:54:00:12:34:56, IP: 10.0.2.15)", 0x0D, 0x0A, 0
-
-connect_msg db "Connecting to internet via DHCP...", 0x0D, 0x0A
-            db "IP assigned: 10.0.2.15, Gateway: 10.0.2.2, DNS: 10.0.2.3", 0x0D, 0x0A, 0
-
-ping_msg db "Pinging IP address...", 0x0D, 0x0A
-         db "Reply from 10.0.2.2: time<1ms", 0x0D, 0x0A, 0
-
-ping_usage_msg db "Usage: ping ip_address", 0x0D, 0x0A, 0
 
 show_no_name_msg db "Usage: show filename", 0x0D, 0x0A, 0
 edit_no_name_msg db "Usage: edit filename content", 0x0D, 0x0A, 0
