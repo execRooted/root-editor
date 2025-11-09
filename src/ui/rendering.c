@@ -3,6 +3,7 @@
 #define FILE_TYPE_PLAIN   0
 #define COLOR_DEFAULT     13
 #define COLOR_SELECTION   29
+#define COLOR_ERROR       31
 
 char * get_system_clipboard();
 
@@ -796,8 +797,9 @@ void init_theme_colors(EditorState* state)
         init_pair(25, COLOR_MAGENTA,  -1);
         init_pair(26, COLOR_BLUE,  -1);
         init_pair(27, COLOR_YELLOW,  -1);
-        init_pair(29, COLOR_BLACK, COLOR_CYAN); 
-        init_pair(30, COLOR_BLACK, COLOR_WHITE); 
+        init_pair(29, COLOR_BLACK, COLOR_CYAN);
+        init_pair(30, COLOR_BLACK, COLOR_WHITE);
+        init_pair(31, COLOR_RED, -1);  
     } else if (t == 3) {
         init_pair(1,  COLOR_WHITE,  -1);
         init_pair(6,  COLOR_WHITE,  -1);
@@ -824,7 +826,8 @@ void init_theme_colors(EditorState* state)
         init_pair(25, COLOR_MAGENTA,  -1);
         init_pair(26, COLOR_BLUE,  -1);
         init_pair(27, COLOR_YELLOW,  -1);
-        init_pair(29, COLOR_BLACK, COLOR_MAGENTA); 
+        init_pair(29, COLOR_BLACK, COLOR_MAGENTA);
+        init_pair(31, COLOR_RED, -1);  
     }
 
 }

@@ -737,12 +737,90 @@ void highlight_line(EditorState* state, int line_num, int screen_row, int line_n
         if (isspace(ch)) { mvaddch(screen_row, col++, ch); i++; continue; }
 
         if (is_bracket(ch)) {
-            attron(COLOR_PAIR(COLOR_DELIMITER));
-            mvaddch(screen_row, col++, ch);
-            attroff(COLOR_PAIR(COLOR_DELIMITER));
-            i++;
-            continue;
-        }
+             int is_unmatched = 0;
+             if (ch == '(' || ch == '[' || ch == '{' || ch == '"' || ch == '\'') {
+                 
+                 char closing = (ch == '(') ? ')' : (ch == '[') ? ']' : (ch == '{') ? '}' : ch;
+                 int stack = 0;
+                 int found_closing = 0;
+
+                 
+                 for (int j = i; j < len; j++) {
+                     if (line[j] == ch) stack++;
+                     else if (line[j] == closing) {
+                         stack--;
+                         if (stack == 0) {
+                             found_closing = 1;
+                             break;
+                         }
+                     }
+                 }
+
+                 
+                 if (!found_closing) {
+                     for (int ln = line_num + 1; ln < state->line_count && !found_closing; ln++) {
+                         char* check_line = state->lines[ln];
+                         if (!check_line) continue;
+                         int check_len = strlen(check_line);
+                         for (int j = 0; j < check_len; j++) {
+                             if (check_line[j] == ch) stack++;
+                             else if (check_line[j] == closing) {
+                                 stack--;
+                                 if (stack == 0) {
+                                     found_closing = 1;
+                                     break;
+                                 }
+                             }
+                         }
+                     }
+                 }
+
+                 if (!found_closing) is_unmatched = 1;
+             } else if (ch == ')' || ch == ']' || ch == '}') {
+                 
+                 char opening = (ch == ')') ? '(' : (ch == ']') ? '[' : '{';
+                 int stack = 0;
+                 int found_opening = 0;
+
+                 
+                 for (int j = i; j >= 0; j--) {
+                     if (line[j] == ch) stack++;
+                     else if (line[j] == opening) {
+                         stack--;
+                         if (stack == 0) {
+                             found_opening = 1;
+                             break;
+                         }
+                     }
+                 }
+
+                 
+                 if (!found_opening) {
+                     for (int ln = line_num - 1; ln >= 0 && !found_opening; ln--) {
+                         char* check_line = state->lines[ln];
+                         if (!check_line) continue;
+                         int check_len = strlen(check_line);
+                         for (int j = check_len - 1; j >= 0; j--) {
+                             if (check_line[j] == ch) stack++;
+                             else if (check_line[j] == opening) {
+                                 stack--;
+                                 if (stack == 0) {
+                                     found_opening = 1;
+                                     break;
+                                 }
+                             }
+                         }
+                     }
+                 }
+
+                 if (!found_opening) is_unmatched = 1;
+             }
+             attron(COLOR_PAIR(is_unmatched ? COLOR_ERROR : COLOR_DELIMITER));
+             mvaddch(screen_row, col++, ch);
+             attroff(COLOR_PAIR(is_unmatched ? COLOR_ERROR : COLOR_DELIMITER));
+             i++;
+             continue;
+         }
 
         if ((state->file_type==FILE_TYPE_PYTHON && ch=='#') ||
             (ch=='/' && i+1<len && (line[i+1]=='/' || line[i+1]=='*'))) {
@@ -801,19 +879,37 @@ void highlight_line(EditorState* state, int line_num, int screen_row, int line_n
 
         
         if (ch=='"' || ch=='\'') {
-            char quote = ch;
-            int start = i++;
-            while (i < len && line[i] != quote) {
-                if (line[i]=='\\' && i+1<len) i++;
-                i++;
-            }
-            if (i < len) i++;
-            attron(COLOR_PAIR(COLOR_STRING));
-            mvprintw(screen_row, col, "%.*s", i-start, &line[start]);
-            col += i-start;
-            attroff(COLOR_PAIR(COLOR_STRING));
-            continue;
-        }
+             char quote = ch;
+             int start = i++;
+             int found_closing = 0;
+             
+             while (i < len && line[i] != quote) {
+                 if (line[i]=='\\' && i+1<len) i++;
+                 i++;
+             }
+             if (i < len) {
+                 i++;
+                 found_closing = 1;
+             } else {
+                 
+                 for (int ln = line_num + 1; ln < state->line_count && !found_closing; ln++) {
+                     char* check_line = state->lines[ln];
+                     if (!check_line) continue;
+                     int check_len = strlen(check_line);
+                     for (int j = 0; j < check_len; j++) {
+                         if (check_line[j] == quote) {
+                             found_closing = 1;
+                             break;
+                         }
+                     }
+                 }
+             }
+             attron(COLOR_PAIR(found_closing ? COLOR_STRING : COLOR_ERROR));
+             mvprintw(screen_row, col, "%.*s", i-start, &line[start]);
+             col += i-start;
+             attroff(COLOR_PAIR(found_closing ? COLOR_STRING : COLOR_ERROR));
+             continue;
+         }
 
         
 
