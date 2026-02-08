@@ -244,3 +244,4 @@ void delete_selected_text(EditorState* state)
         clear_selection(state);
         
 }
+

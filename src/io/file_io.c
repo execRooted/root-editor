@@ -563,4 +563,5 @@ void safe_quit(EditorState* state)
                         return;
                 }
         }
+        
 }

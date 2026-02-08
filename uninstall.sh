@@ -2,7 +2,7 @@
 
 set -e
 
-RED='\033[0;31m'
+RED='\033[0;31m' 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
@@ -58,7 +58,5 @@ sudo rm -rf /usr/local/share/root-editor
 echo -e "${BLUE}[INFO]${NC} Removing desktop entry..."
 sudo rm -f /usr/share/applications/root-editor.desktop
 
-
 echo
 echo -e "${GREEN}[SUCCESS]${NC} root-editor has been uninstalled successfully!"
-
