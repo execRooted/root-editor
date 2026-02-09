@@ -37,7 +37,6 @@ root-editor [filename]
 ## Features
 
 - **Syntax Highlighting**: Supports highlighting for various programming languages.
-- **Themes**: Customizable color schemes for a personalized editing experience.
 - **Plugin Support**: Extensible architecture allowing users to add custom functionality via shared libraries.
 - **Cross-Platform**: Built for Linux systems with ncurses.
 
