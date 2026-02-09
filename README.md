@@ -37,7 +37,6 @@ root-editor [filename]
 
 - **Syntax Highlighting**: Supports highlighting for various programming languages.
 - **Plugin Support**: Extensible architecture allowing users to add custom functionality via shared libraries.
-- **Cross-Platform**: Built for Linux systems with ncurses.
 
 
 
@@ -87,12 +86,9 @@ root-editor features a selection mode that allows you to select and edit text ef
 - **Home/End**: Move to line start/end and extend selection
 
 #### Exiting Selection Mode
-- **Esc**: First press marks for exit (shows "SELECT" in status)
+- **Esc**: First press marks for exit (shows "SELECT" in status (that's how you know you're in Select mode))
 - **Enter**: Second press exits selection mode, re-enables syntax highlighting and enables writing
 
-#### Exiting Find mode:
-- **Esc**: First press marks for exit (shows "FIND" in status)
-- **Enter**: Second press exits Find mode, re-enables syntax highlighting and enables writing
 
 #### Selection Operations
 - **Ctrl+W**: Starts selection mode
@@ -106,7 +102,13 @@ root-editor features a selection mode that allows you to select and edit text ef
 - Status bar shows "SELECT" when in selection mode
 - Syntax highlighting is disabled during selection for better visibility
 
+### Find Mode
 
+This is a mode you can enter using ctrl f. It's preety straight-forward to use; it's an implementation to help you find text more easely
+
+#### Exiting Find mode:
+- **Esc**: First press marks for exit (shows "FIND" in status (that's how u know you're in Find mode))
+- **Enter**: Second press exits Find mode, re-enables syntax highlighting and enables writing
 
 ## Plugins
 
