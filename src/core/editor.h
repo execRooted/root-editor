@@ -78,7 +78,7 @@ typedef struct EditorState {
     time_t key_timestamps[256];
     int syntax_enabled;
     int syntax_display_enabled;
-    int editor_mode; 
+    int editor_mode;
     int auto_tabbing_enabled;
     int file_type;
     char** keywords;
@@ -107,6 +107,15 @@ typedef struct EditorState {
 
     Plugin plugins[MAX_PLUGINS];
     int plugin_count;
+
+    // Find mode state
+    int find_mode;
+    char find_search_term[256];
+    int* find_match_lines;
+    int* find_match_positions;
+    int find_match_count;
+    int find_current_match;
+    int find_escape_pressed;
 
 } EditorState;
 

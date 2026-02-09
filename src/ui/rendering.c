@@ -40,7 +40,7 @@ void render_screen(EditorState* state)
         }
 
         
-        const char* mode_text = (state->select_mode == 1 || state->select_mode == 2) ? "SELECT" : "TEXT";
+        const char* mode_text = state->find_mode ? "FIND" : (state->select_mode == 1 || state->select_mode == 2) ? "SELECT" : "TEXT";
 
         attroff(COLOR_PAIR(1) | A_BOLD);
 
@@ -75,7 +75,7 @@ void render_screen(EditorState* state)
                         int start = offset_in_line;
                         int end = start + avail_width;
                         if (end > line_len) end = line_len;
-                        if (state->syntax_enabled && state->syntax_display_enabled && !state->select_mode) {
+                        if (state->syntax_enabled && state->syntax_display_enabled && !state->select_mode && !state->find_mode) {
                                 highlight_line(state, logical_line, screen_row, text_start_col, offset_in_line);
                         } else {
                                 
@@ -87,9 +87,23 @@ void render_screen(EditorState* state)
                                                 logical_line <= state->select_end_y &&
                                                 i >= (logical_line == state->select_start_y ? state->select_start_x : 0) &&
                                                 i < (logical_line == state->select_end_y ? state->select_end_x : line_len);
+                                        
+                                        // Check if this is the current find match
+                                        int is_find_match = 0;
+                                        if (state->find_mode && state->find_match_positions && state->find_match_lines) {
+                                                int term_len = strlen(state->find_search_term);
+                                                int current_pos = state->find_match_positions[state->find_current_match];
+                                                int current_match_line = state->find_match_lines[state->find_current_match];
+                                                int current_line = logical_line;
+                                                is_find_match = (current_line == current_match_line &&
+                                                                i >= current_pos &&
+                                                                i < current_pos + term_len);
+                                        }
 
                                         if (is_selected) {
                                                 attron(A_REVERSE);
+                                        } else if (is_find_match) {
+                                                attron(COLOR_PAIR(29) | A_BOLD);  // Yellow for find match
                                         } else {
                                                 attron(COLOR_PAIR(COLOR_DEFAULT));
                                         }
@@ -97,6 +111,8 @@ void render_screen(EditorState* state)
                                         mvaddch(screen_row, col++, line[i]);
                                         if (is_selected) {
                                                 attroff(A_REVERSE);
+                                        } else if (is_find_match) {
+                                                attroff(COLOR_PAIR(29) | A_BOLD);
                                         }
                                         attroff(COLOR_PAIR(COLOR_DEFAULT));
                                         i++;
@@ -114,7 +130,7 @@ void render_screen(EditorState* state)
                         if (state->select_mode &&
                             logical_line >= state->select_start_y &&
                             logical_line <= state->select_end_y) {
-                            int is_selected = 1; 
+                            int is_selected = 1;
                             if (is_selected) {
                                 attron(A_REVERSE);
                             } else {
@@ -208,16 +224,33 @@ void render_screen(EditorState* state)
         const char* sticky_cursor_status = (state->sticky_cursor_enabled ? "ON" : "OFF");
         const char* autocomplete_status = (state->auto_complete_enabled ? "ON" : "OFF");
         const char* edited_indicator = (state->dirty ? " [edited]" : "");
-        mvprintw(max_y - 1, 0, "Line: %d, Col: %d | %s%s | Mode: %s | Syntax HL: %s | Auto Tabbing: %s | Sticky Cursor: %s | Autocomplete: %s | Words: %d",
-                  state->cursor_y + 1, state->cursor_x + 1,
-                  state->filename[0] ? state->filename : "[Untitled]",
-                  edited_indicator,
-                  mode_text,
-                  syntax_status,
-                  state->auto_tabbing_enabled ? "ON" : "OFF",
-                  sticky_cursor_status,
-                  autocomplete_status,
-                  words);
+        
+        // Build status bar with or without occurences
+        if (state->find_mode && state->find_match_count > 0) {
+                mvprintw(max_y - 1, 0, "Line: %d, Col: %d | %s%s | Mode: %s | Occurences: %d/%d | Syntax HL: %s | Auto Tabbing: %s | Sticky Cursor: %s | Autocomplete: %s | Words: %d",
+                          state->cursor_y + 1, state->cursor_x + 1,
+                          state->filename[0] ? state->filename : "[Untitled]",
+                          edited_indicator,
+                          mode_text,
+                          state->find_current_match + 1,
+                          state->find_match_count,
+                          syntax_status,
+                          state->auto_tabbing_enabled ? "ON" : "OFF",
+                          sticky_cursor_status,
+                          autocomplete_status,
+                          words);
+        } else {
+                mvprintw(max_y - 1, 0, "Line: %d, Col: %d | %s%s | Mode: %s | Syntax HL: %s | Auto Tabbing: %s | Sticky Cursor: %s | Autocomplete: %s | Words: %d",
+                          state->cursor_y + 1, state->cursor_x + 1,
+                          state->filename[0] ? state->filename : "[Untitled]",
+                          edited_indicator,
+                          mode_text,
+                          syntax_status,
+                          state->auto_tabbing_enabled ? "ON" : "OFF",
+                          sticky_cursor_status,
+                          autocomplete_status,
+                          words);
+        }
         attroff(COLOR_PAIR(1) | A_BOLD);
 
         move(cursor_visual_row, screen_cursor_col);
@@ -397,58 +430,38 @@ void find_all_occurrences(EditorState* state,
             }
             if(!found) unique_lines[unique_count++] = line;
         }
-        char msg[512] = "Found ";
-        strncat(msg, search_term, sizeof(msg) - strlen(msg) - 1);
-        strncat(msg, " on the lines ", sizeof(msg) - strlen(msg) - 1);
-        int len = strlen(msg);
-        for(int j=0; j<unique_count; j++){
-            char num[16];
-            snprintf(num, sizeof(num), "%d", unique_lines[j] + 1);
-            if(j>0) {
-                if(len + 1 < sizeof(msg)) { msg[len++] = ';'; }
-            }
-            if(len + strlen(num) < sizeof(msg)) {
-                strcpy(msg + len, num);
-                len += strlen(num);
-            }
+        
+        // Only enter find mode if there are matches
+        if (match_count > 0) {
+                navigate_matches(state, search_term, match_lines, match_positions, match_count);
+        } else {
+                // Free match arrays if no matches
+                free(match_lines);
+                free(match_positions);
+                show_status(state, "Occurences: 0");
         }
-        show_status(state, msg);
-
-        navigate_matches(state, search_term, match_lines, match_positions, match_count);
-
-        free(match_lines);
-        free(match_positions);
 }
 
 void navigate_matches(EditorState* state,
         const char* search_term, int* match_lines, int* match_positions, int match_count)
 {
-        static int current_match = 0;
-
         if (match_count == 0) return;
 
-        current_match = 0;
-        jump_to_match(state, match_lines[current_match], match_positions[current_match]);
+        // Store match data in state
+        state->find_mode = 1;
+        state->find_escape_pressed = 0;
+        state->find_match_count = match_count;
+        state->find_current_match = 0;
+        state->find_match_lines = match_lines;
+        state->find_match_positions = match_positions;
+        strncpy(state->find_search_term, search_term, sizeof(state->find_search_term) - 1);
+        state->find_search_term[sizeof(state->find_search_term) - 1] = '\0';
 
-        timeout(2000);
+        // Jump to first match
+        jump_to_match(state, match_lines[0], match_positions[0]);
 
-        while (1) {
-                int ch = getch();
-
-                if (ch == '\n' || ch == KEY_ENTER) {
-
-                        current_match = (current_match + 1) % match_count;
-                        jump_to_match(state, match_lines[current_match], match_positions[current_match]);
-                } else if (ch == 27) {
-
-                        break;
-                } else if (ch == ERR) {
-
-                        break;
-                }
-        }
-
-        timeout(-1);
+        // Render screen to show the first match
+        render_screen(state);
 }
 
 void jump_to_match(EditorState* state, int line_num, int position)

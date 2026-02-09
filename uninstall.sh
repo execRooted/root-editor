@@ -10,9 +10,10 @@ NC='\033[0m'
 
 clear
 echo -e "${BLUE}=========================================${NC}"
-echo -e "${BLUE}    ROOT-EDITOR UNINSTALLER             ${NC}"
+echo -e "${BLUE}    ROOT-EDITOR UNINSTALLER      ${NC}"
 echo -e "${BLUE}=========================================${NC}"
 echo
+
 
 
 if [ "$EUID" -ne 0 ]; then

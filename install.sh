@@ -220,3 +220,4 @@ echo
 echo -e "${YELLOW}[NOTE]${NC} Make sure /usr/local/bin is in your PATH if it's not already."
 
 
+

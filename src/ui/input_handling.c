@@ -131,6 +131,11 @@ char* get_system_clipboard()
 void handle_input(EditorState* state, int ch)
 {
 
+        // Don't allow typing in find mode or selection mode
+        if ((state->find_mode || state->select_mode) && ch >= 32 && ch <= 126) {
+                return;
+        }
+
         if (ch >= 32 && ch <= 126) {
                 reset_key_states(state);
                 insert_char(state, ch);
@@ -155,7 +160,29 @@ void handle_input(EditorState* state, int ch)
         switch (ch)
         {
         case KEY_UP:
-                if (state->char_select_mode)
+                if (state->find_mode)
+                {
+                        // Navigate to previous match
+                        if (state->find_match_count > 0) {
+                                state->find_current_match = (state->find_current_match - 1 + state->find_match_count) % state->find_match_count;
+                                int line = state->find_match_lines[state->find_current_match];
+                                int pos = state->find_match_positions[state->find_current_match];
+                                state->cursor_y = line;
+                                state->cursor_x = pos;
+                                state->select_start_x = pos;
+                                state->select_start_y = line;
+                                state->select_end_x = pos + strlen(state->find_search_term);
+                                state->select_end_y = line;
+                                // Adjust scroll
+                                int max_y, max_x;
+                                getmaxyx(stdscr, max_y, max_x);
+                                if (state->cursor_y < state->scroll_offset) {
+                                        state->scroll_offset = state->cursor_y;
+                                } else if (state->cursor_y >= state->scroll_offset + max_y - 32) {
+                                        state->scroll_offset = state->cursor_y - max_y + 6;
+                                }
+                        }
+                } else if (state->char_select_mode)
                 {
                         move_cursor(state, 0, -1);
                         extend_selection(state);
@@ -172,11 +199,33 @@ void handle_input(EditorState* state, int ch)
                 }
                 break;
         case KEY_DOWN:
-                if (state->char_select_mode) 
+                if (state->find_mode)
+                {
+                        // Navigate to next match
+                        if (state->find_match_count > 0) {
+                                state->find_current_match = (state->find_current_match + 1) % state->find_match_count;
+                                int line = state->find_match_lines[state->find_current_match];
+                                int pos = state->find_match_positions[state->find_current_match];
+                                state->cursor_y = line;
+                                state->cursor_x = pos;
+                                state->select_start_x = pos;
+                                state->select_start_y = line;
+                                state->select_end_x = pos + strlen(state->find_search_term);
+                                state->select_end_y = line;
+                                // Adjust scroll
+                                int max_y, max_x;
+                                getmaxyx(stdscr, max_y, max_x);
+                                if (state->cursor_y < state->scroll_offset) {
+                                        state->scroll_offset = state->cursor_y;
+                                } else if (state->cursor_y >= state->scroll_offset + max_y - 32) {
+                                        state->scroll_offset = state->cursor_y - max_y + 6;
+                                }
+                        }
+                } else if (state->char_select_mode)
                 {
                         move_cursor(state, 0, 1);
                         extend_selection(state);
-                } else if (selection_started_with_shift) 
+                } else if (selection_started_with_shift)
                 {
                         move_cursor(state, 0, 1);
                         extend_selection(state);
@@ -264,6 +313,10 @@ void handle_input(EditorState* state, int ch)
         case KEY_BACKSPACE:
         case KEY_DC:
         case 127:
+                // Don't allow deleting in find mode
+                if (state->find_mode) {
+                        break;
+                }
                 if (state -> select_mode && has_selection(state)) {
                         delete_selected_text(state);
                 } else if (state -> select_mode) {
@@ -274,7 +327,25 @@ void handle_input(EditorState* state, int ch)
                 break;
         case KEY_ENTER:
         case '\n':
-                if (state->select_mode == 2) {
+                if (state->find_escape_pressed) {
+                        // Exit find mode after ESC was pressed
+                        state->find_mode = 0;
+                        state->find_escape_pressed = 0;
+                        // Free the match data
+                        if (state->find_match_lines) {
+                                free(state->find_match_lines);
+                                state->find_match_lines = NULL;
+                        }
+                        if (state->find_match_positions) {
+                                free(state->find_match_positions);
+                                state->find_match_positions = NULL;
+                        }
+                        state->find_match_count = 0;
+                        return;
+                } else if (state->find_mode) {
+                        // In find mode, Enter does nothing
+                        return;
+                } else if (state->select_mode == 2) {
                         clear_selection(state);
                         state->syntax_display_enabled = 1;
                         return;
@@ -462,7 +533,25 @@ void handle_input(EditorState* state, int ch)
                 }
                 break;
         case 27:
-                if (state->editor_mode == 1) { 
+                if (state->find_escape_pressed) {
+                        // Second ESC - exit find mode
+                        state->find_mode = 0;
+                        state->find_escape_pressed = 0;
+                        // Free match data
+                        if (state->find_match_lines) {
+                                free(state->find_match_lines);
+                                state->find_match_lines = NULL;
+                        }
+                        if (state->find_match_positions) {
+                                free(state->find_match_positions);
+                                state->find_match_positions = NULL;
+                        }
+                        state->find_match_count = 0;
+                        state->find_search_term[0] = '\0';
+                } else if (state->find_mode) {
+                        // First ESC - set flag to wait for Enter
+                        state->find_escape_pressed = 1;
+                } else if (state->editor_mode == 1) {
                         exit_selecting_mode(state);
                 } else if (state->char_select_mode) {
                         state->char_select_mode = 0;
@@ -470,7 +559,7 @@ void handle_input(EditorState* state, int ch)
                 } else if (state -> select_mode) {
                         
                         
-                        state->select_mode = 2; 
+                        state->select_mode = 2;
                 } else if (state -> show_help) {
                         state -> show_help = 0;
                 } else {
