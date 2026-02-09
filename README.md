@@ -244,16 +244,6 @@ See `plugins/word_count_plugin.c` for a complete example that displays word coun
 - Proper memory management
 - Integration with the editor's rendering pipeline
 
-### Debugging Plugins
-
-- Use `printf` or logging functions for debugging (output goes to terminal)
-- Test plugins in a separate terminal session to see error messages
-- Check the editor's status messages for plugin loading errors
-- Use gdb to debug plugin code: `gdb re` then load a file and trigger plugin hooks
-
-**Note**: Plugins have full access to editor internals. Write plugins responsibly to maintain editor stability and security.
-
-
 
 ## Contributing
 
@@ -262,7 +252,7 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 ## License
 
 This project is licensed under the MIT License. 
-It's open source like all things should be.
+It's open source like all things should be
 
 
 
