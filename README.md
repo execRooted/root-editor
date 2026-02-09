@@ -33,7 +33,6 @@ root-editor [filename]
 ```
 
 
-
 ## Features
 
 - **Syntax Highlighting**: Supports highlighting for various programming languages.
@@ -55,7 +54,7 @@ root-editor [filename]
    - **Ctrl+C**: Copy
    - **Ctrl+V**: Paste
 
-- **Ctrl+F**: Find
+- **Ctrl+F**: Find (This enters Find mode, you can find information about it below)
 - **Ctrl+R**: Replace
 - **Ctrl+L**: Jump to line
 - **Ctrl+T**: Auto Indent
@@ -82,14 +81,18 @@ root-editor features a selection mode that allows you to select and edit text ef
 - **Shift + Arrow Keys**: Start selection and extend it (only works from left -> right and from up -> down)
 
 #### Navigation in Selection Mode
-- **Arrow Keys**: Move cursor and extend selection
+- **Arrow Keys**: Move cursor and extend selection 
 - **Enter**: Move cursor down (like down arrow)
 - **Backspace**: Deletes selection/word and exits selection mode
 - **Home/End**: Move to line start/end and extend selection
 
 #### Exiting Selection Mode
 - **Esc**: First press marks for exit (shows "SELECT" in status)
-- **Enter**: Second press exits selection mode and re-enables syntax highlighting
+- **Enter**: Second press exits selection mode, re-enables syntax highlighting and enables writing
+
+#### Exiting Find mode:
+- **Esc**: First press marks for exit (shows "FIND" in status)
+- **Enter**: Second press exits Find mode, re-enables syntax highlighting and enables writing
 
 #### Selection Operations
 - **Ctrl+W**: Starts selection mode
