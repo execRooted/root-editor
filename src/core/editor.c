@@ -6,7 +6,14 @@
 void init_editor(EditorState* state)
 {
     state -> lines = (char ** ) malloc(MAX_LINES * sizeof(char * ));
+    if (!state->lines) {
+        exit(1);
+    }
+    memset(state->lines, 0, MAX_LINES * sizeof(char*));
     state -> lines[0] = (char * ) malloc(MAX_LINE_LENGTH);
+    if (!state->lines[0]) {
+        exit(1);
+    }
     state -> lines[0][0] = '\0';
     state -> line_count = 1;
     state -> cursor_x = 0;
@@ -1047,27 +1054,31 @@ void reset_key_states(EditorState* state)
 }
 void save_original_content(EditorState* state)
 {
-    
+    if (!state || !state->lines || state->line_count <= 0) return;
+
     free_original_content(state);
 
-    
     state->original_lines = (char**)malloc(state->line_count * sizeof(char*));
     if (!state->original_lines) return;
 
     state->original_line_count = state->line_count;
 
-    
     for (int i = 0; i < state->line_count; i++) {
         state->original_lines[i] = (char*)malloc(MAX_LINE_LENGTH);
         if (!state->original_lines[i]) {
             free_original_content(state);
             return;
         }
-        strcpy(state->original_lines[i], state->lines[i]);
+        if (!state->lines[i]) {
+            state->original_lines[i][0] = '\0';
+        } else {
+            strcpy(state->original_lines[i], state->lines[i]);
+        }
     }
 }
 void free_original_content(EditorState* state)
 {
+    if (!state) return;
     if (state->original_lines) {
         for (int i = 0; i < state->original_line_count; i++) {
             if (state->original_lines[i]) {
@@ -1081,33 +1092,33 @@ void free_original_content(EditorState* state)
 }
 int content_matches_original(EditorState* state)
 {
-    
-    if (!state->original_lines || state->original_line_count == 0) {
+    if (!state || !state->lines || !state->original_lines || state->original_line_count == 0) {
         return 0;
     }
 
-    
     if (state->line_count != state->original_line_count) {
         return 0;
     }
 
-    
     for (int i = 0; i < state->line_count; i++) {
+        if (!state->lines[i] || !state->original_lines[i]) {
+            return 0;
+        }
         if (strcmp(state->lines[i], state->original_lines[i]) != 0) {
-            return 0; 
+            return 0;
         }
     }
 
-    return 1; 
+    return 1;
 }
 void update_dirty_status(EditorState* state)
 {
-    
+    if (!state || !state->lines) return;
+
     if (state->filename[0] == '\0') {
-        
         int has_content = 0;
         for (int i = 0; i < state->line_count; i++) {
-            if (strlen(state->lines[i]) > 0) {
+            if (state->lines[i] && strlen(state->lines[i]) > 0) {
                 has_content = 1;
                 break;
             }

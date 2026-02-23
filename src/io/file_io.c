@@ -5,12 +5,19 @@
 
 void load_file(EditorState* state, const char* filename)
 {
+        if (!state || !filename || !state->lines) {
+                return;
+        }
 
+        size_t filename_len = strlen(filename);
+        if (filename_len == 0 || filename_len >= sizeof(state->filename)) {
+                show_status(state, "Error: Invalid filename");
+                return;
+        }
 
         FILE* file = fopen(filename, "r");
         int file_created = 0;
         if (!file) {
-
                 file = fopen(filename, "w+");
                 if (!file) {
                         show_status(state, "Error: Could not create file");
@@ -19,16 +26,32 @@ void load_file(EditorState* state, const char* filename)
                 file_created = 1;
         }
 
-        for (int i = 0; i < state -> line_count; i++) {
-                free(state -> lines[i]);
+        for (int i = 0; i < state->line_count; i++) {
+                if (state->lines[i]) {
+                        free(state->lines[i]);
+                        state->lines[i] = NULL;
+                }
         }
 
-        state -> line_count = 0;
+        state->line_count = 0;
 
         
         fseek(file, 0, SEEK_END);
         long file_size = ftell(file);
         fseek(file, 0, SEEK_SET);
+
+        if (file_size < 0) {
+                fclose(file);
+                state->lines[0] = (char*)malloc(MAX_LINE_LENGTH);
+                if (state->lines[0]) {
+                        state->lines[0][0] = '\0';
+                        state->line_count = 1;
+                }
+                strncpy(state->filename, filename, sizeof(state->filename) - 1);
+                state->filename[sizeof(state->filename) - 1] = '\0';
+                show_status(state, "Created file");
+                return;
+        }
 
         if (file_size > 0) {
                 char * content = (char * ) malloc(file_size + 1);
@@ -43,7 +66,6 @@ void load_file(EditorState* state, const char* filename)
 
                 state->has_trailing_newline = (read_size > 0 && content[read_size - 1] == '\n');
 
-                
                 if (read_size > 0 && content[read_size - 1] == '\n') {
                         content[read_size - 1] = '\0';
                         read_size--;
@@ -51,36 +73,35 @@ void load_file(EditorState* state, const char* filename)
 
                 char* line_start = content;
                 char* ptr = content;
-                while (*ptr && state -> line_count < MAX_LINES) {
+                while (*ptr && state->line_count < MAX_LINES) {
                         if (*ptr == '\n') {
                                 *ptr = '\0';
-                                state -> lines[state -> line_count] = (char * ) malloc(MAX_LINE_LENGTH);
-                                if (!state -> lines[state -> line_count]) {
+                                state->lines[state->line_count] = (char*)malloc(MAX_LINE_LENGTH);
+                                if (!state->lines[state->line_count]) {
                                         show_status(state, "Memory allocation failed");
                                         free(content);
                                         fclose(file);
                                         return;
                                 }
-                                strncpy(state -> lines[state -> line_count], line_start, MAX_LINE_LENGTH - 1);
-                                state -> lines[state -> line_count][MAX_LINE_LENGTH - 1] = '\0';
-                                state -> line_count++;
+                                strncpy(state->lines[state->line_count], line_start, MAX_LINE_LENGTH - 1);
+                                state->lines[state->line_count][MAX_LINE_LENGTH - 1] = '\0';
+                                state->line_count++;
                                 line_start = ptr + 1;
                         }
                         ptr++;
                 }
 
-
-                if (line_start < ptr && state -> line_count < MAX_LINES) {
-                        state -> lines[state -> line_count] = (char * ) malloc(MAX_LINE_LENGTH);
-                        if (!state -> lines[state -> line_count]) {
+                if (line_start < ptr && state->line_count < MAX_LINES) {
+                        state->lines[state->line_count] = (char*)malloc(MAX_LINE_LENGTH);
+                        if (!state->lines[state->line_count]) {
                                 show_status(state, "Memory allocation failed");
                                 free(content);
                                 fclose(file);
                                 return;
                         }
-                        strncpy(state -> lines[state -> line_count], line_start, MAX_LINE_LENGTH - 1);
-                        state -> lines[state -> line_count][MAX_LINE_LENGTH - 1] = '\0';
-                        state -> line_count++;
+                        strncpy(state->lines[state->line_count], line_start, MAX_LINE_LENGTH - 1);
+                        state->lines[state->line_count][MAX_LINE_LENGTH - 1] = '\0';
+                        state->line_count++;
                 }
 
                 free(content);
@@ -88,17 +109,18 @@ void load_file(EditorState* state, const char* filename)
 
         fclose(file);
 
-        if (state -> line_count == 0) {
-                state -> lines[0] = (char * ) malloc(MAX_LINE_LENGTH);
-                if (!state -> lines[0]) {
+        if (state->line_count == 0) {
+                state->lines[0] = (char*)malloc(MAX_LINE_LENGTH);
+                if (!state->lines[0]) {
                         show_status(state, "Memory allocation failed");
                         return;
                 }
-                state -> lines[0][0] = '\0';
-                state -> line_count = 1;
+                state->lines[0][0] = '\0';
+                state->line_count = 1;
         }
 
-        strcpy(state -> filename, filename);
+        strncpy(state->filename, filename, sizeof(state->filename) - 1);
+        state->filename[sizeof(state->filename) - 1] = '\0';
         state -> cursor_x = 0;
         state -> cursor_y = 0;
         state -> scroll_offset = 0;
