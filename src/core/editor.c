@@ -5,6 +5,10 @@
 
 void init_editor(EditorState* state)
 {
+    if (!state) exit(1);
+
+    memset(state, 0, sizeof(EditorState));
+
     state -> lines = (char ** ) malloc(MAX_LINES * sizeof(char * ));
     if (!state->lines) {
         exit(1);
@@ -31,56 +35,35 @@ void init_editor(EditorState* state)
     state -> select_end_x = 0;
     state -> select_end_y = 0;
     state -> show_help = 0;
-    memset(state -> key_states, 0, sizeof(state -> key_states));
-    memset(state -> key_timestamps, 0, sizeof(state -> key_timestamps));
-    state -> syntax_enabled = 1;  
+    state -> syntax_enabled = 1;
     state -> syntax_display_enabled = 1;
-    state -> auto_tabbing_enabled = 1;    
+    state -> auto_tabbing_enabled = 1;
     state -> file_type = 0;
     state -> keywords = NULL;
     state -> keyword_count = 0;
-
-    
     state -> theme_id = 3;
     strncpy(state -> theme_name, "White Selection", sizeof(state -> theme_name) - 1);
     state -> theme_name[sizeof(state -> theme_name) - 1] = '\0';
-
-    
-
-    
     state -> auto_complete_enabled = 1;
     state -> sticky_cursor_enabled = 1;
-
-    
     state -> json_rules_count = 0;
     state -> json_loaded = 0;
-    memset(state -> json_scopes, 0, sizeof(state -> json_scopes));
-    memset(state -> json_colors, 0, sizeof(state -> json_colors));
-
-    
     state -> original_lines = NULL;
     state -> original_line_count = 0;
-
-    
     state -> last_input_time = time(NULL);
     state -> rapid_input_mode = 0;
     state -> char_select_mode = 0;
-    state -> editor_mode = 0; 
-
-    
+    state -> editor_mode = 0;
     state -> plugin_count = 0;
-    memset(state -> plugins, 0, sizeof(state -> plugins));
+    state -> has_trailing_newline = 1;
+    state -> find_mode = 0;
+    state -> find_match_lines = NULL;
+    state -> find_match_positions = NULL;
+    state -> find_match_count = 0;
+    state -> find_current_match = 0;
+    state -> find_escape_pressed = 0;
 
-    FILE *f = fopen("/tmp/root_editor_debug.log", "w");
-    if (f) 
-    {
-        fprintf(f, "Editor initialization\n");
-        fprintf(f, "Loading syntax configuration...\n");
-        int result = load_syntax_json(state);
-        fprintf(f, "Syntax config loaded: %d\n", result);
-        fclose(f);
-    }
-
+    load_syntax_json(state);
     init_syntax_highlighting(state);
 }
 void toggle_dark_mode(EditorState* state)

@@ -133,7 +133,7 @@ echo -e "${BLUE}[INFO]${NC} Building root-editor..."
 export PATH=/usr/bin:/bin:/usr/local/bin:$PATH
 
 echo -e "${BLUE}[INFO]${NC} Cleaning up any build artifacts..."
-rm -rf build
+sudo rm -rf build
 cmake -S . -B build
 if [ $? -ne 0 ]; then
     echo -e "${RED}[ERROR]${NC} CMake configure failed."
@@ -156,7 +156,7 @@ echo -e "${BLUE}[INFO]${NC} Build successful."
 clear
 echo -e "${BLUE}[INFO]${NC} Building plugins..."
 cd plugins
-rm -rf build
+sudo rm -rf build
 cmake -S . -B build
 if [ $? -ne 0 ]; then
     echo -e "${RED}[ERROR]${NC} Plugin CMake configure failed."

@@ -481,11 +481,11 @@ static void get_config_path(char *out_path, size_t out_sz)
 
 void load_config(EditorState* state)
 {
+        if (!state) return;
         char path[512];
         get_config_path(path, sizeof(path));
         FILE *fp = fopen(path, "r");
         if (!fp) {
-                
                 save_config(state);
                 return;
         }
@@ -518,6 +518,7 @@ void load_config(EditorState* state)
 
 void save_config(EditorState* state)
 {
+        if (!state) return;
         char path[512];
         get_config_path(path, sizeof(path));
 
@@ -526,7 +527,6 @@ void save_config(EditorState* state)
 
         FILE *fp = fopen(path, "w");
         if (!fp) {
-                show_status(state, "Failed to save config");
                 return;
         }
         fprintf(fp, "tab_size=%d\n", state->tab_size);
@@ -540,14 +540,15 @@ void save_config(EditorState* state)
 
 void safe_quit(EditorState* state)
 {
+         if (!state) exit(0);
          if (!state->dirty) {
 
-                  unload_all_plugins(state);
+                   unload_all_plugins(state);
 
-                  printf("\033[?2004l"); fflush(stdout);
-                  endwin();
-                  exit(0);
-         }
+                   printf("\033[?2004l"); fflush(stdout);
+                   endwin();
+                   exit(0);
+          }
         echo();
         curs_set(1);
         attron(COLOR_PAIR(1));

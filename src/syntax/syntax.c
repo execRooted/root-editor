@@ -163,15 +163,6 @@ int is_number(const char* token)
 void init_syntax_highlighting(EditorState* state)
 {
     if (!state) return;
-    FILE *f = fopen("/tmp/editor_debug.log", "w");
-    if (f) {
-        fprintf(f, "Syntax highlighting status:\n");
-        fprintf(f, "- syntax_enabled: %d\n", state->syntax_enabled);
-        fprintf(f, "- syntax_display_enabled: %d\n", state->syntax_display_enabled);
-        fprintf(f, "- file_type: %d\n", state->file_type);
-        fprintf(f, "- json_loaded: %d\n", state->json_loaded);
-        fclose(f);
-    }
 
     if (!state->syntax_enabled) return;
     detect_file_type(state);
@@ -180,6 +171,10 @@ void init_syntax_highlighting(EditorState* state)
 
 void detect_file_type(EditorState* state)
 {
+    if (!state)
+    {
+        return;
+    }
     if (!*state->filename)
     {
         state->file_type = FILE_TYPE_PLAIN;
@@ -487,45 +482,60 @@ static int get_hierarchical_color(EditorState* state, const char* scope)
 }
 int load_syntax_json(EditorState* state)
 {
-    FILE *f = fopen("/tmp/editor_debug.log", "a");
-    if (f) {
-        fprintf(f, "\nAttempting to load syntax.json...\n");
+    if (!state) return 0;
 
-        FILE *json_file = fopen("/home/rooted/home2/Projects/C/root-editor/config/syntax.json", "r");
-        if (!json_file) {
-            fprintf(f, "Failed to open syntax.json\n");
-            fprintf(f, "Error: %s\n", strerror(errno));
-            fclose(f);
-            return 0;
-        }
+    const char* syntax_paths[] = {
+        "/usr/local/share/root-editor/syntax.json",
+        "/usr/share/root-editor/syntax.json",
+        "./config/syntax.json",
+        "config/syntax.json",
+        "../config/syntax.json",
+        NULL
+    };
 
-        fseek(json_file, 0, SEEK_END);
-        long size = ftell(json_file);
-        fseek(json_file, 0, SEEK_SET);
-
-        char *buffer = malloc(size + 1);
-        if (!buffer) {
-            fprintf(f, "Failed to allocate memory for syntax.json\n");
-            fclose(json_file);
-            fclose(f);
-            return 0;
-        }
-
-        size_t read = fread(buffer, 1, size, json_file);
-        buffer[read] = '\0';
-
-        fprintf(f, "Read %ld bytes from syntax.json\n", read);
-        fprintf(f, "Parsing JSON...\n");
-
-        int result = parse_json_token_colors(buffer, state);
-        fprintf(f, "JSON parsing result: %d\n", result);
-
-        free(buffer);
-        fclose(json_file);
-        fclose(f);
-        return result;
+    char* home_path = NULL;
+    char home_config[512] = {0};
+    const char* home = getenv("HOME");
+    if (home) {
+        snprintf(home_config, sizeof(home_config), "%s/.config/root-editor/syntax.json", home);
+        home_path = home_config;
     }
-    return 0;
+
+    FILE *json_file = NULL;
+    for (int i = 0; syntax_paths[i] != NULL; i++) {
+        json_file = fopen(syntax_paths[i], "r");
+        if (json_file) break;
+    }
+    if (!json_file && home_path) {
+        json_file = fopen(home_path, "r");
+    }
+
+    if (!json_file) {
+        return 0;
+    }
+
+    fseek(json_file, 0, SEEK_END);
+    long size = ftell(json_file);
+    fseek(json_file, 0, SEEK_SET);
+
+    if (size <= 0) {
+        fclose(json_file);
+        return 0;
+    }
+
+    char *buffer = malloc(size + 1);
+    if (!buffer) {
+        fclose(json_file);
+        return 0;
+    }
+
+    size_t read = fread(buffer, 1, size, json_file);
+    buffer[read] = '\0';
+    fclose(json_file);
+
+    int result = parse_json_token_colors(buffer, state);
+    free(buffer);
+    return result;
 }
 int parse_json_token_colors(const char* json_content, EditorState* state);
 int hex_to_color_pair(const char* hex_color);
