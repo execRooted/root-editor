@@ -53,6 +53,8 @@ detect_package_manager() {
         echo "yum"
     elif command -v dnf &> /dev/null; then
         echo "dnf"
+    elif command -v dnf5 &> /dev/null; then
+        echo "dnf5"
     elif command -v zypper &> /dev/null; then
         echo "zypper"
     else
@@ -83,6 +85,10 @@ install_dependencies() {
             echo -e "${BLUE}[INFO]${NC} Installing dependencies with dnf..."
             sudo dnf groupinstall -y "Development Tools"
             sudo dnf install -y ncurses-devel cmake
+            ;;
+        dnf5)
+            echo -e "${BLUE}[INFO]${NC} Installing dependencies with dnf5..."
+            sudo dnf5 install -y gcc gcc-c++ make ncurses-devel cmake pkg-config
             ;;
         zypper)
             echo -e "${BLUE}[INFO]${NC} Installing dependencies with zypper..."
