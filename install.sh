@@ -51,10 +51,12 @@ detect_package_manager() {
         echo "apt"
     elif command -v yum &> /dev/null; then
         echo "yum"
-    elif command -v dnf &> /dev/null; then
-        echo "dnf"
     elif command -v dnf5 &> /dev/null; then
         echo "dnf5"
+    elif command -v dnf &> /dev/null; then
+        echo "dnf"
+    elif command -v emerge &> /dev/null; then
+        echo "emerge"
     elif command -v zypper &> /dev/null; then
         echo "zypper"
     else
@@ -89,6 +91,10 @@ install_dependencies() {
         dnf5)
             echo -e "${BLUE}[INFO]${NC} Installing dependencies with dnf5..."
             sudo dnf5 install -y gcc gcc-c++ make ncurses-devel cmake pkg-config
+            ;;
+        emerge)
+            echo -e "${BLUE}[INFO]${NC} Installing dependencies with emerge..."
+            sudo emerge -v sys-devel/gcc dev-util/cmake sys-libs/ncurses sys-devel/make
             ;;
         zypper)
             echo -e "${BLUE}[INFO]${NC} Installing dependencies with zypper..."
