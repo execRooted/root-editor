@@ -93,8 +93,29 @@ install_dependencies() {
             sudo dnf5 install -y gcc gcc-c++ make ncurses-devel cmake pkg-config
             ;;
         emerge)
-            echo -e "${BLUE}[INFO]${NC} Installing dependencies with emerge..."
-            sudo emerge -v sys-devel/gcc dev-util/cmake sys-libs/ncurses sys-devel/make
+            echo -e "${BLUE}[INFO]${NC} Checking dependencies on Gentoo..."
+            local missing_emerge=()
+            if ! command -v gcc &> /dev/null; then
+                missing_emerge+=("sys-devel/gcc")
+            fi
+            if ! command -v cmake &> /dev/null; then
+                missing_emerge+=("dev-util/cmake")
+            fi
+            if ! command -v make &> /dev/null; then
+                missing_emerge+=("sys-devel/make")
+            fi
+            if ! pkg-config --exists ncurses 2>/dev/null && ! ls /usr/include/ncurses.h &> /dev/null && ! ls /usr/include/ncurses/ncurses.h &> /dev/null; then
+                missing_emerge+=("sys-libs/ncurses")
+            fi
+            if [ ${#missing_emerge[@]} -ne 0 ]; then
+                echo -e "${RED}[ERROR]${NC} Missing dependencies on Gentoo:"
+                for dep in "${missing_emerge[@]}"; do
+                    echo "  - $dep"
+                done
+                echo -e "${YELLOW}[NOTE]${NC} Install them with: sudo emerge -av ${missing_emerge[*]}"
+                exit 1
+            fi
+            echo -e "${GREEN}[OK]${NC} All dependencies found on Gentoo."
             ;;
         zypper)
             echo -e "${BLUE}[INFO]${NC} Installing dependencies with zypper..."

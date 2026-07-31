@@ -1,1 +1,1 @@
-/usr/bin/cc -fPIC -shared -Wl,--dependency-file=CMakeFiles/word_count_plugin.dir/link.d -Wl,-soname,libword_count_plugin.so -o libword_count_plugin.so CMakeFiles/word_count_plugin.dir/word_count_plugin.c.o  -lcurses -lform
+/usr/bin/cc -fPIC -shared -Wl,--dependency-file=CMakeFiles/word_count_plugin.dir/link.d -Wl,-soname,libword_count_plugin.so -o libword_count_plugin.so CMakeFiles/word_count_plugin.dir/word_count_plugin.c.o  /usr/lib64/libncurses.so /usr/lib64/libtinfo.so /usr/lib64/libform.so
