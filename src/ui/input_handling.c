@@ -178,9 +178,11 @@ void handle_input(EditorState* state, int ch)
                                 getmaxyx(stdscr, max_y, max_x);
                                 if (state->cursor_y < state->scroll_offset) {
                                         state->scroll_offset = state->cursor_y;
-                                } else if (state->cursor_y >= state->scroll_offset + max_y - 32) {
+                                } else if (state->cursor_y >= state->scroll_offset + max_y - 5) {
                                         state->scroll_offset = state->cursor_y - max_y + 6;
                                 }
+                                if (state->scroll_offset < 0) state->scroll_offset = 0;
+                                if (state->scroll_offset >= state->line_count) state->scroll_offset = state->line_count - 1;
                         }
                 } else if (state->char_select_mode)
                 {
@@ -217,9 +219,11 @@ void handle_input(EditorState* state, int ch)
                                 getmaxyx(stdscr, max_y, max_x);
                                 if (state->cursor_y < state->scroll_offset) {
                                         state->scroll_offset = state->cursor_y;
-                                } else if (state->cursor_y >= state->scroll_offset + max_y - 32) {
+                                } else if (state->cursor_y >= state->scroll_offset + max_y - 5) {
                                         state->scroll_offset = state->cursor_y - max_y + 6;
                                 }
+                                if (state->scroll_offset < 0) state->scroll_offset = 0;
+                                if (state->scroll_offset >= state->line_count) state->scroll_offset = state->line_count - 1;
                         }
                 } else if (state->char_select_mode)
                 {

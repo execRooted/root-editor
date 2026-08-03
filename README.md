@@ -1,6 +1,6 @@
 # root-editor
 
-> Made and tested on Arch Linux and Debian-based (Tails more specificly), should work fine in all major distros
+> Made and tested on Arch Linux, Debian, and Gentoo. Should work fine in all major distros
 
 ## Installation
 

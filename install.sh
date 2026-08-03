@@ -45,24 +45,27 @@ echo -e "${BLUE}[INFO]${NC} Starting installation process..."
 
 
 detect_package_manager() {
-    if command -v pacman &> /dev/null; then
+    if command -v pacman >/dev/null 2>&1; then
         echo "pacman"
-    elif command -v apt &> /dev/null; then
+    elif [ -x /usr/bin/apt ] && /usr/bin/apt --version >/dev/null 2>&1; then
         echo "apt"
-    elif command -v yum &> /dev/null; then
+    elif command -v yum >/dev/null 2>&1; then
         echo "yum"
-    elif command -v dnf5 &> /dev/null; then
+    elif command -v dnf5 >/dev/null 2>&1; then
         echo "dnf5"
-    elif command -v dnf &> /dev/null; then
+    elif command -v dnf >/dev/null 2>&1; then
         echo "dnf"
-    elif command -v emerge &> /dev/null; then
+    elif command -v emerge >/dev/null 2>&1; then
         echo "emerge"
-    elif command -v zypper &> /dev/null; then
+    elif command -v zypper >/dev/null 2>&1; then
         echo "zypper"
     else
         echo "unknown"
     fi
 }
+
+
+
 
 PKG_MANAGER=$(detect_package_manager)
 echo -e "${BLUE}[INFO]${NC} Detected package manager: $PKG_MANAGER"
@@ -251,6 +254,5 @@ echo "You can now run 'root-editor' or 're' from anywhere, or use the desktop en
 echo "Plugins are installed in /usr/local/lib/root-editor/plugins/"
 echo
 echo -e "${YELLOW}[NOTE]${NC} Make sure /usr/local/bin is in your PATH if it's not already."
-
 
 
