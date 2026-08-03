@@ -84,9 +84,9 @@ void show_welcome_screen()
                 mvprintw(info_start_y++, (max_x - 15) / 2, "Ctrl+Q - Quit");
                 mvprintw(info_start_y++, (max_x - 15) / 2, "Ctrl+S - Save");
                 mvprintw(info_start_y++, (max_x - 25) / 2, "Arrow Keys - Move cursor");
-                mvprintw(info_start_y++, (max_x - 10) / 2, "F1 - Help");
-                mvprintw(info_start_y++, (max_x - 30) / 2, "");
-                mvprintw(info_start_y++, (max_x - 40) / 2, "Press G for my Github, Enter to continue...");
+                 mvprintw(info_start_y++, (max_x - 10) / 2, "F1 - Help");
+                 mvprintw(info_start_y++, (max_x - 30) / 2, "");
+                 mvprintw(info_start_y++, (max_x - 30) / 2, "   Press Enter to exit...");
         }
 
         attroff(COLOR_PAIR(1));
@@ -94,12 +94,7 @@ void show_welcome_screen()
 
         timeout(-1);
         int ch;
-        do {
-            ch = getch();
-            if (ch == 'g' || ch == 'G') {
-                system("xdg-open https://github.com/execRooted");
-            }
-        } while (ch != '\n' && ch != KEY_ENTER);
+        getch();
         timeout(0);
 }
 
