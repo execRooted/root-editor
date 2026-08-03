@@ -3,6 +3,29 @@
 #include "../core/editor.h"
 #include "../core/plugin.h"
 
+static void create_parent_dirs(const char* path)
+{
+        char tmp[1024];
+        size_t len = strlen(path);
+        if (len >= sizeof(tmp)) {
+                return;
+        }
+        strncpy(tmp, path, sizeof(tmp) - 1);
+        tmp[sizeof(tmp) - 1] = '\0';
+
+        for (char* p = tmp + 1; *p; p++) {
+                if (*p == '/') {
+                        char saved = *p;
+                        *p = '\0';
+                        if (mkdir(tmp, 0755) != 0 && errno != EEXIST) {
+                                *p = saved;
+                                return;
+                        }
+                        *p = saved;
+                }
+        }
+}
+
 void load_file(EditorState* state, const char* filename)
 {
         if (!state || !filename || !state->lines) {
@@ -18,6 +41,7 @@ void load_file(EditorState* state, const char* filename)
         FILE* file = fopen(filename, "r");
         int file_created = 0;
         if (!file) {
+                create_parent_dirs(filename);
                 file = fopen(filename, "w+");
                 if (!file) {
                         show_status(state, "Error: Could not create file");
@@ -156,6 +180,7 @@ void save_file(EditorState* state)
                 }
         }
 
+        create_parent_dirs(state->filename);
         FILE * file = fopen(state -> filename, "w");
         if (!file) {
 
