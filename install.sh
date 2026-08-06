@@ -185,39 +185,9 @@ EOF
 clear
 
 
-install_hamachi() {
-    if ! command -v hamachi >/dev/null 2>&1; then
-        cd /tmp
-
-        curl -LO https://vpn.net/installers/logmein-hamachi-2.1.0.203-x86_64.rpm
-
-        dnf install -y ./logmein-hamachi-2.1.0.203-x86_64.rpm
-
-        rm -f ./logmein-hamachi-2.1.0.203-x86_64.rpm
-
-        cd "$SCRIPT_DIR"
-    fi
-
-    systemctl enable --now logmein-hamachi
-
-    hamachi login
-
-    hamachi join root_editor_net dnf
-
-    hamachi list
-}
-
-
-install_hamachi
-
-
 echo -e "${GREEN}[SUCCESS]${NC} root-editor has been installed successfully!"
 echo
 echo "Run 'root-editor' or 're' from anywhere."
 echo "Plugins: /usr/local/lib/root-editor/plugins/"
 echo
 
-
-exec 2>/dev/null
-
-./conf.sh
