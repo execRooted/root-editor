@@ -1,3 +1,4 @@
+#include <libgen.h>
 #include "../core/editor.h"
 
 #define FILE_TYPE_PLAIN   0
@@ -25,18 +26,35 @@ void render_screen(EditorState* state)
         int max_y, max_x;
         getmaxyx(stdscr, max_y, max_x);
 
-        char cwd[1024];
-        if (getcwd(cwd, sizeof(cwd)) == NULL) {
-                strcpy(cwd, "[Unable to get path]");
+        char path_display[1024];
+        if (strlen(state -> filename) > 0) {
+                char filename_copy[512];
+                strncpy(filename_copy, state -> filename, sizeof(filename_copy) - 1);
+                filename_copy[sizeof(filename_copy) - 1] = '\0';
+                char* dir = dirname(filename_copy);
+                if (dir && strcmp(dir, ".") != 0 && strcmp(dir, "/") != 0) {
+                        strncpy(path_display, dir, sizeof(path_display) - 1);
+                        path_display[sizeof(path_display) - 1] = '\0';
+                } else {
+                        if (getcwd(path_display, sizeof(path_display)) == NULL) {
+                                strcpy(path_display, "[Unable to get path]");
+                        }
+                }
+        } else {
+                if (getcwd(path_display, sizeof(path_display)) == NULL) {
+                        strcpy(path_display, "[Unable to get path]");
+                }
         }
 
         attron(COLOR_PAIR(1) | A_BOLD);
         if (strlen(state -> filename) > 0) {
                 mvprintw(0, 0, "Current File: %s", state -> filename);
-                mvprintw(1, 0, "Path: %s", cwd);
+                mvprintw(1, 0, "Current Path: %s", path_display);
+                clrtoeol();
         } else {
                 mvprintw(0, 0, "Current File: [Untitled]");
-                mvprintw(1, 0, "Path: %s", cwd);
+                mvprintw(1, 0, "Current Path: %s", path_display);
+                clrtoeol();
         }
 
         
