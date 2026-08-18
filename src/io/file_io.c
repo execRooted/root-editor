@@ -41,6 +41,35 @@ void load_file(EditorState* state, const char* filename)
         FILE* file = fopen(filename, "r");
         int file_created = 0;
         if (!file) {
+                if (errno == ENOENT) {
+                        for (int i = 0; i < state->line_count; i++) {
+                                if (state->lines[i]) {
+                                        free(state->lines[i]);
+                                        state->lines[i] = NULL;
+                                }
+                        }
+                        state->line_count = 0;
+                        state->lines[0] = (char*)malloc(MAX_LINE_LENGTH);
+                        if (state->lines[0]) {
+                                state->lines[0][0] = '\0';
+                                state->line_count = 1;
+                        }
+                        strncpy(state->filename, filename, sizeof(state->filename) - 1);
+                        state->filename[sizeof(state->filename) - 1] = '\0';
+                        state->cursor_x = 0;
+                        state->cursor_y = 0;
+                        state->scroll_offset = 0;
+                        show_status(state, "New file");
+                        save_original_content(state);
+                        update_dirty_status(state);
+                        detect_file_type(state);
+                        load_config(state);
+                        if (state->syntax_enabled) {
+                                init_syntax_highlighting(state);
+                        }
+                        call_plugin_file_load_hooks(state, filename);
+                        return;
+                }
                 create_parent_dirs(filename);
                 file = fopen(filename, "w+");
                 if (!file) {

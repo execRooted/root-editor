@@ -58,6 +58,7 @@ sudo rm -rf /usr/local/share/root-editor
 
 echo -e "${BLUE}[INFO]${NC} Removing desktop entry..."
 sudo rm -f /usr/share/applications/root-editor.desktop
+sudo rm -f /usr/share/pixmaps/root-editor.png
 
 echo
 echo -e "${GREEN}[SUCCESS]${NC} root-editor has been uninstalled successfully!"

@@ -631,12 +631,14 @@ clear
 
 echo -e "${BLUE}[INFO]${NC} Creating desktop entry..."
 
+cp logo.png /usr/share/pixmaps/root-editor.png
+
 tee /usr/share/applications/root-editor.desktop > /dev/null << EOF
 [Desktop Entry]
 Name=Root Editor
 Comment=A C terminal-based text editor
 Exec=re %f
-Icon=terminal
+Icon=root-editor
 Terminal=true
 Type=Application
 Categories=Utility;TextEditor;
