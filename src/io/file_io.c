@@ -56,6 +56,7 @@ void load_file(EditorState* state, const char* filename)
                         }
                         strncpy(state->filename, filename, sizeof(state->filename) - 1);
                         state->filename[sizeof(state->filename) - 1] = '\0';
+                        state->file_exists = 0;
                         state->cursor_x = 0;
                         state->cursor_y = 0;
                         state->scroll_offset = 0;
@@ -161,6 +162,7 @@ void load_file(EditorState* state, const char* filename)
         }
 
         fclose(file);
+        state->file_exists = 1;
 
         if (state->line_count == 0) {
                 state->lines[0] = (char*)malloc(MAX_LINE_LENGTH);
@@ -246,6 +248,8 @@ void save_file(EditorState* state)
                 show_status(state, "Warning: File may not have been saved completely");
                 return;
         }
+
+        state->file_exists = 1;
 
         
         

@@ -762,15 +762,32 @@ void copy_to_system_clipboard(const char* text)
 
     
     int is_wayland = getenv("WAYLAND_DISPLAY") != NULL;
-    if (is_wayland) {
-        system("cat '/tmp/root_editor_clipboard_temp.txt' | wl-copy 2>/dev/null &");
+    const char* sudo_user = getenv("SUDO_USER");
+    char cmd[512];
+
+    if (sudo_user) {
+        if (is_wayland) {
+            snprintf(cmd, sizeof(cmd), "cat '%s' | su %s -c \"wl-copy 2>/dev/null\" &", temp_file, sudo_user);
+            system(cmd);
+        } else {
+            snprintf(cmd, sizeof(cmd), "cat '%s' | su %s -c \"xclip -selection clipboard 2>/dev/null\" &", temp_file, sudo_user);
+            system(cmd);
+            snprintf(cmd, sizeof(cmd), "cat '%s' | su %s -c \"xclip -selection primary 2>/dev/null\" &", temp_file, sudo_user);
+            system(cmd);
+        }
     } else {
-        system("cat '/tmp/root_editor_clipboard_temp.txt' | xclip -selection clipboard 2>/dev/null &");
-        system("cat '/tmp/root_editor_clipboard_temp.txt' | xclip -selection primary 2>/dev/null &");
+        if (is_wayland) {
+            snprintf(cmd, sizeof(cmd), "cat '%s' | wl-copy 2>/dev/null &", temp_file);
+            system(cmd);
+        } else {
+            snprintf(cmd, sizeof(cmd), "cat '%s' | xclip -selection clipboard 2>/dev/null &", temp_file);
+            system(cmd);
+            snprintf(cmd, sizeof(cmd), "cat '%s' | xclip -selection primary 2>/dev/null &", temp_file);
+            system(cmd);
+        }
     }
 
-    
-    system("rm -f '/tmp/root_editor_clipboard_temp.txt' 2>/dev/null &");
+    system("rm -f '/tmp/kilo_editor_clipboard_temp.txt' 2>/dev/null &");
 }
 void toggle_help(EditorState* state)
 {
@@ -1107,6 +1124,11 @@ void update_dirty_status(EditorState* state)
             }
         }
         state->dirty = has_content;
+        return;
+    }
+
+    if (!state->file_exists) {
+        state->dirty = 1;
         return;
     }
 

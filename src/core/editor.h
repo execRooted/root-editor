@@ -67,6 +67,7 @@ typedef struct EditorState {
     int horizontal_scroll_offset;
     char filename[256];
     int dirty;
+    int file_exists;
     int line_numbers;
     int word_wrap;
     int tab_size;

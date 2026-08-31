@@ -463,6 +463,17 @@ void handle_input(EditorState* state, int ch)
                                 }
                                 new_line_str[indent_len] = '\0';
 
+                                char *current_line = state->lines[state->cursor_y];
+                                const char *tail = &current_line[state->cursor_x];
+                                int tail_len = strlen(tail);
+                                if (indent_len + tail_len >= MAX_LINE_LENGTH) {
+                                        tail_len = MAX_LINE_LENGTH - 1 - indent_len;
+                                }
+                                memcpy(new_line_str + indent_len, tail, tail_len);
+                                new_line_str[indent_len + tail_len] = '\0';
+
+                                current_line[state->cursor_x] = '\0';
+
                                 for (int i = state->line_count; i > state->cursor_y + 1; i--) {
                                         state->lines[i] = state->lines[i - 1];
                                 }
