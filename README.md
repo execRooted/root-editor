@@ -1,6 +1,13 @@
 # root-editor
 
-> Made and tested on Arch Linux, Debian, and Gentoo. Should work fine in all major distros
+> Made and tested on Arch Linux, Debian, Fedora, and Gentoo. Should work fine in all major distros.
+> 
+--- 
+
+If you found this project interesting and want to help me out, buy me a coffee :)
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-%23FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/execrooted)
+---
 
 ## Installation
 
