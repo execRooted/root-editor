@@ -1,6 +1,6 @@
 # root-editor
 
-> Made and tested on Arch Linux, Debian, Fedora, and Gentoo. Should work fine in all major distros.
+> Tested on Arch Linux, Debian, Fedora, and Gentoo. Should work fine in all major distros.
 > 
 --- 
 
